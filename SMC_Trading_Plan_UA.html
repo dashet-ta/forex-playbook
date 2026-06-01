@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMC Intraweek Trading Plan — Dasha 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1c2333;
+    --border:    #30363d;
+    --border2:   #21262d;
+    --ink:       #e6edf3;
+    --ink2:      #a0aab4;  /* lifted from #8b949e — WCAG AA pass on dark bg */
+    --ink3:      #8b949e;  /* lifted from #6e7681 — used for secondary labels */
+    --wd:        #58a6ff;
+    --h4:        #3fb68b;
+    --h1:        #a78bfa;
+    --m15:       #e3b341;
+    --gold:      #c48a0a;  /* deepened from #d4a017 — separates from m15 amber */
+    --red:       #f85149;
+    --green:     #3fb68b;
+    --dim-wd:    rgba(88,166,255,0.08);
+    --dim-h4:    rgba(63,182,139,0.08);
+    --dim-h1:    rgba(167,139,250,0.08);
+    --dim-m15:   rgba(227,179,65,0.08);
+    --dim-red:   rgba(248,81,73,0.08);
+    --dim-gold:  rgba(196,138,10,0.08);
+    --mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+    --sans: -apple-system, 'Segoe UI', system-ui, sans-serif;
+    --radius: 6px;
+  }
+
+  html { font-size: 13px; scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; }
+  h2 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em;
+       text-transform: uppercase; color: var(--ink3); margin-bottom: 10px; }
+  p, li { font-size: 0.87rem; color: var(--ink2); line-height: 1.6; }
+  b, strong { color: var(--ink); font-weight: 600; }
+  small { font-size: 0.78rem; color: var(--ink3); }
+
+  /* ── HEADER ── */
+  .cover {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 20px 10px;
+    margin: 10px 0 0;
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+  .cover-title { line-height: 1.15; }
+  .cover-title span {
+    display: block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink3);
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+  }
+  .kv-list { list-style: none; }
+  .kv-list li {
+    display: flex; gap: 10px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border2);
+    font-size: 0.8rem;
+  }
+  .kv-list li:last-child { border-bottom: none; }
+  .kv-list .k { color: var(--ink3); min-width: 80px; font-size: 0.75rem; }
+  .kv-list .v { color: var(--ink); }
+  .tf-list { list-style: none; }
+  .tf-list li {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border2);
+    font-size: 0.8rem;
+  }
+  .tf-list li:last-child { border-bottom: none; }
+  .tf-list .badge { min-width: 44px; text-align: center; }
+  .tf-list .role { color: var(--ink2); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 3px;
+    letter-spacing: 0.04em; white-space: nowrap;
+  }
+  .badge-wd  { background: rgba(88,166,255,0.15);  color: var(--wd); }
+  .badge-h4  { background: rgba(63,182,139,0.15);  color: var(--h4); }
+  .badge-h1  { background: rgba(167,139,250,0.15); color: var(--h1); }
+  .badge-m15 { background: rgba(227,179,65,0.15);  color: var(--m15); }
+  .badge-gold{ background: rgba(196,138,10,0.15);  color: var(--gold); }
+  .badge-red { background: rgba(248,81,73,0.15);   color: var(--red); }
+
+  /* ── SECTION WRAPPER ── */
+  .section { margin-top: 10px; }
+  .sec-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sec-num {
+    font-family: var(--mono); font-size: 0.7rem;
+    color: var(--ink3); letter-spacing: 0.05em; min-width: 24px;
+  }
+  .sec-title { font-size: 1rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+  .subsec {
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink3); margin: 16px 0 8px;
+  }
+
+  /* ── КРОК 0 — phase box ── */
+  .phase-box {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .phase-num {
+    background: var(--gold); color: #0d1117;
+    font-family: var(--mono); font-size: 1rem; font-weight: 900;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .phase-body { background: var(--bg2); padding: 8px 14px; }
+  .phase-title { font-size: 0.9rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .phase-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;
+  }
+  .phase-opt {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 8px 10px; border-radius: var(--radius);
+    font-size: 0.82rem; color: var(--ink2);
+  }
+  .phase-opt.trend { background: rgba(88,166,255,0.07); border: 1px solid rgba(88,166,255,0.2); }
+  .phase-opt.range { background: rgba(196,138,10,0.07);  border: 1px solid rgba(196,138,10,0.2); }
+  .phase-opt .dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+  }
+  .phase-opt.trend .dot { background: var(--wd); }
+  .phase-opt.range .dot { background: var(--gold); }
+
+  /* ── TWO-COLUMN MAIN LAYOUT ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: start;
+    margin-top: 8px;
+  }
+
+  /* ── TREND COLUMN ── */
+  .col-trend {
+    background: var(--bg2);
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .col-trend-header {
+    background: rgba(88,166,255,0.1);
+    border-bottom: 1px solid rgba(88,166,255,0.25);
+    padding: 10px 16px;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--wd);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .col-trend-header .step-badge {
+    font-family: var(--mono); font-size: 0.7rem;
+    background: rgba(88,166,255,0.2); color: var(--wd);
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .col-trend-body { padding: 8px 12px 6px; }
+
+  /* ── RANGE COLUMN ── */
+  .col-range {
+    background: var(--bg2);
+    border: 1px solid rgba(196,138,10,0.25);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .col-range-header {
+    background: rgba(196,138,10,0.1);
+    border-bottom: 1px solid rgba(196,138,10,0.25);
+    padding: 10px 16px;
+    font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--gold);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .col-range-header .step-badge {
+    font-family: var(--mono); font-size: 0.7rem;
+    background: rgba(196,138,10,0.2); color: var(--gold);
+    padding: 2px 8px; border-radius: 3px;
+  }
+  .col-range-body { padding: 8px 12px 6px; }
+
+  /* ── TF BLOCK (inside columns) ── */
+  .tf-block {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 5px;
+    overflow: hidden;
+    transition: border-color 0.15s ease;
+  }
+  /* Coloured outer left border matching each TF */
+  .tf-block:has(.wd)  { border-left: 2px solid var(--wd); }
+  .tf-block:has(.h4)  { border-left: 2px solid var(--h4); }
+  .tf-block:has(.h1)  { border-left: 2px solid var(--h1); }
+  .tf-block:has(.m15) { border-left: 2px solid var(--m15); }
+  .tf-block-label {
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.65rem; font-weight: 700;
+    writing-mode: vertical-rl; text-orientation: mixed;
+    transform: rotate(180deg); letter-spacing: 0.06em; padding: 6px 0;
+  }
+  .tf-block-label.wd  { background: rgba(88,166,255,0.12);  color: var(--wd);  border-right: 2px solid var(--wd); }
+  .tf-block-label.h4  { background: rgba(63,182,139,0.12);  color: var(--h4);  border-right: 2px solid var(--h4); }
+  .tf-block-label.h1  { background: rgba(167,139,250,0.12); color: var(--h1);  border-right: 2px solid var(--h1); }
+  .tf-block-label.m15 { background: rgba(227,179,65,0.12);  color: var(--m15); border-right: 2px solid var(--m15); }
+  .tf-block-body { padding: 6px 10px; background: var(--bg3); }
+  .tf-block-role { font-size: 0.75rem; font-weight: 600; color: var(--ink); margin-bottom: 3px; }
+  .tf-block-bullets { list-style: none; }
+  .tf-block-bullets li {
+    font-size: 0.75rem; color: var(--ink2); padding: 1px 0 1px 10px; position: relative;
+  }
+  .tf-block-bullets li::before { content: '·'; position: absolute; left: 2px; color: var(--ink3); }
+
+  /* ── STEPS (range strategies) ── */
+  .step {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 7px 0; border-bottom: 1px solid var(--border2);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+  }
+  .step-body { font-size: 0.82rem; }
+  .step-title { font-weight: 600; margin-bottom: 3px; }
+  .step-desc { color: var(--ink2); font-size: 0.8rem; }
+
+  /* ── FORMULA ── */
+  .formula {
+    font-family: var(--mono); font-size: 0.78rem; color: var(--wd);
+    background: rgba(88,166,255,0.06); border-left: 2px solid var(--wd);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 8px 14px; margin: 10px 0; letter-spacing: 0.02em;
+  }
+
+  /* ── ALERTS ── */
+  .alert-red {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--dim-red); border-left: 2px solid var(--red);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 8px 14px; font-size: 0.82rem; font-weight: 600;
+    color: var(--red); margin: 10px 0;
+  }
+  .alert-gold {
+    background: var(--dim-gold); border-left: 2px solid var(--gold);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 8px 14px; font-size: 0.8rem; font-weight: 700;
+    color: var(--gold); letter-spacing: 0.06em; text-transform: uppercase;
+    margin: 12px 0 8px;
+  }
+  .note {
+    background: var(--bg3); border-left: 2px solid var(--border);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 7px 14px; font-size: 0.8rem; color: var(--ink3);
+    font-style: italic; margin: 8px 0;
+  }
+
+  /* ── BOTTOM ROW (OF logic + Checklist) ── */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+    margin-top: 20px;
+  }
+  .bottom-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .bottom-card-header {
+    background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .bottom-card-num {
+    font-family: var(--mono); font-size: 0.7rem; color: var(--ink3);
+  }
+  .bottom-card-title { font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+
+  /* ── REF CARDS (довідкові панелі під основним контентом) ── */
+  .ref-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+    margin-top: 16px;
+  }
+  .ref-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    overflow: hidden;
+    /* opacity removed — use background tint for hierarchy instead */
+  }
+  .ref-card-header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border2);
+    padding: 8px 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .ref-card-icon {
+    font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink3);
+    font-family: var(--sans);   /* was --mono; UI label → --sans */
+    background: var(--bg3); border: 1px solid var(--border);
+    padding: 2px 7px; border-radius: 3px;
+  }
+  .ref-card-title { font-size: 0.84rem; font-weight: 600; color: var(--ink2); }
+  .ref-card-body { padding: 12px 14px; }
+  .bottom-card-body { padding: 14px 16px; }
+
+  /* ── OF LOGIC TABLES ── */
+  table {
+    width: 100%; border-collapse: collapse;
+    font-size: 0.82rem; margin: 8px 0;
+  }
+  table thead tr { background: var(--bg3); }
+  table th {
+    text-align: left; padding: 7px 10px;
+    color: var(--ink3); font-size: 0.72rem;
+    font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  table td {
+    padding: 7px 10px; color: var(--ink2);
+    border-bottom: 1px solid var(--border2);
+    vertical-align: top;
+  }
+  table tbody tr:last-child td { border-bottom: none; }
+  table tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+  /* ── VAL STEPS ── */
+  .val-step {
+    border: 1px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 5px;
+  }
+  .val-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 12px; background: var(--bg3);
+    border-bottom: 1px solid var(--border);
+  }
+  .val-num {
+    font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+    background: var(--bg2); color: var(--ink3);
+    border: 1px solid var(--border); border-radius: 3px; padding: 1px 6px;
+  }
+  .val-title { font-size: 0.84rem; font-weight: 600; }
+  .val-body { padding: 8px 14px; font-size: 0.82rem; color: var(--ink2); background: var(--bg2); }
+
+  /* ── CHECKLIST ── */
+  .checklist { display: flex; flex-direction: column; gap: 5px; }
+  .chk-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 9px; border-radius: var(--radius);
+    background: var(--bg3); font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.12s ease;
+  }
+  .chk-row:hover { background: var(--bg2); }
+
+  /* Custom checkbox */
+  .chk-box {
+    appearance: none; -webkit-appearance: none;
+    width: 15px; height: 15px; flex-shrink: 0;
+    border: 1.5px solid var(--border);
+    border-radius: 3px;
+    background: var(--bg2);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .chk-box:checked {
+    background: var(--h4);
+    border-color: var(--h4);
+  }
+  .chk-box:checked::after {
+    content: '';
+    position: absolute;
+    left: 3px; top: 0px;
+    width: 5px; height: 9px;
+    border: 2px solid #0d1117;
+    border-top: none; border-left: none;
+    transform: rotate(45deg);
+  }
+
+  /* Checked row state */
+  .chk-row:has(.chk-box:checked) {
+    background: rgba(63,182,139,0.05);
+  }
+  .chk-row:has(.chk-box:checked) .chk-text {
+    color: var(--ink3);
+    text-decoration: line-through;
+    text-decoration-color: var(--ink3);
+  }
+  .chk-row:has(.chk-box:checked) .chk-tag {
+    opacity: 0.5;
+  }
+
+  .chk-tag {
+    font-family: var(--sans); font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.04em; color: var(--ink3);
+    background: var(--bg2); padding: 2px 6px;
+    border-radius: 3px; white-space: nowrap; min-width: 68px; text-align: center;
+    transition: opacity 0.12s ease;
+  }
+  .chk-text { flex: 1; color: var(--ink2); transition: color 0.12s ease; }
+  .chk-req { font-size: 0.7rem; font-weight: 700; white-space: nowrap; }
+  .chk-req.req { color: var(--h4); }
+  .chk-req.opt { color: var(--ink3); }
+
+  /* ── BOTTOM SECTIONS (Mgmt + Skip) ── */
+  .mgmt-row {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    align-items: start;
+  }
+  .mgmt-row .ref-card { flex: 1; min-width: 0; }
+  .mgmt-table tbody td:first-child { color: var(--m15); font-size: 0.78rem; }
+  .mgmt-row table th { padding: 6px 9px; font-size: 0.68rem; }
+  .mgmt-row table td { padding: 6px 9px; font-size: 0.8rem; }
+
+  /* ── SKIP RULES ── */
+  .skip-rules { display: flex; flex-direction: column; gap: 4px; }
+  .skip-row {
+    display: grid; grid-template-columns: 50px 155px 1fr;
+    border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
+  }
+  .skip-stop {
+    background: var(--dim-red); color: var(--red);
+    font-family: var(--sans); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.05em; padding: 7px 4px; text-align: center;
+    border-right: 1px solid rgba(248,81,73,0.2);
+  }
+  .skip-rule { padding: 7px 10px; font-weight: 600; color: var(--ink); background: var(--bg2); font-size: 0.8rem; }
+  .skip-desc { padding: 7px 10px; color: var(--ink2); background: var(--bg2); border-left: 1px solid var(--border2); font-size: 0.79rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 40px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem; color: var(--ink3); text-align: center;
+  }
+
+  /* ── TOOLTIP ── */
+  .tooltip-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .tooltip-trigger {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 15px; height: 15px; border-radius: 50%;
+    background: rgba(227,179,65,0.15); border: 1px solid rgba(227,179,65,0.35);
+    color: var(--m15); font-size: 0.62rem; font-weight: 700;
+    cursor: default; flex-shrink: 0; line-height: 1;
+    font-family: var(--sans);
+  }
+  .tooltip-box {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%; transform: translateX(-50%);
+    background: var(--bg3); border: 1px solid rgba(227,179,65,0.35);
+    border-radius: var(--radius);
+    padding: 5px 10px;
+    font-size: 0.64rem; font-weight: 400; font-style: italic;
+    text-transform: none; letter-spacing: 0.02em;
+    color: var(--m15); white-space: nowrap;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  }
+  .tooltip-box::after {
+    content: '';
+    position: absolute;
+    top: 100%; left: 50%; transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(227,179,65,0.35);
+  }
+  .tooltip-wrap:hover .tooltip-box { display: block; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* ── PLAN TAB SWITCHER ── */
+  .plan-tab-bar {
+    display: flex; gap: 4px;
+    padding: 8px 0 0;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-tab-btn {
+    padding: 7px 20px;
+    font-family: var(--sans); font-size: 0.75rem; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    border: 1px solid var(--border); border-bottom: none;
+    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--bg2); color: var(--ink3);
+    cursor: pointer; transition: background 0.15s, color 0.15s;
+    position: relative; bottom: -1px;
+  }
+  .plan-tab-btn:hover { background: var(--bg3); color: var(--ink); }
+  .plan-tab-btn.active {
+    background: var(--bg); color: var(--ink);
+    border-color: var(--border); border-bottom-color: var(--bg);
+  }
+  .plan-tab-btn.btc-tab.active { color: var(--gold); border-top: 2px solid var(--gold); }
+  .plan-section { display: block; }
+  .plan-section.hidden { display: none; }
+
+  /* ── BTC ANALYSIS STYLES ── */
+  .btc-cover {
+    background: linear-gradient(135deg, rgba(247,147,26,0.08) 0%, rgba(247,147,26,0.03) 100%);
+    border: 1px solid rgba(247,147,26,0.25);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 16px;
+    display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center;
+  }
+  .btc-cover-title { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.02em; color: var(--gold); }
+  .btc-cover-sub { font-size: 0.78rem; color: var(--ink2); margin-top: 4px; }
+  .btc-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: var(--radius);
+    font-family: var(--sans); font-size: 0.68rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .btc-badge-orange { background: rgba(247,147,26,0.15); border: 1px solid rgba(247,147,26,0.35); color: var(--gold); }
+  .btc-badge-red    { background: var(--dim-red); border: 1px solid rgba(248,81,73,0.3); color: var(--red); }
+  .btc-badge-green  { background: rgba(63,182,139,0.12); border: 1px solid rgba(63,182,139,0.3); color: var(--h4); }
+  .btc-badge-blue   { background: rgba(88,166,255,0.12); border: 1px solid rgba(88,166,255,0.3); color: var(--wd); }
+
+  .btc-section-title {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); margin: 18px 0 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .btc-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(227,179,65,0.2); }
+
+  .btc-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .btc-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+  .btc-card {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 12px 14px;
+  }
+  .btc-card-title {
+    font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .btc-card-title.orange { color: var(--gold); }
+  .btc-card-title.green  { color: var(--h4); }
+  .btc-card-title.red    { color: var(--red); }
+  .btc-card-title.blue   { color: var(--wd); }
+  .btc-card-title.purple { color: var(--h1); }
+
+  .mmt-row {
+    display: grid; grid-template-columns: 28px 1fr;
+    gap: 0 8px; align-items: start; margin-bottom: 6px;
+  }
+  .mmt-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem; flex-shrink: 0; margin-top: 1px;
+  }
+  .mmt-body { font-size: 0.79rem; color: var(--ink); }
+  .mmt-label { font-weight: 700; margin-bottom: 1px; }
+  .mmt-desc  { font-size: 0.72rem; color: var(--ink2); line-height: 1.45; }
+
+  .session-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 6px 0; border-bottom: 1px solid var(--border2);
+  }
+  .session-row:last-child { border-bottom: none; }
+  .session-time {
+    font-family: var(--sans); font-size: 0.71rem; font-weight: 700;
+    color: var(--gold); min-width: 50px; flex-shrink: 0; padding-top: 1px;
+  }
+  .session-body { font-size: 0.78rem; color: var(--ink); }
+  .session-name { font-weight: 700; }
+  .session-note { font-size: 0.71rem; color: var(--ink2); }
+
+  .dow-table { width: 100%; border-collapse: collapse; font-size: 0.77rem; }
+  .dow-table th { padding: 5px 8px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink3); border-bottom: 1px solid var(--border); text-align: left; }
+  .dow-table td { padding: 5px 8px; border-bottom: 1px solid var(--border2); vertical-align: top; }
+  .dow-table tr:last-child td { border-bottom: none; }
+  .dow-day { font-weight: 700; color: var(--ink); }
+  .dow-skip { color: var(--red); font-weight: 700; font-size: 0.68rem; }
+  .dow-ok   { color: var(--h4); font-weight: 700; font-size: 0.68rem; }
+  .dow-caution { color: var(--gold); font-weight: 700; font-size: 0.68rem; }
+
+  .combo-col { display: flex; flex-direction: column; gap: 8px; }
+  .combo-item {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 8px 10px;
+    display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: start;
+  }
+  .combo-num {
+    font-family: var(--sans); font-size: 0.65rem; font-weight: 700;
+    color: var(--ink3); padding-top: 2px;
+  }
+  .combo-text { font-size: 0.78rem; color: var(--ink); }
+  .combo-sub  { font-size: 0.7rem; color: var(--ink2); margin-top: 2px; }
+
+  .risk-row {
+    display: grid; grid-template-columns: 100px 1fr;
+    border-bottom: 1px solid var(--border2); padding: 6px 0;
+    font-size: 0.79rem;
+  }
+  .risk-row:last-child { border-bottom: none; }
+  .risk-label { color: var(--ink2); font-size: 0.74rem; }
+  .risk-val   { color: var(--ink); font-weight: 600; }
+
+  .journal-step {
+    display: grid; grid-template-columns: 22px 1fr;
+    gap: 6px; align-items: start; margin-bottom: 6px;
+  }
+  .journal-num {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(227,179,65,0.15); border: 1px solid rgba(227,179,65,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem; font-weight: 700; color: var(--gold); flex-shrink: 0;
+  }
+  .journal-text { font-size: 0.78rem; color: var(--ink); padding-top: 1px; }
+  .journal-sub  { font-size: 0.71rem; color: var(--ink2); }
+
+  @media print {
+    body { max-width: 100%; padding: 0 12px; background: white; color: #111; }
+    :root {
+      --bg:#fff; --bg2:#f8f9fa; --bg3:#f0f2f4;
+      --ink:#111; --ink2:#333; --ink3:#555;
+      --border:#ccc; --border2:#e0e0e0;
+      --wd:#1a5fa8; --h4:#1a7a56; --h1:#5c3fa8;
+      --m15:#8a6a00; --gold:#6b4c00; --red:#b91c1c;
+    }
+    /* Flatten badge backgrounds for print legibility */
+    .badge, .chk-tag, .ref-card-icon, .skip-stop {
+      background: #eee !important;
+      color: #333 !important;
+      border-color: #ccc !important;
+    }
+    .badge-wd  { background: #dce8f8 !important; color: #1a5fa8 !important; }
+    .badge-h4  { background: #d5ede4 !important; color: #1a7a56 !important; }
+    .badge-h1  { background: #e8ddf8 !important; color: #5c3fa8 !important; }
+    .badge-m15 { background: #f5eccc !important; color: #8a6a00 !important; }
+    .badge-red { background: #fde0df !important; color: #b91c1c !important; }
+    .skip-stop { background: #fde0df !important; color: #b91c1c !important; }
+    .two-col, .bottom-row, .ref-row, .mgmt-row, .phase-grid { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ TAB SWITCHER ══ -->
+<div class="plan-tab-bar">
+  <button class="plan-tab-btn active" onclick="switchPlanTab('main', this)">📋 Trading Plan</button>
+  <button class="plan-tab-btn btc-tab"  onclick="switchPlanTab('btc', this)">₿ BTC Analysis</button>
+</div>
+
+<!-- ══ MAIN TRADING PLAN ══ -->
+<div id="plan-main" class="plan-section">
+
+<!-- ═══════════════════════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="cover-title">
+    <span>SMC · DASHA · 2026</span>
+    <h1>Intraweek Trading Plan</h1>
+  </div>
+  <div>
+    <h2>Параметри стратегії</h2>
+    <ul class="kv-list">
+      <li><span class="k">Тип</span>       <span class="v">Intraweek — утримання 5–7 днів</span></li>
+      <li><span class="k">Ризик</span>     <span class="v">1% стандарт / 0.5% знижений</span></li>
+      <li><span class="k">Ціль RR</span>   <span class="v">Мінімум 1:3 на угоду</span></li>
+    </ul>
+  </div>
+  <div>
+    <h2>Таймфрейми</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:4px 0">
+      <span class="badge badge-wd">W-D1</span><span style="font-size:0.72rem;color:var(--ink3);margin-right:6px">контекст + A/B</span>
+      <span class="badge badge-h4">H4</span><span style="font-size:0.72rem;color:var(--ink3);margin-right:6px">підтвердження OF</span>
+      <span class="badge badge-h1">H1</span><span style="font-size:0.72rem;color:var(--ink3);margin-right:6px">вхід</span>
+      <span class="badge badge-m15">M15</span><span style="font-size:0.72rem;color:var(--ink3)">добір</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ КРОК 0 — Фаза ринку -->
+<div class="section">
+  <div class="phase-box">
+    <div class="phase-num">0</div>
+    <div class="phase-body">
+      <div class="phase-title">КРОК 0 — Визначення фази ринку</div>
+      <p style="font-size:0.82rem;color:var(--ink2);margin-bottom:8px">На кожному TF (від D1) запитай: тренд/імпульс чи боковик?</p>
+      <div class="phase-grid">
+        <div class="phase-opt trend">
+          <div class="dot"></div>
+          <div><b>ТРЕНД / ІМПУЛЬС</b> → визначаємо A→B, Order Flow → крок 1А ↓</div>
+        </div>
+        <div class="phase-opt range">
+          <div class="dot"></div>
+          <div><b>БОКОВИК</b> → торгуємо від границь → крок 1Б ↓. Не шукаємо OF.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ КРОКИ 1 + 2 — двоколонковий layout -->
+<div class="two-col">
+
+  <!-- ══ КРОК 1А — ТРЕНД / ІМПУЛЬС ══ -->
+  <div class="col-trend">
+    <div class="col-trend-header">
+      <span class="step-badge">КРОК 1А</span>
+      Тренд / Імпульс — Top-Down аналіз
+    </div>
+    <div class="col-trend-body">
+
+      <div class="tf-block">
+        <div class="tf-block-label wd">W1</div>
+        <div class="tf-block-body">
+          <div class="tf-block-role">Контекст — визначення A і B</div>
+          <ul class="tf-block-bullets">
+            <li><b style="color:var(--ink)">План розширення weekly свічки (правило 3х свічок)</b> — якщо свічка #2 закрилась тілом відносно свічки #1, то свічка #3 оновить min/max свічки #2. <span style="color:var(--red);font-weight:600">⚠ NB!</span> <span style="color:var(--ink2)">Якщо знімається велика полка ліквідності чи фрактал — правило може не спрацювати.</span></li>
+            <li><b style="color:var(--ink)">Точка A</b> — остання external ліквідність що знімалась, або POI що тестувалась.</li>
+            <li><b style="color:var(--ink)">Точка B</b> — протилежний свінг high/low або POI на W1.</li>
+          </ul>
+          <div style="margin-top:10px;padding:10px 14px;background:rgba(248,81,73,0.12);border:2px solid var(--red);border-radius:6px;display:flex;align-items:flex-start;gap:10px;">
+            <span style="font-size:1.2rem;line-height:1;flex-shrink:0;">⚠️</span>
+            <div>
+              <div style="color:var(--red);font-weight:700;font-size:0.85rem;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:4px;">Перевірка валідності плану на H4</div>
+              <div style="color:var(--ink);font-size:0.88rem;line-height:1.5;">Після пошуку точок A/B на Weekly TF — <b>перейди на H4</b> і перевір, чи план не інвалідовано.</div>
+              <div style="margin-top:6px;padding:6px 10px;background:rgba(248,81,73,0.18);border-left:3px solid var(--red);border-radius:3px;color:var(--red);font-weight:600;font-size:0.85rem;line-height:1.5;">
+                План <u>інвалідовано</u>, коли на H4 ключовий свінг (який зародив останній рух) <b>перебитий тілом</b>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tf-block">
+        <div class="tf-block-label wd">D1</div>
+        <div class="tf-block-body">
+          <div class="tf-block-role">Bias + POI + FTA</div>
+          <ul class="tf-block-bullets">
+            <li>D1 bias: [long] / [short] / [корекція]. Відмітити рівень Daily Open.</li>
+            <li>D1 POI: OB, FVG, RB, Int. Liquidity.</li>
+            <li>FTA — найближчий рівень що може зупинити рух.</li>
+            <li>Weekly Open / Monthly Open: якщо ціна вже далеко від WO/MO у напрямку угоди — потенціал руху обмежений.</li>
+            <li><b style="color:var(--ink)">Daily Open правило:</b> рух вгору → шукати мінімум нижче DO; рух вниз → максимум вище DO.</li>
+            <li><b style="color:var(--ink)">День тижня:</b> чи підходить для торгівлі? (см. розклад нижче).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tf-block">
+        <div class="tf-block-label h4">H4</div>
+        <div class="tf-block-body">
+          <div class="tf-block-role">Уточнення зон або Добір позиції</div>
+          <ul class="tf-block-bullets">
+            <li>Підтвердити точки A та B з D1.</li>
+            <li>H4 POI яка може розвернути ціну: OB / FVG.</li>
+            <li>Compression на H4 → сильний доп. фактор.</li>
+            <li>Для добору: наявність H4 shift.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tf-block">
+        <div class="tf-block-label h1">H1</div>
+        <div class="tf-block-body">
+          <div class="tf-block-role" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <span>Модель входу</span>
+            <span style="font-size:0.65rem;font-weight:400;color:var(--ink3);font-family:var(--sans)">пріоритет: <b style="color:var(--h1)">OF inv</b> &gt; <b style="color:var(--h4)">i-FVG</b> &gt; <b style="color:var(--ink3)">Shift 0.5R</b></span>
+          </div>
+          <ul class="tf-block-bullets">
+            <li>Інвалідація OF → пробиття останнього протилежного BSL/SSL sweep.</li>
+            <li>Інверсія FVG (i-FVG) → сильний розворотний сигнал. Вхід від зони <b style="color:var(--h1)">0.5</b> i-FVG.</li>
+            <li>Market Shift → підтвердження розвороту від точки A. Вхід 0.5R.</li>
+            <li style="margin-top:4px">H1 OB / FVG / i-FVG / RB → ліміт-ордер.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tf-block">
+        <div class="tf-block-label m15">M15</div>
+        <div class="tf-block-body">
+          <div class="tf-block-role">Добір позиції (H4/M15)</div>
+          <ul class="tf-block-bullets">
+            <li>H4 POI + QM M15.</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ КРОК 1Б — БОКОВИК ══ -->
+  <div class="col-range">
+    <div class="col-range-header">
+      <span class="step-badge">КРОК 1Б</span>
+      Боковик — Range / Консолідація
+    </div>
+    <div class="col-range-body">
+
+      <p style="font-size:0.8rem;color:var(--ink2);margin-bottom:8px">
+        Якщо на D1/W1 визначено Inside Bar або боковик — не шукаємо OF.
+      </p>
+
+      <div class="subsec" style="margin-top:0;margin-bottom:5px">Ознаки консолідації</div>
+      <table style="margin-bottom:10px">
+        <tbody>
+          <tr><td style="width:18px;color:var(--ink3)">1</td><td>Свічки звужують діапазон — «затухання тренду»</td></tr>
+          <tr><td style="color:var(--ink3)">2</td><td>Досягнення HTF рівнів ліквідності або POI</td></tr>
+          <tr><td style="color:var(--ink3)">3</td><td>Inside Bar на W / D. <span style="color:var(--ink3)">Валідація: D1 — <b style="color:var(--ink2)">2+ свічки</b> всередині; W1/M1 — <b style="color:var(--ink2)">1 свічка</b>.</span></td></tr>
+        </tbody>
+      </table>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
+          <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point A</span>
+          <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Девіація за Inside Low/High → зняття SSL/BSL.</p>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
+          <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point B</span>
+          <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Зона 0.5 ренджа.</p>
+        </div>
+      </div>
+
+      <div style="border-top:1px solid rgba(196,138,10,0.2);margin:8px 0 12px"></div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+
+        <!-- Стратегія 1 -->
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Стратегія 1 — Всередині</div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div>
+            <div class="step-body"><div class="step-title" style="color:var(--wd)">D1 — визначити боковик</div><div class="step-desc">Відмітити Range High, Range Low, 0.5 Range.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div>
+            <div class="step-body"><div class="step-title" style="color:var(--h4)">H4 — чекати девіацію</div><div class="step-desc">Вихід за Range Low/High → зняття SSL/BSL (Point A).</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">3</div>
+            <div class="step-body"><div class="step-title" style="color:var(--wd)">D1/H4 — FTA і зони підтримки/супротиву</div><div class="step-desc">Проставити FTA та ключові зони — вони можуть розвернути ціну до досягнення 0.5 Range.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">4</div>
+            <div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — повернення + злам</div><div class="step-desc">Market Shift або i-FVG → ТВХ.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">5</div>
+            <div class="step-body"><div class="step-title" style="color:var(--gold)">Таргети</div><div class="step-desc">1-й: <b>0.5 Range</b>. 2-й: протилежна границя.</div></div>
+          </div>
+          <div style="margin-top:6px;font-size:0.72rem;color:var(--red);font-weight:600">⚠ Від 0.5 Range нових позицій не відкриваємо.</div>
+        </div>
+
+        <!-- Стратегія 2 -->
+        <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
+          <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--wd);margin-bottom:8px">Стратегія 2 — Пробій</div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div>
+            <div class="step-body"><div class="step-title" style="color:var(--wd)">H4/D1 — ідентифікація пробою</div><div class="step-desc">Різкий імпульс → продавлює Range High або Low.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div>
+            <div class="step-body"><div class="step-title" style="color:var(--h4)">H4/H1 — підтвердження FVG пробою</div><div class="step-desc">FVG що сформувалось при пробої має витримати тест. Ціна повертається до FVG → FVG тримається (не пробивається назад у боковик) = пробій підтверджено. Якщо ціна пройшла FVG назад — пробій хибний, повертаємось до меж боковику.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">3</div>
+            <div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — тест POI після зламу</div><div class="step-desc">FVG / i-FVG / OB що сформувалось при пробої → ТВХ.</div></div>
+          </div>
+          <div class="step">
+            <div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">4</div>
+            <div class="step-body"><div class="step-title" style="color:var(--gold)">Точка B — ціль за межами</div><div class="step-desc">POI або ліквідність на W1/D1. Не ціль всередині діапазону.</div></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end .two-col -->
+
+<!-- ══════════════════════════════════════════════════ Два блоки: лівий + правий -->
+<div class="mgmt-row" style="margin-top:12px">
+
+  <!-- ПРАВИЙ: Менеджмент + Правила пропуску -->
+  <div class="ref-card" style="order:2">
+    <div class="ref-card-header">
+      <span class="ref-card-icon">Менеджмент</span>
+      <span class="ref-card-title">Менеджмент позиції</span>
+    </div>
+    <div class="ref-card-body">
+      <table class="mgmt-table">
+        <thead><tr><th style="width:110px">Дія</th><th style="width:140px">Умова</th><th>Деталі</th></tr></thead>
+        <tbody>
+          <tr><td>Stop Loss</td>         <td>При відкритті</td>                       <td>Точка інвалідації OF</td></tr>
+          <tr><td>Break Even</td>        <td>Позиція у профіті</td>                   <td>SL → рівень входу по досягненню 1RR</td></tr>
+          <tr><td>Часткове закриття</td> <td>H4 зона / FTA / перед вихідними</td>    <td>Фіксуємо частину. Перед вихідними — закрити/зменшити (ризик гепу)</td></tr>
+          <tr><td>Добір H4/M15</td>      <td>Internal liq. знята чи ребаланс FVG</td><td>H4 визначає зону → M15 підтверджує (Asia sweep, QM, shift). <b style="color:var(--gold)">H4 bias = D1 bias.</b></td></tr>
+          <tr><td>Вихід (обов'язк.)</td> <td>Зламана точка між A і B</td>            <td><b>B1/B2 не має бути зламана у зворотному напрямку.</b> Якщо зламана → OF інвалідовано, виходимо навіть якщо B не досягнуто.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="subsec" style="margin-top:10px">Prop Firm ліміти</div>
+      <table>
+        <thead><tr><th>Параметр</th><th>Ліміт</th><th>Тактика</th></tr></thead>
+        <tbody>
+          <tr><td>Макс. денна просадка</td>    <td><b style="color:var(--red)">5%</b></td>   <td>При 2.5% — пауза, аналіз</td></tr>
+          <tr><td>Макс. загальна просадка</td> <td><b style="color:var(--red)">10%</b></td>  <td>При 6% — стоп на тиждень</td></tr>
+          <tr><td>Ціль прибутку</td>           <td><b style="color:var(--h4)">8–10%</b></td> <td>1% ризику → 3–5 угод достатньо</td></tr>
+          <tr><td>Ризик на угоду</td>          <td>1% / 0.5%</td>                             <td>Знижений за контекстом</td></tr>
+        </tbody>
+      </table>
+
+      <div class="subsec" style="margin-top:10px">Правила пропуску угоди</div>
+      <div class="skip-rules">
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Немає D1 POI</div>
+          <div class="skip-desc">Найбільша причина програшів у бектесті. Без D1 POI — немає угоди.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Конфлікт H4/D1 bias</div>
+          <div class="skip-desc">H4 short, D1 long → чекаємо поки H4 підтвердить розворот.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Контртрендова угода</div>
+          <div class="skip-desc">Тільки за повного вирівнювання W1+D1+H4. Без цього — ні.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Пізній вхід</div>
+          <div class="skip-desc">POI вже пройдено → чекаємо наступну можливість.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Немає MTF валідації</div>
+          <div class="skip-desc">Не входити тільки на HTF тезі без підтвердження H1/M15.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ЛІВИЙ: Чекліст входу -->
+  <div class="ref-card" style="order:1">
+    <div class="ref-card-header">
+      <span class="ref-card-icon">Чекліст</span>
+      <span class="ref-card-title">Чекліст входу</span>
+    </div>
+    <div class="ref-card-body">
+      <p style="font-size:0.75rem;color:var(--ink2);margin-bottom:6px">Якщо хоча б один <b style="color:var(--red)">ОБОВЯЗКОВИЙ</b> не виконано — угоду пропустити.</p>
+      <div class="checklist">
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">ФАЗА</span><span class="chk-text">Визначена фаза: боковик чи тренд/імпульс?</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">A → B</span><span class="chk-text">Точки A та B (BSL/SSL та/або FVG) на HTF</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">КОНТЕКСТ</span><span class="chk-text">Напрямок OF визначено на D1–H4</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">D1 POI</span><span class="chk-text">Є D1 POI (OB / FVG / RB) у зоні реакції</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">H1 МОДЕЛЬ</span><span class="chk-text">OB / FVG / i-FVG / інвалідація OF / Market Shift</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">D1/H4 FTA</span><span class="chk-text">Немає D1/H4 FTA зони що блокує рух до B</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">КОМПРЕСІЯ</span><span class="chk-text">Compression на H1, H4 або M15</span><span class="chk-req opt">+ доп.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box"><span class="chk-tag">SL</span><span class="chk-text">SL за H1: остання маніпуляція або точка інвалідації OF</span><span class="chk-req req">✓ обов.</span></label>
+      </div>
+      <div class="alert-red" style="margin-top:8px">СТОП: немає D1 POI &nbsp;·&nbsp; немає MTF валідації</div>
+      <button onclick="document.querySelectorAll('.chk-box').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути чекліст</button>
+    </div>
+  </div>
+
+</div><!-- end .mgmt-row -->
+
+<footer>
+  SMC Intraweek Trading Plan &nbsp;·&nbsp; Dasha &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Персональний план
+</footer>
+
+</div><!-- end #plan-main -->
+
+<!-- ══════════════════════════════════════════════════════════ BTC ANALYSIS TAB ══ -->
+<div id="plan-btc" class="plan-section hidden">
+
+  <!-- BTC Cover -->
+  <div class="btc-cover">
+    <div>
+      <div class="btc-cover-title">₿ BTC Analysis — Makavelli System</div>
+      <div class="btc-cover-sub">SMC + Volume / Order Flow · Top-Down W1 → M15 · MMT Terminal</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+      <span class="btc-badge btc-badge-orange">BTC / USDT</span>
+      <span class="btc-badge btc-badge-blue">Binance Spot Priority</span>
+    </div>
+  </div>
+
+  <!-- ══ КРОК 0 — Фаза ринку (BTC) ══ -->
+  <div class="section">
+    <div class="phase-box">
+      <div class="phase-num">0</div>
+      <div class="phase-body">
+        <div class="phase-title">КРОК 0 — Фаза ринку BTC</div>
+        <p style="font-size:0.82rem;color:var(--ink2);margin-bottom:8px">На кожному TF (від W1) визначити: тренд/імпульс чи боковик? Яка загальна структура крипторинку?</p>
+        <div class="phase-grid">
+          <div class="phase-opt trend">
+            <div class="dot"></div>
+            <div><b>ТРЕНД / ІМПУЛЬС</b> → SMC логіка A→B + Order Flow підтвердження MMT → Крок 1 ↓</div>
+          </div>
+          <div class="phase-opt range">
+            <div class="dot"></div>
+            <div><b>БОКОВИК / КОНСОЛІДАЦІЯ</b> → від меж девіацій + Volume підтвердження. Без явної структури — пропустити.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ КРОК 1 — Top-Down аналіз BTC ══ -->
+  <div class="btc-section-title">Крок 1 — Top-Down аналіз (W1 → M15)</div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+
+    <!-- W1 -->
+    <div class="tf-block">
+      <div class="tf-block-label wd">W1</div>
+      <div class="tf-block-body">
+        <div class="tf-block-role">Макро-контекст + Ліквідність</div>
+        <ul class="tf-block-bullets">
+          <li>Визначити глобальний напрямок: бичачий / ведмежий / боковик.</li>
+          <li>Великі BSL / SSL (тижневі максимуми / мінімуми).</li>
+          <li>Тижневий FVG та Order Block — зони реакції.</li>
+          <li>Де знаходиться ціна відносно попереднього тижневого діапазону?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- D1 -->
+    <div class="tf-block">
+      <div class="tf-block-label wd">D1</div>
+      <div class="tf-block-body">
+        <div class="tf-block-role">Bias + Daily POI</div>
+        <ul class="tf-block-bullets">
+          <li>D1 bias: [long] / [short] / [корекція]. Відмітити рівень Daily Open.</li>
+          <li>D1 POI: OB, FVG, i-FVG, RB.</li>
+          <li>FTA — найближчий рівень що блокує рух.</li>
+          <li>Daily Open правило: рух вгору → шукати мінімум нижче DO; рух вниз → максимум вище DO.</li>
+          <li>День тижня: чи підходить для торгівлі? (см. розклад нижче).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- H4 -->
+    <div class="tf-block">
+      <div class="tf-block-label h4">H4</div>
+      <div class="tf-block-body">
+        <div class="tf-block-role">Підтвердження Order Flow</div>
+        <ul class="tf-block-bullets">
+          <li>H4 POI: OB / FVG яка може розвернути ціну.</li>
+          <li>Compression на H4 → сильний додатковий фактор для продовження OF.</li>
+          <li><b style="color:var(--ink)">Volume Profile H4:</b> натягнути VP → рівень <b style="color:var(--h4)">POC</b> = точка Part Fix (30–50%) + переведення SL у BE.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- H1 -->
+    <div class="tf-block">
+      <div class="tf-block-label h1">H1</div>
+      <div class="tf-block-body">
+        <div class="tf-block-role">Модель входу + Валідація</div>
+        <ul class="tf-block-bullets">
+          <li>Market Shift на H1 → підтвердження розвороту від точки A.</li>
+          <li>i-FVG (інверсія FVG) → найсильніший розворотний сигнал. Вхід від зони <b style="color:var(--h1)">0.5</b> i-FVG.</li>
+          <li>H1 OB / FVG / RB → ліміт-ордер для входу.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- M15 -->
+    <div class="tf-block">
+      <div class="tf-block-label m15">M15</div>
+      <div class="tf-block-body">
+        <div class="tf-block-role">Тільки добір + Точне визначення входу</div>
+        <ul class="tf-block-bullets">
+          <li>M15 — не первинний TF для входу. Використовувати тільки як добір до H1 позиції.</li>
+          <li>Asia session sweep / QM / shift → добір до H1 позиції.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ КРОК 2 — MMT Terminal Checklist ══ -->
+  <div class="btc-section-title">Крок 2 — MMT Terminal (Volume &amp; Order Flow)</div>
+
+  <div class="ref-card" style="margin-bottom:12px">
+    <div class="ref-card-header">
+      <span class="ref-card-icon">MMT</span>
+      <span class="ref-card-title">Screener Service — Workflow &amp; Чекліст</span>
+    </div>
+    <div class="ref-card-body">
+
+      <div class="btc-grid-2" style="margin-bottom:0">
+
+        <!-- LEFT: 4 tools -->
+        <div style="display:flex;flex-direction:column;gap:10px">
+
+          <div class="mmt-row">
+            <div class="mmt-icon" style="background:rgba(248,81,73,0.12)">🔥</div>
+            <div class="mmt-body">
+              <div class="mmt-label">Liquidity Heatmap</div>
+              <div class="mmt-desc">Відштовхуємось від рівнів ліквідності. Ставимо нотіфікації на рівні і в момент зняття — перевіряємо наступні умови для входу в позицію.</div>
+            </div>
+          </div>
+
+          <div class="mmt-row">
+            <div class="mmt-icon" style="background:rgba(63,182,139,0.12)">🫧</div>
+            <div class="mmt-body">
+              <div class="mmt-label">Large Trades on Spot</div>
+              <div class="mmt-desc">Великі агресивні угоди у зоні POI = підтвердження поглинання. Якщо великі угоди ростуть у напрямку угоди — сильний сигнал. Це і є зона <b>POC</b>.</div>
+            </div>
+          </div>
+
+          <div class="mmt-row">
+            <div class="mmt-icon" style="background:rgba(88,166,255,0.12)">📊</div>
+            <div class="mmt-body">
+              <div class="mmt-label">Orderbook Liquidity Depth</div>
+              <div class="mmt-desc">Coinglass: індикатор <b>Orderbook Liquidity → Depth</b>. <b>Depth негативний і великий</b> (напр. −2.5K+) = стіна продавців попереду ціни, рух вгору важкий. <b>Depth близько до нуля або позитивний</b> = шлях вільний. Перевіряй: чи немає великої ask-стіни між ціною і ціллю — це <b>FTA</b> що зупинить рух.</div>
+            </div>
+          </div>
+
+          <div class="mmt-row">
+            <div class="mmt-icon" style="background:rgba(167,139,250,0.12)">Δ</div>
+            <div class="mmt-body">
+              <div class="mmt-label">Cumulative Delta (CVD) Spot / Дисбаланс ордерів (Mobchart)</div>
+              <div class="mmt-desc">Дивергенція між ціною та CVD = попередження про розворот. Якщо CVD зростає — покупці агресивніші. Якщо падає — продавці домінують.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: checklist -->
+        <div>
+          <p style="font-size:0.75rem;color:var(--ink2);margin-bottom:8px">MMT чекліст перед входом:</p>
+          <div class="checklist">
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.12);color:var(--red)">HEATMAP</span><span class="chk-text">Кластер ордерів ≥$6M під/над зоною входу — підтверджено?</span><span class="chk-req req">✓ обов.</span></label>
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">LG TRADES</span><span class="chk-text">Large Trades (Binance Spot) підтверджують напрямок у POI?</span><span class="chk-req req">✓ обов.</span></label>
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(88,166,255,0.1);color:var(--wd)">DEPTH</span><span class="chk-text">Orderbook Liquidity Depth — немає великої ask/bid стіни між ціною і ціллю (Depth ≈ 0 або на боці угоди)?</span><span class="chk-req req">✓ обов.</span></label>
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(167,139,250,0.1);color:var(--h1)">CVD</span><span class="chk-text">Binance Spot CVD підтверджує напрямок (не дивергенція)?</span><span class="chk-req req">✓ обов.</span></label>
+
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(227,179,65,0.12);color:var(--gold)">SL LOGIC</span><span class="chk-text">SL розміщено під/над кластером лімітних ордерів ($6M+)</span><span class="chk-req req">✓ обов.</span></label>
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.12);color:var(--h4)">PART FIX</span><span class="chk-text">Перший рівень лімітного супротиву → 50% part fix + BE на точку входу</span><span class="chk-req req">✓ обов.</span></label>
+            <label class="chk-row"><input type="checkbox" class="chk-box btc-chk"><span class="chk-tag" style="background:rgba(227,179,65,0.12);color:var(--gold)">NYCE SWING</span><span class="chk-text">SL за маніпуляційним свінгом NYCE (14:30 London) де застосовно</span><span class="chk-req opt">+ доп.</span></label>
+          </div>
+
+          <button onclick="document.querySelectorAll('.btc-chk').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути BTC чекліст</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ КРОК 3 — Сесії та Таймінг ══ -->
+  <div class="btc-section-title">Крок 3 — Сесії та Таймінг</div>
+
+  <div class="btc-grid-2" style="margin-bottom:12px">
+
+    <!-- Sessions -->
+    <div class="btc-card">
+      <div class="btc-card-title orange">Розклад сесій (London час)</div>
+
+      <div class="session-row">
+        <div class="session-time">14:30 ★</div>
+        <div class="session-body">
+          <div class="session-name">NYCE / NYSE Open <span class="btc-badge btc-badge-orange" style="font-size:0.6rem;padding:2px 6px;margin-left:4px">НАЙКРИТИЧНІША</span></div>
+          <div class="session-note">Маніпуляція перед NYC open. NYSE відкривається → найбільш активна сесія. NYCE swing = рівень SL або точка входу після маніпуляції.</div>
+        </div>
+      </div>
+
+      <div class="session-row">
+        <div class="session-time">13:00</div>
+        <div class="session-body">
+          <div class="session-name">NY Premarket відкриття</div>
+          <div class="session-note">Початок NY активності. Можливі ранні переміщення до 14:30. Важливий рівень Daily Open у цей час.</div>
+        </div>
+      </div>
+
+      <div class="session-row">
+        <div class="session-time">08:00</div>
+        <div class="session-body">
+          <div class="session-name">London Open</div>
+          <div class="session-note">Перша ліквідність дня. Маніпуляція Азійського діапазону. Азійський sweep → потенційна точка A для денного руху.</div>
+        </div>
+      </div>
+
+      <div class="session-row">
+        <div class="session-time">01–07</div>
+        <div class="session-body">
+          <div class="session-name">Азійська сесія</div>
+          <div class="session-note">Консолідація. Формування діапазону для sweep London/NY. Визначити Asian High / Low.</div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;padding:8px;background:rgba(227,179,65,0.08);border:1px solid rgba(227,179,65,0.2);border-radius:var(--radius);font-size:0.72rem;color:var(--ink2)">
+        <b style="color:var(--gold)">Алгоритм дня:</b> Asia range → London sweep (маніпуляція) → NY premarket (13:00) → NYCE/NYSE open (14:30) → напрям до кінця дня.
+      </div>
+    </div>
+
+    <!-- Day of week -->
+    <div class="btc-card">
+      <div class="btc-card-title orange">День тижня — Фільтр торгівлі</div>
+      <table class="dow-table">
+        <thead><tr><th>День</th><th>Статус</th><th>Тактика</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="dow-day">Пн</td>
+            <td class="dow-caution">⚠ Маніп.</td>
+            <td style="font-size:0.73rem">Маніпулятивний день. Можливі хибні рухи. Обережно, без агресивних входів.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Вт</td>
+            <td class="dow-ok">✓ Ідеал</td>
+            <td style="font-size:0.73rem">Ідеально для формування мінімумів і максимумів тижня. Пріоритетний день для входу.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Ср</td>
+            <td class="dow-ok">✓ Ідеал</td>
+            <td style="font-size:0.73rem">Ідеально для формування мінімумів і максимумів тижня. Разом з Вт — найкращі дні.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Чт</td>
+            <td class="dow-skip">✗ Пропуск</td>
+            <td style="font-size:0.73rem">Пропускати. Нестабільна динаміка, часто хибні рухи.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Пт</td>
+            <td class="dow-caution">⚠ Короткі</td>
+            <td style="font-size:0.73rem">Тільки короткострокові цілі. Перед вихідними — зменшити розмір позиції.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Сб</td>
+            <td class="dow-skip">✗ Пропуск</td>
+            <td style="font-size:0.73rem">Пропускати. Низька ліквідність, непередбачувані рухи.</td>
+          </tr>
+          <tr>
+            <td class="dow-day">Нд</td>
+            <td class="dow-caution">⚠ З метрик.</td>
+            <td style="font-size:0.73rem">Тільки при підтвердженні метриками (MMT). Знижений ризик 2×.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ══ КРОК 4 — Чекліст входу: Long / Short ══ -->
+  <div class="btc-section-title">Крок 4 — Чекліст входу: Long та Short Combo</div>
+
+  <div class="btc-grid-2" style="margin-bottom:12px">
+
+    <!-- LONG combo -->
+    <div class="btc-card" style="border-color:rgba(63,182,139,0.3)">
+      <div class="btc-card-title green">📈 Long Combo — умови для купівлі</div>
+      <div class="checklist">
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">W1/D1</span><span class="chk-text">W1/D1 бичача структура або корекція до бичачої POI</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">SSL</span><span class="chk-text">Знято тижневий / денний SSL (точка A) — ліквідність зібрана</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H4 OB/FVG</span><span class="chk-text">Ціна у H4 бичачому OB або FVG зоні</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H1 SHIFT</span><span class="chk-text">H1 Market Shift вгору або i-FVG бичача</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">HEATMAP</span><span class="chk-text">Зелений Heatmap ≥$6M під зоною — покупці захищають рівень</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">LG TRADES↑</span><span class="chk-text">Бичачі Large Trades (зелені) у зоні — агресивна купівля</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">CVD↑</span><span class="chk-text">Binance Spot CVD зростає або дивергенція вгору</span><span class="chk-req opt">+ доп.</span></label>
+
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">14:30</span><span class="chk-text">NYCE/NYSE open — вхід після маніпулятивного sweep вниз</span><span class="chk-req opt">+ доп.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-long-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">SL</span><span class="chk-text">SL під кластером $6M лімітних ордерів / під NYCE swing</span><span class="chk-req req">✓ обов.</span></label>
+      </div>
+      <button onclick="document.querySelectorAll('.btc-long-chk').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути Long</button>
+    </div>
+
+    <!-- SHORT combo -->
+    <div class="btc-card" style="border-color:rgba(248,81,73,0.3)">
+      <div class="btc-card-title red">📉 Short Combo — умови для продажу</div>
+      <div class="checklist">
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">W1/D1</span><span class="chk-text">W1/D1 ведмежа структура або корекція до ведмежої POI</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">BSL</span><span class="chk-text">Знято тижневий / денний BSL (точка A) — ліквідність зібрана</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">H4 OB/FVG</span><span class="chk-text">Ціна у H4 ведмежому OB або FVG зоні</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">H1 SHIFT</span><span class="chk-text">H1 Market Shift вниз або i-FVG ведмежа</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">HEATMAP</span><span class="chk-text">Червоний Heatmap ≥$6M над зоною — продавці захищають рівень</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">LG TRADES↓</span><span class="chk-text">Ведмежі Large Trades (червоні) у зоні — агресивний продаж</span><span class="chk-req req">✓ обов.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(247,147,26,0.12);color:var(--gold)">CVD↓</span><span class="chk-text">Binance Spot CVD падає або дивергенція вниз</span><span class="chk-req opt">+ доп.</span></label>
+
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">14:30</span><span class="chk-text">NYCE/NYSE open — вхід після маніпулятивного sweep вгору</span><span class="chk-req opt">+ доп.</span></label>
+        <label class="chk-row"><input type="checkbox" class="chk-box btc-short-chk"><span class="chk-tag" style="background:rgba(248,81,73,0.1);color:var(--red)">SL</span><span class="chk-text">SL над кластером $6M лімітних ордерів / над NYCE swing</span><span class="chk-req req">✓ обов.</span></label>
+      </div>
+      <button onclick="document.querySelectorAll('.btc-short-chk').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути Short</button>
+    </div>
+
+  </div>
+
+  <!-- ══ КРОК 5 — Менеджмент позиції + Ризик ══ -->
+  <div class="btc-section-title">Крок 5 — Менеджмент позиції та Ризик</div>
+
+  <div class="mgmt-row">
+
+    <div class="ref-card">
+      <div class="ref-card-header">
+        <span class="ref-card-icon">Ризик</span>
+        <span class="ref-card-title">Ризик-менеджмент BTC</span>
+      </div>
+      <div class="ref-card-body">
+        <table class="mgmt-table">
+          <thead><tr><th style="width:140px">Параметр</th><th style="width:140px">Значення</th><th>Примітка</th></tr></thead>
+          <tbody>
+            <tr><td>Ризик M1–M15</td><td><b style="color:var(--gold)">0.3–0.5%</b></td><td>Для short-term інтрадей входів по BTC</td></tr>
+            <tr><td>Ризик H1–H4+</td><td><b style="color:var(--gold)">0.5–1%</b></td><td>Для позицій вищих таймфреймів</td></tr>
+            <tr><td>Ціль RR</td><td><b style="color:var(--h4)">мін. 1:3</b></td><td>Не входити з RR нижче 1:2.5</td></tr>
+            <tr><td>Break Even</td><td>При +1R</td><td>Перенести SL у BE після відходу на 1R</td></tr>
+            <tr><td>Часткове закриття</td><td>На FTA / H4 POI</td><td>Фіксувати 30–50% при наближенні до зони</td></tr>
+            <tr><td>Volume Profile POC</td><td><b style="color:var(--h4)">H4 VP</b></td><td>Натягнути VP на H4 → рівень POC = точка Part Fix (30–50%) + переведення SL у BE</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="ref-card">
+      <div class="ref-card-header">
+        <span class="ref-card-icon">SL Логіка</span>
+        <span class="ref-card-title">Stop Loss — BTC специфіка</span>
+      </div>
+      <div class="ref-card-body">
+        <div class="skip-rules">
+          <div class="skip-row">
+            <div class="skip-stop" style="background:rgba(63,182,139,0.1);color:var(--h4);border-right-color:rgba(63,182,139,0.2)">LONG</div>
+            <div class="skip-rule">Під кластером $6M+</div>
+            <div class="skip-desc">SL розміщується під великим кластером лімітних ордерів (зелений Heatmap). Ціна повернеться — але не пробиватиме захист.</div>
+          </div>
+          <div class="skip-row">
+            <div class="skip-stop">SHORT</div>
+            <div class="skip-rule">Над кластером $6M+</div>
+            <div class="skip-desc">SL розміщується над великим кластером аск-ордерів (червоний Heatmap). Продавці захищають рівень.</div>
+          </div>
+          <div class="skip-row">
+            <div class="skip-stop" style="background:rgba(227,179,65,0.1);color:var(--gold);border-right-color:rgba(227,179,65,0.2)">NICE</div>
+            <div class="skip-rule">За NYCE маніп. свінгом</div>
+            <div class="skip-desc">SL за маніпуляційним екстремумом 14:30 сесії — нижче / вище swing який сформував маніпуляцію перед NYSE.</div>
+          </div>
+          <div class="skip-row">
+            <div class="skip-stop" style="background:rgba(88,166,255,0.1);color:var(--wd);border-right-color:rgba(88,166,255,0.2)">H1</div>
+            <div class="skip-rule">За H1 структурою</div>
+            <div class="skip-desc">Стандартний SL за останньою маніпуляцією або точкою інвалідації OF на H1 (так само як forex).</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ══ Правила пропуску (BTC) ══ -->
+  <div class="btc-section-title">Правила пропуску угоди — BTC</div>
+
+  <div class="ref-card" style="margin-bottom: 20px">
+    <div class="ref-card-header">
+      <span class="ref-card-icon">Правила</span>
+      <span class="ref-card-title">Коли не торгувати BTC</span>
+    </div>
+    <div class="ref-card-body">
+      <div class="skip-rules">
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Четвер / Субота</div>
+          <div class="skip-desc">Чт і Сб — пропускаємо завжди. Нестабільна динаміка, низька надійність сигналів.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Немає MMT підтвердження</div>
+          <div class="skip-desc">Без Large Trades + Liquidity Heatmap підтвердження — угоди немає, навіть при ідеальній SMC структурі.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">CVD дивергенція проти</div>
+          <div class="skip-desc">Binance Spot CVD іде проти напрямку угоди — інституції не підтримують. Чекати.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Немає D1 POI</div>
+          <div class="skip-desc">Той самий принцип що і у forex. Без D1 Point of Interest — немає контексту для входу.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Вхід поза сесією</div>
+          <div class="skip-desc">Входити тільки в London, NY Premarket (13:00) або NYCE/NYSE (14:30). Вхід у мертву годину — пропустити.</div>
+        </div>
+        <div class="skip-row">
+          <div class="skip-stop">СТОП</div>
+          <div class="skip-rule">Понеділок без фільтра</div>
+          <div class="skip-desc">Пн — маніпулятивний. Якщо немає чіткого MMT підтвердження + SMC сигналу — пропустити.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    BTC Analysis — Makavelli System &nbsp;·&nbsp; Dasha &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; SMC + Volume / Order Flow
+  </footer>
+
+</div><!-- end #plan-btc -->
+
+<script>
+  function switchPlanTab(tab, btn) {
+    document.querySelectorAll('.plan-section').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.plan-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('plan-' + tab).classList.remove('hidden');
+    btn.classList.add('active');
+    // persist choice
+    try { localStorage.setItem('planTab', tab); } catch(e) {}
+  }
+  // restore last tab on load
+  try {
+    var saved = localStorage.getItem('planTab');
+    if (saved && saved !== 'main') {
+      var btn = document.querySelector('.plan-tab-btn.btc-tab');
+      if (btn) switchPlanTab(saved, btn);
+    }
+  } catch(e) {}
+</script>
+
+</body>
+</html>

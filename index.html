@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMC Trading Suite</title>
+<style>
+  :root {
+    --bg:      #0d0f14;
+    --bg2:     #13161e;
+    --border:  #2a2f3f;
+    --text:    #e2e8f0;
+    --text2:   #94a3b8;
+    --accent:  #3b82f6;
+    --accent2: #1d4ed8;
+    --green:   #22c55e;
+    --radius:  6px;
+    --bar:     42px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    font-size: 13px;
+    overflow: hidden;
+  }
+
+  /* ── Tab bar ── */
+  .tabbar {
+    display: flex;
+    align-items: center;
+    height: var(--bar);
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 16px;
+    gap: 4px;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .suite-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--text2);
+    text-transform: uppercase;
+    margin-right: 12px;
+    white-space: nowrap;
+  }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 0 14px;
+    height: 30px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    transition: background .15s, color .15s, border-color .15s;
+    white-space: nowrap;
+  }
+  .tab:hover { background: #1a1e2a; color: var(--text); }
+  .tab.active {
+    background: var(--accent2);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .tab-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .6;
+    flex-shrink: 0;
+  }
+  .tab.active .tab-dot { opacity: 1; background: var(--green); }
+
+  /* ── Frame area ── */
+  .frames {
+    height: calc(100vh - var(--bar));
+    position: relative;
+  }
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+  }
+  iframe.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="tabbar">
+  <span class="suite-label">SMC Suite</span>
+
+  <div class="tab active" onclick="switchTab('fxnews')" id="tab-fxnews">
+    <span class="tab-dot"></span>
+    FX News
+  </div>
+
+  <div class="tab" onclick="switchTab('backtest')" id="tab-backtest">
+    <span class="tab-dot"></span>
+    SMC Backtest
+  </div>
+
+  <div class="tab" onclick="switchTab('plan')" id="tab-plan">
+    <span class="tab-dot"></span>
+    Trading Plan
+  </div>
+</div>
+
+<div class="frames">
+  <iframe id="frame-fxnews"  class="active" src="http://localhost:8080/forex-news-dashboard.html"></iframe>
+  <iframe id="frame-backtest"        src="http://localhost:8081/index.html"></iframe>
+  <iframe id="frame-plan"            src="http://localhost:8080/SMC_Trading_Plan_UA.html"></iframe>
+</div>
+
+<script>
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    document.getElementById('frame-' + name).classList.add('active');
+    // persist last active tab across reloads
+    localStorage.setItem('smc_suite_tab', name);
+  }
+
+  // Restore last tab on load
+  const saved = localStorage.getItem('smc_suite_tab');
+  if (saved) switchTab(saved);
+</script>
+</body>
+</html>

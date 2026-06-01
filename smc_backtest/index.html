@@ -1,0 +1,2771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMC Backtest Journal</title>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --bg2: #13161e;
+    --bg3: #1a1e2a;
+    --bg4: #222636;
+    --border: #2a2f3f;
+    --border2: #353c52;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --accent: #3b82f6;
+    --accent2: #1d4ed8;
+    --green: #22c55e;
+    --green2: #166534;
+    --green3: #14532d;
+    --red: #ef4444;
+    --red2: #991b1b;
+    --red3: #7f1d1d;
+    --yellow: #eab308;
+    --purple: #a855f7;
+    --teal: #14b8a6;
+    --radius: 8px;
+    --radius2: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .topbar-logo {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topbar-logo span { color: var(--accent); }
+
+  .topbar-nav { display: flex; gap: 2px; margin-left: auto; }
+
+  .nav-btn {
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+
+  .nav-btn:hover { background: var(--bg3); color: var(--text); }
+  .nav-btn.active { background: var(--bg4); color: var(--text); }
+
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 280px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sidebar-title { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; flex: 1; }
+
+  .sidebar-list { flex: 1; overflow-y: auto; padding: 8px; }
+
+  .backtest-card {
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.15s;
+  }
+
+  .backtest-card:hover { background: var(--bg3); border-color: var(--border); }
+
+  .backtest-card.active {
+    background: var(--bg4);
+    border-color: var(--border2);
+  }
+
+  .backtest-card-name { font-weight: 600; font-size: 13px; margin-bottom: 4px; }
+
+  .backtest-card-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text3);
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .tag-pair { background: #1e3a5f; color: #93c5fd; }
+  .tag-strategy { background: #2d1b4e; color: #c4b5fd; }
+  .tag-green { background: var(--green3); color: #86efac; }
+  .tag-red { background: var(--red3); color: #fca5a5; }
+  .tag-yellow { background: #422006; color: #fde68a; }
+
+  /* ── Content ── */
+  .content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+
+  /* ── Views ── */
+  .view { display: none; flex-direction: column; flex: 1; }
+  .view.active { display: flex; }
+
+  /* ── Backtests List View ── */
+  .page-header {
+    padding: 24px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .page-title { font-size: 18px; font-weight: 700; flex: 1; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--bg4); }
+  .btn-danger { background: var(--red2); color: #fff; }
+  .btn-danger:hover { background: #7f1d1d; }
+  .btn-ghost { background: transparent; color: var(--text2); }
+  .btn-ghost:hover { background: var(--bg3); color: var(--text); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 6px; border-radius: 6px; }
+
+  /* ── Backtest Table ── */
+  .table-wrap { padding: 16px 28px; overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th {
+    text-align: left;
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  tr:hover td { background: var(--bg3); }
+
+  .clickable { cursor: pointer; }
+
+  /* ── Stats Panel ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 20px 28px;
+  }
+
+  .stat-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+  }
+
+  .stat-label { font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.4px; }
+
+  .stat-value { font-size: 20px; font-weight: 700; color: var(--text); }
+
+  .stat-value.green { color: var(--green); }
+  .stat-value.red { color: var(--red); }
+  .stat-value.yellow { color: var(--yellow); }
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.purple { color: var(--purple); }
+
+  /* ── Trades Table ── */
+  .trades-section { padding: 0 28px 28px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 0 12px;
+  }
+
+  .section-title { font-size: 14px; font-weight: 600; flex: 1; }
+
+  /* ── Setup Pills ── */
+  .setup-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .setup-pill:hover { background: var(--bg3); border-color: var(--accent); }
+
+  /* Global tooltip — rendered in body, never clipped */
+  #globalTooltip {
+    display: none;
+    position: fixed;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    min-width: 200px;
+    z-index: 9999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    pointer-events: none;
+  }
+
+  .setup-tooltip-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .setup-tooltip-row:last-child { margin-bottom: 0; }
+
+  .setup-tooltip-tf {
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 32px;
+  }
+
+  .setup-tooltip-tools { color: var(--text2); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius2);
+    width: 100%;
+    max-width: 720px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    background: var(--bg2);
+    z-index: 1;
+  }
+
+  .modal-title { font-size: 16px; font-weight: 700; flex: 1; }
+
+  .modal-body { padding: 20px 24px; }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    position: sticky;
+    bottom: 0;
+    background: var(--bg2);
+  }
+
+  /* ── Form ── */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-col-full { grid-column: 1 / -1; }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .field input, .field select, .field textarea {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+  }
+
+  .field textarea { resize: vertical; min-height: 60px; }
+
+  .field select option { background: var(--bg3); }
+
+  /* ── Dictionary field ── */
+  .dict-field {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 8px;
+  }
+
+  .dict-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 6px;
+    min-height: 28px;
+  }
+
+  .dict-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    color: var(--text3);
+    transition: all 0.12s;
+  }
+
+  .dict-tag:hover { border-color: var(--accent); color: var(--text2); }
+
+  .dict-tag.selected {
+    background: rgba(59,130,246,0.12);
+    border: 1.5px solid var(--accent);
+    color: #93c5fd;
+    font-weight: 600;
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.2);
+  }
+
+  .dict-tag-remove {
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 14px;
+    line-height: 1;
+    padding: 0 2px;
+  }
+
+  .dict-tag-remove:hover { color: var(--red); }
+
+  .dict-input-row {
+    display: flex;
+    gap: 6px;
+    position: relative;
+  }
+
+  .dict-input {
+    flex: 1;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 5px 8px;
+    font-size: 12px;
+    outline: none;
+  }
+
+  .dict-input:focus { border-color: var(--accent); }
+
+  /* ── Autocomplete dropdown — fixed so it escapes all overflow:hidden parents ── */
+  #globalAcDropdown {
+    display: none;
+    position: fixed;
+    background: var(--bg4);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    z-index: 9998;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    max-height: 220px;
+    overflow-y: auto;
+    min-width: 200px;
+  }
+  #globalAcDropdown.open { display: block; }
+  .ac-item {
+    padding: 7px 12px;
+    font-size: 12px;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.1s;
+    white-space: nowrap;
+  }
+  .ac-item:hover { background: var(--bg3); color: var(--text); }
+  .ac-item.already-selected { opacity: 0.4; pointer-events: none; }
+  .ac-empty { padding: 8px 12px; font-size: 11px; color: var(--text3); }
+
+  /* ── Setup Builder ── */
+  .setup-builder { display: flex; flex-direction: column; gap: 8px; }
+
+  .tf-row {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: visible;
+  }
+
+  .tf-row-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--radius);
+  }
+
+  .tf-row-header:hover { background: var(--bg4); border-radius: var(--radius); }
+
+  .tf-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    min-width: 36px;
+  }
+
+  .tf-enabled { display: flex; align-items: center; margin-left: auto; }
+
+  .tf-tools-wrap { padding: 0 10px 10px; display: none; }
+  .tf-tools-wrap.open { display: block; }
+
+  /* ── Screenshots ── */
+  .screenshots-area {
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .screenshots-area:hover, .screenshots-area.drag-over {
+    border-color: var(--accent);
+    background: rgba(59,130,246,0.05);
+  }
+
+  .screenshots-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+
+  .screenshots-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .screenshot-thumb {
+    position: relative;
+    width: 90px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+  }
+
+  .screenshot-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .screenshot-thumb-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(0,0,0,0.7);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    cursor: pointer;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+
+  .screenshot-thumb:hover .screenshot-thumb-remove { opacity: 1; }
+
+  /* ── Image Lightbox ── */
+  .lightbox {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox.open { display: flex; }
+
+  .lightbox img {
+    max-width: 95vw;
+    max-height: 95vh;
+    border-radius: var(--radius);
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    color: #fff;
+    font-size: 28px;
+    cursor: pointer;
+    opacity: 0.7;
+  }
+
+  .lightbox-close:hover { opacity: 1; }
+
+  /* ── Result badge ── */
+  .result-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .result-tp { background: var(--green3); color: #86efac; }
+  .result-sl { background: var(--red3); color: #fca5a5; }
+  .result-be { background: #1c1917; color: #d4c5b0; }
+  .result-skip { background: #1c1f2a; color: var(--text3); }
+
+  /* ── Direction ── */
+  .dir-long { color: var(--green); font-weight: 700; }
+  .dir-short { color: var(--red); font-weight: 700; }
+
+  /* ── RR display ── */
+  .rr-pos { color: var(--green); font-weight: 700; }
+  .rr-neg { color: var(--red); font-weight: 700; }
+
+  /* ── Statistics View ── */
+  .stats-section { padding: 0 28px 28px; }
+
+  .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .stats-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius2);
+    padding: 16px;
+  }
+
+  .stats-card-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  .bar-label { min-width: 60px; color: var(--text2); }
+  .bar-track { flex: 1; background: var(--bg4); border-radius: 3px; height: 8px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .bar-value { min-width: 40px; text-align: right; color: var(--text); font-weight: 500; }
+
+  /* ── Toggle ── */
+  .toggle-group { display: flex; gap: 4px; }
+
+  .toggle-btn {
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: var(--border); margin: 12px 0; }
+
+  /* ── Empty state ── */
+  .empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 60px 20px;
+    color: var(--text3);
+  }
+
+  .empty-icon { font-size: 36px; opacity: 0.5; }
+  .empty-text { font-size: 14px; }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+  /* ── Inline edit ── */
+  .inline-edit { display: none; }
+  .inline-edit.open { display: block; }
+
+  /* ── Checkbox ── */
+  input[type="checkbox"] { accent-color: var(--accent); }
+
+  /* ── Session colors ── */
+  .session-london { color: #fb923c; }
+  .session-ny { color: #34d399; }
+  .session-ny-pm { color: #a78bfa; }
+  .session-asia { color: #38bdf8; }
+  .session-other { color: var(--text3); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">📊 <span>SMC</span> Backtest Journal</div>
+    <div class="topbar-nav">
+      <button class="nav-btn active" onclick="showPage('backtests')">Backtests</button>
+      <button class="nav-btn" onclick="showPage('statistics')">Statistics</button>
+      <button class="nav-btn" onclick="openSettings()" id="settingsBtn" title="Settings">⚙️</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- Sidebar: Backtest list -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">Backtests</span>
+        <button class="btn btn-primary btn-sm" onclick="openCreateBacktest()">+ New</button>
+      </div>
+      <div class="sidebar-list" id="sidebarList"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+      <!-- Backtests overview page -->
+      <div class="view active" id="page-backtests">
+        <div class="page-header">
+          <div class="page-title" id="btPageTitle">Select a Backtest</div>
+          <div id="btPageActions" style="display:none; gap:8px; display:none">
+            <button class="btn btn-secondary btn-sm" onclick="openEditBacktest()">✏️ Edit</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddTrade()">+ Add Trade</button>
+          </div>
+        </div>
+
+        <!-- Stats summary -->
+        <div id="btStats" style="display:none">
+          <div class="stats-grid" id="btStatsGrid"></div>
+          <div class="divider" style="margin:0 28px"></div>
+        </div>
+
+        <!-- Trades table -->
+        <div class="trades-section">
+          <div id="btTradesWrap">
+            <div class="empty" id="btEmptyState">
+              <div class="empty-icon">📋</div>
+              <div class="empty-text">Select a backtest from the sidebar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics page -->
+      <div class="view" id="page-statistics">
+        <div class="page-header">
+          <div class="page-title">Statistics</div>
+          <div class="toggle-group" id="statsFilter">
+            <button class="toggle-btn active" onclick="setStatsFilter('all', this)">All</button>
+          </div>
+        </div>
+        <div class="stats-section" id="statsContent"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: Create / Edit Backtest
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalBacktest">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalBtTitle">New Backtest</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modalBacktest')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field form-col-full">
+          <label>Name</label>
+          <input type="text" id="btName" placeholder="e.g. EURUSD Swing H4 March 2026">
+        </div>
+        <div class="field">
+          <label>Date Range Start</label>
+          <input type="date" id="btDateStart">
+        </div>
+        <div class="field">
+          <label>Date Range End</label>
+          <input type="date" id="btDateEnd">
+        </div>
+        <div class="field">
+          <label>Pair</label>
+          <select id="btPair">
+            <option>EURUSD</option>
+            <option>GBPUSD</option>
+            <option>USDCAD</option>
+            <option>XAUUSD</option>
+            <option>BTCUSD</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Strategy</label>
+          <input type="text" id="btStrategy" placeholder="e.g. Swing v1">
+        </div>
+        <div class="field">
+          <label>Setup</label>
+          <input type="text" id="btSetup" placeholder="e.g. Qm & fvg/ob [m15]">
+        </div>
+        <div class="field form-col-full">
+          <label>Idea / Description</label>
+          <textarea id="btIdea" placeholder="Describe the trading idea…"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalBacktest')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBacktest()">Save Backtest</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: Add / Edit Trade
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalTrade">
+  <div class="modal" style="max-width: 780px;">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTradeTitle">Add Trade</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modalTrade')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+
+        <!-- Date Start / End -->
+        <div class="field">
+          <label>Date & Time (Open)</label>
+          <input type="datetime-local" id="tradeDate" onchange="autoDetectSession(this.value)">
+        </div>
+        <div class="field">
+          <label>Date & Time (Close)</label>
+          <input type="datetime-local" id="tradeDateClose">
+        </div>
+
+        <!-- Pair, Session, Direction -->
+        <div class="field">
+          <label>Pair</label>
+          <select id="tradePair">
+            <option>EURUSD</option>
+            <option>GBPUSD</option>
+            <option>USDCAD</option>
+            <option>XAUUSD</option>
+            <option>BTCUSD</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label style="display:flex;align-items:center;gap:6px">
+            Session
+            <span id="sessionAutoTag" style="display:none;font-size:10px;font-weight:600;padding:1px 6px;background:rgba(59,130,246,0.15);border:1px solid var(--accent);border-radius:3px;color:var(--accent);text-transform:none;letter-spacing:0">auto</span>
+          </label>
+          <select id="tradeSession" onchange="document.getElementById('sessionAutoTag').style.display='none'">
+            <option value="london">London</option>
+            <option value="ny">NY AM</option>
+            <option value="ny-pm">NY PM</option>
+            <option value="asia">Asia</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Direction</label>
+          <select id="tradeDirection">
+            <option value="long">Long</option>
+            <option value="short">Short</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Result</label>
+          <select id="tradeResult" onchange="onResultChange(this.value)">
+            <option value="tp">TP (Take Profit)</option>
+            <option value="sl">SL (Stop Loss)</option>
+            <option value="be">BE (Break Even)</option>
+            <option value="skip">Skipped</option>
+          </select>
+        </div>
+
+        <!-- RR -->
+        <div class="field">
+          <label>RR (e.g. 3.2 or -1)</label>
+          <input type="number" id="tradeRR" step="0.01" placeholder="3.2">
+        </div>
+        <div class="field">
+          <label>Risk %</label>
+          <input type="number" id="tradeRisk" step="0.1" value="1" placeholder="1">
+        </div>
+
+        <!-- Setup Builder (full width) -->
+        <div class="field form-col-full">
+          <label>Setup — Timeframes & POIs</label>
+          <div class="setup-builder" id="setupBuilder"></div>
+        </div>
+
+        <!-- Target -->
+        <div class="field form-col-full">
+          <div class="tf-row">
+            <div class="tf-row-header" onclick="toggleSection('targetBody')">
+              <span class="tf-label" style="color:var(--teal)">Target</span>
+              <span style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center" id="targetSummary"><span style="color:var(--text3);font-size:12px">click to add targets</span></span>
+              <span style="color:var(--text3);font-size:12px" id="targetArrow">▸</span>
+            </div>
+            <div class="tf-tools-wrap" id="targetBody">
+              <div class="setup-builder" id="targetBuilder"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mistakes -->
+        <div class="field form-col-full">
+          <div class="tf-row">
+            <div class="tf-row-header" onclick="toggleSection('mistakesBody')">
+              <span class="tf-label" style="color:var(--red)">Mistakes</span>
+              <span style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center" id="mistakesSummary"><span style="color:var(--text3);font-size:12px">none</span></span>
+              <span style="color:var(--text3);font-size:12px" id="mistakesArrow">▸</span>
+            </div>
+            <div class="tf-tools-wrap" id="mistakesBody">
+              <div class="dict-tags" id="mistakesTags" style="margin-bottom:8px"></div>
+              <div class="dict-input-row">
+                <input class="dict-input" id="mistakesInput" placeholder="Mistake… (choose or type new)"
+                  oninput="acFilter('mistakes',null,this.value,this)"
+                  onfocus="acOpen('mistakes',null,this)"
+                  onblur="acClose()"
+                  onkeydown="dictAdd('mistakes', event)">
+                <button class="btn btn-secondary btn-sm" onclick="dictAdd('mistakes')">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="field form-col-full">
+          <div class="tf-row">
+            <div class="tf-row-header" onclick="toggleSection('notesBody')">
+              <span class="tf-label" style="color:var(--yellow)">Notes</span>
+              <span style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center" id="notesSummary"><span style="color:var(--text3);font-size:12px">none</span></span>
+              <span style="color:var(--text3);font-size:12px" id="notesArrow">▸</span>
+            </div>
+            <div class="tf-tools-wrap" id="notesBody">
+              <div class="dict-tags" id="notesTags" style="margin-bottom:8px"></div>
+              <div class="dict-input-row">
+                <input class="dict-input" id="notesInput" placeholder="Note… (choose or type new)"
+                  oninput="acFilter('notes',null,this.value,this)"
+                  onfocus="acOpen('notes',null,this)"
+                  onblur="acClose()"
+                  onkeydown="dictAdd('notes', event)">
+                <button class="btn btn-secondary btn-sm" onclick="dictAdd('notes')">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screenshots -->
+        <div class="field form-col-full">
+          <label>Screenshots — drag & drop, click, or <kbd style="background:var(--bg4);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;font-size:10px">Ctrl+V</kbd></label>
+          <div class="screenshots-area" id="screenshotsArea"
+               ondragover="event.preventDefault(); this.classList.add('drag-over')"
+               ondragleave="this.classList.remove('drag-over')"
+               ondrop="handleDrop(event)">
+            <input type="file" accept="image/*" multiple onchange="handleScreenshotFiles(this.files)" id="screenshotInput">
+            <span style="font-size:24px">📸</span>
+            <span style="color:var(--text3); font-size:13px">Drop / click / <strong style="color:var(--accent)">Ctrl+V</strong> to paste from clipboard</span>
+            <span style="color:var(--text3); font-size:11px">Multiple files — TradingView chart screenshots</span>
+          </div>
+          <div class="screenshots-preview" id="screenshotsPreview"></div>
+
+          <!-- AI Analyze button -->
+          <div id="analyzeWrap" style="display:none; margin-top:10px">
+            <button class="btn btn-secondary" id="analyzeBtn" onclick="analyzeScreenshots()" style="width:100%; justify-content:center; gap:8px; border-color:var(--purple); color:var(--purple)">
+              <span id="analyzeBtnIcon">🤖</span>
+              <span id="analyzeBtnText">Analyze with Claude Haiku</span>
+            </button>
+            <div id="analyzeResult" style="display:none; margin-top:8px; padding:10px; background:var(--bg4); border:1px solid var(--border2); border-radius:var(--radius); font-size:12px; color:var(--text2)"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalTrade')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTrade()">Save Trade</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     LIGHTBOX
+════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     MODAL: Settings
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalSettings">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ Settings</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modalSettings')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field form-col-full">
+          <label>Anthropic API Key</label>
+          <div style="display:flex; gap:8px">
+            <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-…" style="flex:1">
+            <button class="btn btn-secondary btn-sm" onclick="toggleApiKeyVisibility()">👁</button>
+          </div>
+          <div style="font-size:11px; color:var(--text3); margin-top:4px">
+            Зберігається локально в браузері. Отримати: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> → API Keys
+          </div>
+        </div>
+        <div class="field form-col-full">
+          <label>Модель</label>
+          <select id="apiModelSelect">
+            <option value="claude-haiku-4-5-20251001">claude-haiku-4-5 (найдешевша, рекомендована)</option>
+            <option value="claude-sonnet-4-6">claude-sonnet-4-6 (точніша, дорожча)</option>
+          </select>
+        </div>
+        <div class="field form-col-full">
+          <div id="apiTestResult" style="display:none; padding:8px 10px; border-radius:var(--radius); font-size:12px"></div>
+          <button class="btn btn-secondary" style="width:100%; justify-content:center; margin-top:6px" onclick="testApiKey()">🔌 Перевірити підключення</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalSettings')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Global Setup Tooltip -->
+<div id="globalTooltip"></div>
+<div id="globalAcDropdown"></div>
+
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lightbox-close">✕</span>
+  <img id="lightboxImg" src="" alt="">
+</div>
+
+<script src="https://unpkg.com/dexie@3.2.7/dist/dexie.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+// DATABASE (Dexie.js / IndexedDB)
+// ═══════════════════════════════════════════════
+
+const db = new Dexie('SMCBacktestJournal');
+db.version(1).stores({
+  backtests: 'id, name, pair, dateStart',
+  trades:    'id, btId, dateOpen, pair, result',
+  settings:  'key'
+});
+
+// ═══════════════════════════════════════════════
+// STATE (in-memory, synced from DB on load)
+// ═══════════════════════════════════════════════
+
+const TF_LIST = ['W1', 'D1', 'H4', 'H1', 'M15'];
+
+let state = {
+  backtests: [],          // full bt objects (dict, meta)
+  activeBtId: null,
+  editingTradeId: null,
+  editingBtId: null,
+  tradeScreenshots: [],
+  tradeSetup: {},
+  tradeMistakes: [],
+  tradeNotes: [],
+  tradeTargets: {},   // { W1: [], D1: ['fractal','fvg'], H4: ['ext liq'], ... }
+};
+
+// ── DB helpers ──
+
+async function loadState() {
+  try {
+    // Try server first — if available, it's the source of truth
+    const loadedFromServer = await _loadFromServer();
+
+    // Load all backtests from IndexedDB
+    const bts = await db.backtests.toArray();
+    const trades = await db.trades.toArray();
+
+    // If IndexedDB is empty and server had nothing — try migrating from localStorage
+    if (bts.length === 0 && !loadedFromServer) {
+      await _migrateFromLocalStorage();
+      // Re-read after migration
+      const bts2 = await db.backtests.toArray();
+      const trades2 = await db.trades.toArray();
+      state.backtests = bts2.map(bt => ({
+        ...bt,
+        trades: trades2.filter(t => t.btId === bt.id)
+      }));
+    } else {
+      state.backtests = bts.map(bt => ({
+        ...bt,
+        trades: trades.filter(t => t.btId === bt.id)
+      }));
+    }
+
+    // Load last active bt
+    const setting = await db.settings.get('activeBtId');
+    if (setting) state.activeBtId = setting.value;
+    // fallback: pick first backtest if none active
+    if (!state.activeBtId && state.backtests.length) {
+      state.activeBtId = state.backtests[0].id;
+    }
+  } catch(e) {
+    console.warn('DB load error:', e);
+  }
+}
+
+async function saveBacktestMeta(bt) {
+  const { trades, ...meta } = bt;
+  await db.backtests.put(meta);
+  const setting = await db.settings.get('activeBtId');
+  await db.settings.put({ key: 'activeBtId', value: state.activeBtId });
+}
+
+async function saveTradeRecord(trade, btId) {
+  await db.trades.put({ ...trade, btId });
+}
+
+async function deleteTradeRecord(tradeId) {
+  await db.trades.delete(tradeId);
+}
+
+async function deleteBacktestFromDB(btId) {
+  await db.backtests.delete(btId);
+  await db.trades.where('btId').equals(btId).delete();
+}
+
+// Migrate old localStorage data — async, awaitable
+async function _migrateFromLocalStorage() {
+  try {
+    const old = localStorage.getItem('smc_backtest_v1');
+    if (!old) return;
+    const parsed = JSON.parse(old);
+    if (!parsed.backtests || !parsed.backtests.length) return;
+
+    console.log('Migrating', parsed.backtests.length, 'backtests from localStorage → IndexedDB…');
+
+    for (const bt of parsed.backtests) {
+      const { trades, ...meta } = bt;
+      await db.backtests.put(meta);
+      for (const t of (trades || [])) {
+        await db.trades.put({ ...t, btId: bt.id });
+      }
+    }
+
+    if (parsed.activeBtId) {
+      await db.settings.put({ key: 'activeBtId', value: parsed.activeBtId });
+    }
+
+    console.log('Migration complete ✅');
+    // keep localStorage as backup, don't delete it yet
+  } catch(e) {
+    console.warn('Migration error:', e);
+  }
+}
+
+// Legacy saveState — now async, calls DB + server
+async function saveState() {
+  const bt = getActiveBt();
+  if (bt) await saveBacktestMeta(bt);
+  await db.settings.put({ key: 'activeBtId', value: state.activeBtId });
+  _syncToServer().catch(() => {}); // fire-and-forget, never blocks UI
+}
+
+// ═══════════════════════════════════════════════
+// SERVER SYNC  (localhost:8081/api/data)
+// ═══════════════════════════════════════════════
+
+const SERVER = 'http://localhost:8081';
+let _serverAvailable = false;
+
+async function _checkServer() {
+  try {
+    const r = await fetch(`${SERVER}/api/health`, { signal: AbortSignal.timeout(800) });
+    _serverAvailable = r.ok;
+  } catch { _serverAvailable = false; }
+}
+
+// Load from server — returns true if data was loaded
+async function _loadFromServer() {
+  try {
+    const r = await fetch(`${SERVER}/api/data`, { signal: AbortSignal.timeout(1500) });
+    if (!r.ok) return false;
+    const data = await r.json();
+    if (!data.backtests || !data.backtests.length) return false;
+
+    // Write into IndexedDB so the rest of the app works normally
+    await db.backtests.clear();
+    await db.trades.clear();
+    for (const bt of data.backtests) {
+      const { trades, ...meta } = bt;
+      await db.backtests.put(meta);
+      for (const t of (trades || [])) {
+        await db.trades.put({ ...t, btId: bt.id });
+      }
+    }
+    if (data.activeBtId) {
+      await db.settings.put({ key: 'activeBtId', value: data.activeBtId });
+    }
+    _serverAvailable = true;
+    console.log('✅ Loaded from server:', data.backtests.length, 'backtests');
+    return true;
+  } catch (e) {
+    console.log('ℹ️ Server not available, using local IndexedDB');
+    return false;
+  }
+}
+
+// Push full state to server
+async function _syncToServer() {
+  if (!_serverAvailable) return;
+  try {
+    const payload = {
+      backtests: state.backtests,
+      activeBtId: state.activeBtId,
+      savedAt: new Date().toISOString()
+    };
+    await fetch(`${SERVER}/api/data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(2000)
+    });
+  } catch (e) {
+    console.warn('Sync to server failed (data still in IndexedDB):', e.message);
+  }
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function onResultChange(val) {
+  const rrInput = document.getElementById('tradeRR');
+  if (val === 'sl') {
+    rrInput.value = '-1';
+  } else if (val === 'be') {
+    rrInput.value = '0';
+  }
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+
+function showPage(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  event && event.target && event.target.classList.add('active');
+  if (name === 'statistics') renderStatistics();
+}
+
+// ═══════════════════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════════════════
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ═══════════════════════════════════════════════
+// BACKTEST CRUD
+// ═══════════════════════════════════════════════
+
+function openCreateBacktest() {
+  state.editingBtId = null;
+  document.getElementById('modalBtTitle').textContent = 'New Backtest';
+  ['btName','btDateStart','btDateEnd','btStrategy','btSetup','btIdea'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('btPair').value = 'EURUSD';
+  openModal('modalBacktest');
+}
+
+function openEditBacktest() {
+  const bt = getActiveBt();
+  if (!bt) return;
+  state.editingBtId = bt.id;
+  document.getElementById('modalBtTitle').textContent = 'Edit Backtest';
+  document.getElementById('btName').value = bt.name || '';
+  document.getElementById('btDateStart').value = bt.dateStart || '';
+  document.getElementById('btDateEnd').value = bt.dateEnd || '';
+  document.getElementById('btPair').value = bt.pair || 'EURUSD';
+  document.getElementById('btStrategy').value = bt.strategy || '';
+  document.getElementById('btSetup').value = bt.setup || '';
+  document.getElementById('btIdea').value = bt.idea || '';
+  openModal('modalBacktest');
+}
+
+async function saveBacktest() {
+  const name = document.getElementById('btName').value.trim();
+  if (!name) { alert('Please enter a backtest name'); return; }
+  const data = {
+    name,
+    dateStart: document.getElementById('btDateStart').value,
+    dateEnd: document.getElementById('btDateEnd').value,
+    pair: document.getElementById('btPair').value,
+    strategy: document.getElementById('btStrategy').value.trim(),
+    setup: document.getElementById('btSetup').value.trim(),
+    idea: document.getElementById('btIdea').value.trim(),
+  };
+  if (state.editingBtId) {
+    const bt = state.backtests.find(b => b.id === state.editingBtId);
+    Object.assign(bt, data);
+    await saveBacktestMeta(bt);
+  } else {
+    const bt = { id: uid(), trades: [], dict: { mistakes: [], notes: [], targets: [], tfTools: {} }, ...data };
+    TF_LIST.forEach(tf => bt.dict.tfTools[tf] = []);
+    state.backtests.push(bt);
+    state.activeBtId = bt.id;
+    await saveBacktestMeta(bt);
+  }
+  closeModal('modalBacktest');
+  renderSidebar();
+  renderActiveBacktest();
+}
+
+async function deleteBacktest(id) {
+  if (!confirm('Delete this backtest and all its trades?')) return;
+  state.backtests = state.backtests.filter(b => b.id !== id);
+  if (state.activeBtId === id) state.activeBtId = state.backtests[0]?.id || null;
+  await deleteBacktestFromDB(id);
+  await db.settings.put({ key: 'activeBtId', value: state.activeBtId });
+  _syncToServer().catch(() => {});
+  renderSidebar();
+  renderActiveBacktest();
+}
+
+function getActiveBt() { return state.backtests.find(b => b.id === state.activeBtId) || null; }
+
+function selectBacktest(id) {
+  state.activeBtId = id;
+  renderSidebar();
+  renderActiveBacktest();
+}
+
+// ═══════════════════════════════════════════════
+// TRADE CRUD
+// ═══════════════════════════════════════════════
+
+function _collapseAllTradeSections() {
+  ['targetBody','mistakesBody','notesBody'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('open');
+    const arrowId = id.replace('Body','Arrow');
+    const arrow = document.getElementById(arrowId);
+    if (arrow) arrow.textContent = '▸';
+  });
+}
+
+function openAddTrade() {
+  const bt = getActiveBt();
+  if (!bt) return;
+  state.editingTradeId = null;
+  state.tradeScreenshots = [];
+  state.tradeSetup = {};
+  state.tradeMistakes = [];
+  state.tradeNotes = [];
+  state.tradeTargets = {};
+  _collapseAllTradeSections();
+  document.getElementById('modalTradeTitle').textContent = 'Add Trade';
+  // Reset fields
+  const now = new Date();
+  const fmt = d => d.toISOString().slice(0,16);
+  document.getElementById('tradeDate').value = fmt(now);
+  document.getElementById('tradeDateClose').value = '';
+  document.getElementById('tradePair').value = bt.pair || 'EURUSD';
+  document.getElementById('tradeSession').value = 'ny';
+  document.getElementById('tradeDirection').value = 'long';
+  document.getElementById('tradeResult').value = 'tp';
+  document.getElementById('tradeRR').value = '';
+  document.getElementById('tradeRisk').value = '1';
+  buildSetupUI(bt);
+  renderDictTags('mistakes');
+  renderDictTags('notes');
+  renderTargetUI(bt);
+  renderScreenshotsPreview();
+  openModal('modalTrade');
+}
+
+function openEditTrade(tradeId) {
+  const bt = getActiveBt();
+  if (!bt) return;
+  const trade = bt.trades.find(t => t.id === tradeId);
+  if (!trade) return;
+  _collapseAllTradeSections();
+  state.editingTradeId = tradeId;
+  state.tradeScreenshots = [...(trade.screenshots || [])];
+  state.tradeSetup = JSON.parse(JSON.stringify(trade.setup || {}));
+  state.tradeMistakes = [...(trade.mistakes || [])];
+  state.tradeNotes = [...(trade.notes || [])];
+  // support both old flat array and new structured object
+  const rawTargets = trade.targets || {};
+  state.tradeTargets = Array.isArray(rawTargets) ? {} : JSON.parse(JSON.stringify(rawTargets));
+  document.getElementById('modalTradeTitle').textContent = 'Edit Trade';
+  document.getElementById('tradeDate').value = trade.dateOpen || '';
+  document.getElementById('tradeDateClose').value = trade.dateClose || '';
+  document.getElementById('tradePair').value = trade.pair || bt.pair || 'EURUSD';
+  document.getElementById('tradeSession').value = trade.session || 'ny';
+  document.getElementById('tradeDirection').value = trade.direction || 'long';
+  const tradeResult = trade.result || 'tp';
+  document.getElementById('tradeResult').value = tradeResult;
+  // auto-fill RR: use saved value, or -1 for SL, 0 for BE if not set
+  const savedRR = trade.rr !== undefined && trade.rr !== null && trade.rr !== '' ? trade.rr : null;
+  if (savedRR !== null) {
+    document.getElementById('tradeRR').value = savedRR;
+  } else {
+    onResultChange(tradeResult);
+  }
+  document.getElementById('tradeRisk').value = trade.risk || '1';
+  buildSetupUI(bt, trade.setup);
+  renderDictTags('mistakes');
+  renderDictTags('notes');
+  renderTargetUI(bt);
+  renderScreenshotsPreview();
+  openModal('modalTrade');
+}
+
+async function saveTrade() {
+  const bt = getActiveBt();
+  if (!bt) return;
+  const rr = parseFloat(document.getElementById('tradeRR').value);
+  const trade = {
+    dateOpen: document.getElementById('tradeDate').value,
+    dateClose: document.getElementById('tradeDateClose').value,
+    pair: document.getElementById('tradePair').value,
+    session: document.getElementById('tradeSession').value,
+    direction: document.getElementById('tradeDirection').value,
+    result: document.getElementById('tradeResult').value,
+    rr: isNaN(rr) ? null : rr,
+    risk: parseFloat(document.getElementById('tradeRisk').value) || 1,
+    setup: JSON.parse(JSON.stringify(state.tradeSetup)),
+    mistakes: [...state.tradeMistakes],
+    notes: [...state.tradeNotes],
+    targets: JSON.parse(JSON.stringify(state.tradeTargets)),
+    screenshots: [...state.tradeScreenshots],
+  };
+  // Update tf tool dicts (no duplicates)
+  TF_LIST.forEach(tf => {
+    const tools = state.tradeSetup[tf] || [];
+    if (!bt.dict.tfTools[tf]) bt.dict.tfTools[tf] = [];
+    tools.forEach(tool => { if (!bt.dict.tfTools[tf].includes(tool)) bt.dict.tfTools[tf].push(tool); });
+  });
+  if (!bt.dict.mistakes)    bt.dict.mistakes = [];
+  if (!bt.dict.notes)       bt.dict.notes = [];
+  if (!bt.dict.targetTools) bt.dict.targetTools = {};
+  state.tradeMistakes.forEach(m => { if (!bt.dict.mistakes.includes(m)) bt.dict.mistakes.push(m); });
+  state.tradeNotes.forEach(n =>    { if (!bt.dict.notes.includes(n))    bt.dict.notes.push(n); });
+  // Save target tools dict per TF
+  TF_LIST.forEach(tf => {
+    const tools = state.tradeTargets[tf] || [];
+    if (!bt.dict.targetTools[tf]) bt.dict.targetTools[tf] = [];
+    tools.forEach(t => { if (!bt.dict.targetTools[tf].includes(t)) bt.dict.targetTools[tf].push(t); });
+  });
+
+  let tradeId;
+  if (state.editingTradeId) {
+    tradeId = state.editingTradeId;
+    const idx = bt.trades.findIndex(t => t.id === tradeId);
+    bt.trades[idx] = { id: tradeId, ...trade };
+  } else {
+    tradeId = uid();
+    bt.trades.push({ id: tradeId, ...trade });
+  }
+  // Persist to IndexedDB
+  await saveTradeRecord({ id: tradeId, ...trade }, bt.id);
+  await saveBacktestMeta(bt); // save updated dict
+  closeModal('modalTrade');
+  renderActiveBacktest();
+}
+
+async function deleteTrade(tradeId) {
+  const bt = getActiveBt();
+  if (!bt) return;
+  if (!confirm('Delete this trade?')) return;
+  bt.trades = bt.trades.filter(t => t.id !== tradeId);
+  await deleteTradeRecord(tradeId);
+  renderActiveBacktest();
+}
+
+// ═══════════════════════════════════════════════
+// SETUP BUILDER UI
+// ═══════════════════════════════════════════════
+
+function buildSetupUI(bt, existingSetup) {
+  const wrap = document.getElementById('setupBuilder');
+  wrap.innerHTML = '';
+  TF_LIST.forEach(tf => {
+    const tools = (existingSetup && existingSetup[tf]) ? existingSetup[tf] : [];
+    if (!state.tradeSetup[tf]) state.tradeSetup[tf] = tools;
+
+    const currentTags = (state.tradeSetup[tf] || []).map(t =>
+      `<span class="dict-tag selected" onclick="removeTfTool('${tf}','${esc(t)}')">${esc(t)} <span class="dict-tag-remove">×</span></span>`
+    ).join('');
+
+    const row = document.createElement('div');
+    row.className = 'tf-row';
+    row.id = 'tfrow_' + tf;
+    row.innerHTML = `
+      <div class="tf-row-header" onclick="toggleTfRow('${tf}')">
+        <span class="tf-label">${tf}</span>
+        <span style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center" id="tfrowSummary_${tf}">${tools.length ? tools.map(t => `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:rgba(59,130,246,0.12);border:1.5px solid var(--accent);border-radius:4px;font-size:11px;font-weight:600;color:#93c5fd">${esc(t)}</span>`).join('') : '<span style="color:var(--text3);font-size:12px">click to add POIs</span>'}</span>
+        <span style="color:var(--text3); font-size:12px">▸</span>
+      </div>
+      <div class="tf-tools-wrap" id="tftools_${tf}">
+        <div class="dict-tags" id="tfSelTags_${tf}" style="margin-bottom:8px">${currentTags}</div>
+        <div class="dict-input-row">
+          <input class="dict-input" id="tfInput_${tf}" placeholder="POI name… (choose or type new)"
+            oninput="acFilter('setup','${tf}',this.value,this)"
+            onfocus="acOpen('setup','${tf}',this)"
+            onblur="acClose()"
+            onkeydown="tfToolAdd('${tf}', event)">
+          <button class="btn btn-secondary btn-sm" onclick="tfToolAdd('${tf}')">+</button>
+        </div>
+      </div>
+    `;
+    wrap.appendChild(row);
+  });
+}
+
+function toggleTfRow(tfOrRowId, bodyId) {
+  // Called as toggleTfRow('H4') for Setup rows, or toggleTfRow('tgtrow_H4','tgttools_H4') for Target rows
+  if (bodyId) {
+    // Target row variant
+    const body = document.getElementById(bodyId);
+    if (!body) return;
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open');
+    const arrowTf = bodyId.replace('tgttools_','');
+    const arrow = document.getElementById('tgtArrow_' + arrowTf);
+    if (arrow) arrow.textContent = isOpen ? '▸' : '▾';
+  } else {
+    // Setup row variant
+    const wrap = document.getElementById('tftools_' + tfOrRowId);
+    if (!wrap) return;
+    wrap.classList.toggle('open');
+  }
+}
+
+// ── Duplicate flash helper ──
+function _flashDuplicate(input) {
+  input.style.borderColor = 'var(--red)';
+  input.style.outline = '0';
+  input.placeholder = '⚠ Already exists!';
+  setTimeout(() => {
+    input.style.borderColor = '';
+    input.placeholder = input.dataset.placeholder || '';
+  }, 1200);
+}
+
+// ═══════════════════════════════════════════════
+// AUTOCOMPLETE — shared for Setup / Target / Mistakes / Notes
+// type: 'setup' | 'target' | 'mistakes' | 'notes'
+// tf:   timeframe string for setup/target, null for mistakes/notes
+// ═══════════════════════════════════════════════
+
+
+// ═══════════════════════════════════════════════
+// AUTOCOMPLETE — single global fixed dropdown
+// ═══════════════════════════════════════════════
+
+// Active AC state
+let _acState = { type: null, tf: null, inputEl: null };
+
+function _acGetDict(type, tf) {
+  // Collect values from ALL backtests (global dictionary), not just the active one.
+  // This way values entered in any backtest are available as suggestions in all others.
+  const allValues = new Set();
+  for (const bt of state.backtests) {
+    if (!bt.dict) continue;
+    if (type === 'setup') {
+      (bt.dict.tfTools?.[tf] || []).forEach(v => allValues.add(v));
+    } else if (type === 'target') {
+      (bt.dict.targetTools?.[tf] || []).forEach(v => allValues.add(v));
+    } else if (type === 'mistakes') {
+      (bt.dict.mistakes || []).forEach(v => allValues.add(v));
+    } else if (type === 'notes') {
+      (bt.dict.notes || []).forEach(v => allValues.add(v));
+    }
+  }
+  return [...allValues].sort((a, b) => a.localeCompare(b));
+}
+
+function _acGetSelected(type, tf) {
+  if (type === 'setup')    return state.tradeSetup[tf] || [];
+  if (type === 'target')   return state.tradeTargets[tf] || [];
+  if (type === 'mistakes') return state.tradeMistakes;
+  if (type === 'notes')    return state.tradeNotes;
+  return [];
+}
+
+function _acPosition(inputEl) {
+  const drop = document.getElementById('globalAcDropdown');
+  const rect = inputEl.getBoundingClientRect();
+  drop.style.left = rect.left + 'px';
+  drop.style.width = rect.width + 'px';
+  // show below or above depending on space
+  const spaceBelow = window.innerHeight - rect.bottom;
+  if (spaceBelow >= 180 || spaceBelow > window.innerHeight - rect.top) {
+    drop.style.top = (rect.bottom + 4) + 'px';
+    drop.style.bottom = 'auto';
+  } else {
+    drop.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+    drop.style.top = 'auto';
+  }
+}
+
+function _acRender(query) {
+  const drop = document.getElementById('globalAcDropdown');
+  if (!drop) return;
+  const { type, tf } = _acState;
+  const dict = _acGetDict(type, tf);
+  const selected = _acGetSelected(type, tf);
+  const q = (query || '').toLowerCase().trim();
+  const filtered = q ? dict.filter(t => t.toLowerCase().includes(q)) : dict;
+
+  let html = '';
+  if (filtered.length) {
+    html = filtered.map(t => {
+      const isSel = selected.includes(t);
+      const safeVal = t.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return `<div class="ac-item${isSel ? ' already-selected' : ''}" onmousedown="acPick('${safeVal}')">${isSel ? '<span style="color:var(--green);margin-right:4px">✓</span>' : ''}${esc(t)}</div>`;
+    }).join('');
+  } else if (!q) {
+    html = `<div class="ac-empty">No saved items yet — type to add new</div>`;
+  }
+
+  // append "add new" option if query is typed and not exact match
+  if (q && !dict.find(t => t.toLowerCase() === q)) {
+    const safeQ = q.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    const border = filtered.length ? 'border-top:1px solid var(--border);margin-top:4px;padding-top:4px' : '';
+    html += `<div class="ac-item" style="${border}" onmousedown="acPick('${safeQ}')">＋ Add "<strong>${esc(q)}</strong>"</div>`;
+  }
+
+  drop.innerHTML = html || `<div class="ac-empty">No saved items yet — type to add new</div>`;
+}
+
+let _acRafId = null;
+
+function _acTrackPosition() {
+  if (!_acState.inputEl) return;
+  const drop = document.getElementById('globalAcDropdown');
+  if (!drop || !drop.classList.contains('open')) return;
+  _acPosition(_acState.inputEl);
+  _acRafId = requestAnimationFrame(_acTrackPosition);
+}
+
+function acOpen(type, tf, inputEl) {
+  _acState = { type, tf, inputEl };
+  const drop = document.getElementById('globalAcDropdown');
+  _acRender(inputEl ? inputEl.value : '');
+  _acPosition(inputEl);
+  drop.classList.add('open');
+  // start tracking position on every frame so scroll doesn't misalign dropdown
+  if (_acRafId) cancelAnimationFrame(_acRafId);
+  _acRafId = requestAnimationFrame(_acTrackPosition);
+}
+
+function acClose() {
+  setTimeout(() => {
+    const drop = document.getElementById('globalAcDropdown');
+    if (drop) drop.classList.remove('open');
+    _acState = { type: null, tf: null, inputEl: null };
+    if (_acRafId) { cancelAnimationFrame(_acRafId); _acRafId = null; }
+  }, 180);
+}
+
+function acFilter(type, tf, query, inputEl) {
+  if (_acState.type !== type || _acState.tf !== tf) {
+    _acState = { type, tf, inputEl };
+  }
+  const drop = document.getElementById('globalAcDropdown');
+  if (!drop.classList.contains('open')) {
+    _acPosition(inputEl);
+    drop.classList.add('open');
+    if (_acRafId) cancelAnimationFrame(_acRafId);
+    _acRafId = requestAnimationFrame(_acTrackPosition);
+  }
+  _acRender(query);
+}
+
+function acPick(val) {
+  if (!val) return;
+  const { type, tf, inputEl } = _acState;
+  if (!type) return;
+  if (type === 'setup')    _setupAddVal(tf, val);
+  if (type === 'target')   _targetAddVal(tf, val);
+  if (type === 'mistakes') _dictAddVal('mistakes', val);
+  if (type === 'notes')    _dictAddVal('notes', val);
+  if (inputEl) inputEl.value = '';
+  document.getElementById('globalAcDropdown').classList.remove('open');
+  _acState = { type: null, tf: null, inputEl: null };
+  if (_acRafId) { cancelAnimationFrame(_acRafId); _acRafId = null; }
+}
+
+// Close dropdown if clicking outside
+document.addEventListener('mousedown', e => {
+  const drop = document.getElementById('globalAcDropdown');
+  if (drop && !drop.contains(e.target) && _acState.inputEl && !_acState.inputEl.contains(e.target)) {
+    drop.classList.remove('open');
+    if (_acRafId) { cancelAnimationFrame(_acRafId); _acRafId = null; }
+  }
+});
+
+// ═══════════════════════════════════════════════
+// SETUP ADD/REMOVE
+// ═══════════════════════════════════════════════
+
+function _setupAddVal(tf, val) {
+  const bt = getActiveBt();
+  if (!state.tradeSetup[tf]) state.tradeSetup[tf] = [];
+  if (state.tradeSetup[tf].includes(val)) return;
+  state.tradeSetup[tf].push(val);
+  if (bt) {
+    if (!bt.dict.tfTools[tf]) bt.dict.tfTools[tf] = [];
+    if (!bt.dict.tfTools[tf].includes(val)) bt.dict.tfTools[tf].push(val);
+  }
+  renderTfSelTags(tf);
+}
+
+function removeTfTool(tf, tool) {
+  if (!state.tradeSetup[tf]) return;
+  state.tradeSetup[tf] = state.tradeSetup[tf].filter(t => t !== tool);
+  renderTfSelTags(tf);
+}
+
+function renderTfSelTags(tf) {
+  const wrap = document.getElementById('tfSelTags_' + tf);
+  if (!wrap) return;
+  const tools = state.tradeSetup[tf] || [];
+  wrap.innerHTML = tools.map(t =>
+    `<span class="dict-tag selected" onclick="removeTfTool('${tf}','${t.replace(/'/g,"\\'")}')"> ${esc(t)} <span class="dict-tag-remove">×</span></span>`
+  ).join('') || '';
+  const summary = document.getElementById('tfrowSummary_' + tf);
+  if (summary) summary.innerHTML = tools.length
+    ? tools.map(t => `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:rgba(59,130,246,0.12);border:1.5px solid var(--accent);border-radius:4px;font-size:11px;font-weight:600;color:#93c5fd">${esc(t)}</span>`).join('')
+    : '<span style="color:var(--text3);font-size:12px">click to add POIs</span>';
+}
+
+function tfToolAdd(tf, event) {
+  if (event && event.type === 'keydown' && event.key !== 'Enter') return;
+  const input = document.getElementById('tfInput_' + tf);
+  const val = input.value.trim();
+  if (!val) return;
+  if ((state.tradeSetup[tf] || []).includes(val)) { _flashDuplicate(input); return; }
+  _setupAddVal(tf, val);
+  input.value = '';
+}
+
+// ═══════════════════════════════════════════════
+// DICT FIELDS (Mistakes / Notes)
+// ═══════════════════════════════════════════════
+
+function _dictAddVal(type, val) {
+  const bt = getActiveBt();
+  const arr = type === 'mistakes' ? state.tradeMistakes : state.tradeNotes;
+  if (arr.includes(val)) return;
+  arr.push(val);
+  // save to backtest dict
+  if (bt) {
+    if (!bt.dict[type]) bt.dict[type] = [];
+    if (!bt.dict[type].includes(val)) bt.dict[type].push(val);
+  }
+  renderDictTags(type);
+}
+
+function dictAdd(type, event) {
+  if (event && event.type === 'keydown' && event.key !== 'Enter') return;
+  const input = document.getElementById(type + 'Input');
+  const val = input.value.trim();
+  if (!val) return;
+  const arr = type === 'mistakes' ? state.tradeMistakes : state.tradeNotes;
+  if (arr.includes(val)) { _flashDuplicate(input); return; }
+  _dictAddVal(type, val);
+  input.value = '';
+}
+
+function removeDictTag(type, val) {
+  if (type === 'mistakes') state.tradeMistakes = state.tradeMistakes.filter(v => v !== val);
+  else state.tradeNotes = state.tradeNotes.filter(v => v !== val);
+  renderDictTags(type);
+}
+
+function toggleSection(bodyId) {
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open');
+  // update arrow — arrow id = bodyId with 'Body' replaced by 'Arrow', or derived
+  const arrowId = bodyId.replace('Body', 'Arrow');
+  const arrow = document.getElementById(arrowId);
+  if (arrow) arrow.textContent = isOpen ? '▸' : '▾';
+}
+
+function renderDictTags(type) {
+  const arr = type === 'mistakes' ? state.tradeMistakes : state.tradeNotes;
+  const wrap = document.getElementById(type + 'Tags');
+  if (wrap) wrap.innerHTML = arr.map(v =>
+    `<span class="dict-tag selected">${esc(v)} <span class="dict-tag-remove" onclick="removeDictTag('${type}','${v.replace(/'/g,"\\'")}')">×</span></span>`
+  ).join('');
+  // update summary in collapsed header
+  const summary = document.getElementById(type + 'Summary');
+  if (summary) summary.innerHTML = arr.length
+    ? arr.map(v => `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:rgba(239,68,68,0.1);border:1.5px solid var(--red);border-radius:4px;font-size:11px;font-weight:600;color:#fca5a5">${esc(v)}</span>`).join('')
+    : '<span style="color:var(--text3);font-size:12px">none</span>';
+}
+
+// ═══════════════════════════════════════════════
+// TARGET FIELD — structured by TF (same as Setup)
+// ═══════════════════════════════════════════════
+
+function renderTargetUI(bt) {
+  if (!bt.dict.targetTools) bt.dict.targetTools = {};
+  TF_LIST.forEach(tf => { if (!bt.dict.targetTools[tf]) bt.dict.targetTools[tf] = []; });
+  buildTargetUI(bt, state.tradeTargets);
+}
+
+function buildTargetUI(bt, existingTargets) {
+  const wrap = document.getElementById('targetBuilder');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+
+  TF_LIST.forEach(tf => {
+    if (!state.tradeTargets[tf]) state.tradeTargets[tf] = (existingTargets && existingTargets[tf]) ? [...existingTargets[tf]] : [];
+
+    const selTools = state.tradeTargets[tf] || [];
+    const selTags = selTools.map(t =>
+      `<span class="dict-tag selected" style="background:rgba(20,184,166,0.1);border-color:var(--teal);color:#5eead4">${esc(t)} <span class="dict-tag-remove" onclick="removeTargetTool('${tf}','${t.replace(/'/g,"\\'")}')">×</span></span>`
+    ).join('');
+
+    const row = document.createElement('div');
+    row.className = 'tf-row';
+    row.innerHTML = `
+      <div class="tf-row-header" onclick="toggleTfRow('tgtrow_${tf}', 'tgttools_${tf}')">
+        <span class="tf-label" style="color:var(--teal)">${tf}</span>
+        <span style="flex:1; display:flex; flex-wrap:wrap; gap:4px; align-items:center" id="tgtSummary_${tf}">
+          ${selTools.length
+            ? selTools.map(t => `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:rgba(20,184,166,0.1);border:1.5px solid var(--teal);border-radius:4px;font-size:11px;font-weight:600;color:#5eead4">${esc(t)}</span>`).join('')
+            : '<span style="color:var(--text3);font-size:12px">click to add</span>'}
+        </span>
+        <span style="color:var(--text3);font-size:12px" id="tgtArrow_${tf}">▸</span>
+      </div>
+      <div class="tf-tools-wrap" id="tgttools_${tf}">
+        <div class="dict-tags" id="tgtSelTags_${tf}" style="margin-bottom:8px">${selTags}</div>
+        <div class="dict-input-row">
+          <input class="dict-input" id="tgtInput_${tf}" placeholder="Target name… (choose or type new)"
+            oninput="acFilter('target','${tf}',this.value,this)"
+            onfocus="acOpen('target','${tf}',this)"
+            onblur="acClose()"
+            onkeydown="targetToolAdd('${tf}', event)">
+          <button class="btn btn-secondary btn-sm" onclick="targetToolAdd('${tf}')">+</button>
+        </div>
+      </div>`;
+    wrap.appendChild(row);
+  });
+
+  _updateTargetSummary();
+}
+
+
+// ═══════════════════════════════════════════════
+// TARGET ADD/REMOVE
+// ═══════════════════════════════════════════════
+
+function _targetAddVal(tf, val) {
+  const bt = getActiveBt();
+  if (!state.tradeTargets[tf]) state.tradeTargets[tf] = [];
+  if (state.tradeTargets[tf].includes(val)) return;
+  state.tradeTargets[tf].push(val);
+  if (bt) {
+    if (!bt.dict.targetTools) bt.dict.targetTools = {};
+    if (!bt.dict.targetTools[tf]) bt.dict.targetTools[tf] = [];
+    if (!bt.dict.targetTools[tf].includes(val)) bt.dict.targetTools[tf].push(val);
+  }
+  _renderTgtSelTags(tf);
+  _updateTargetSummary();
+}
+
+function removeTargetTool(tf, tool) {
+  if (!state.tradeTargets[tf]) return;
+  state.tradeTargets[tf] = state.tradeTargets[tf].filter(t => t !== tool);
+  _renderTgtSelTags(tf);
+  _updateTargetSummary();
+}
+
+function targetToolAdd(tf, event) {
+  if (event && event.type === 'keydown' && event.key !== 'Enter') return;
+  const input = document.getElementById('tgtInput_' + tf);
+  const val = input.value.trim();
+  if (!val) return;
+  if ((state.tradeTargets[tf] || []).includes(val)) { _flashDuplicate(input); return; }
+  _targetAddVal(tf, val);
+  input.value = '';
+}
+
+function _renderTgtSelTags(tf) {
+  const wrap = document.getElementById('tgtSelTags_' + tf);
+  if (!wrap) return;
+  const tools = state.tradeTargets[tf] || [];
+  wrap.innerHTML = tools.map(t =>
+    `<span class="dict-tag selected" style="background:rgba(20,184,166,0.1);border-color:var(--teal);color:#5eead4">${esc(t)} <span class="dict-tag-remove" onclick="removeTargetTool('${tf}','${t.replace(/'/g,"\\'")}')">×</span></span>`
+  ).join('');
+  const sum = document.getElementById('tgtSummary_' + tf);
+  if (sum) sum.innerHTML = tools.length
+    ? tools.map(t => `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:rgba(20,184,166,0.1);border:1.5px solid var(--teal);border-radius:4px;font-size:11px;font-weight:600;color:#5eead4">${esc(t)}</span>`).join('')
+    : '<span style="color:var(--text3);font-size:12px">click to add</span>';
+}
+
+function _updateTargetSummary() {
+  // Update the collapsed header summary (teal tags per TF)
+  const summary = document.getElementById('targetSummary');
+  if (!summary) return;
+  const allTags = [];
+  TF_LIST.forEach(tf => {
+    (state.tradeTargets[tf] || []).forEach(t => {
+      allTags.push(`<span style="display:inline-flex;align-items:center;gap:3px;padding:1px 7px;background:rgba(20,184,166,0.1);border:1.5px solid var(--teal);border-radius:4px;font-size:11px;font-weight:600;color:#5eead4"><span style="opacity:0.6;font-size:10px">${tf}</span>${esc(t)}</span>`);
+    });
+  });
+  summary.innerHTML = allTags.length
+    ? allTags.join('')
+    : '<span style="color:var(--text3);font-size:12px">click to add targets</span>';
+}
+
+// ═══════════════════════════════════════════════
+// SCREENSHOTS
+// ═══════════════════════════════════════════════
+
+function handleScreenshotFiles(files) {
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      state.tradeScreenshots.push(e.target.result);
+      renderScreenshotsPreview();
+      updateAnalyzeBtn();
+    };
+    reader.readAsDataURL(file);
+  });
+  const inp = document.getElementById('screenshotInput');
+  if (inp) inp.value = '';
+}
+
+function handleDrop(event) {
+  event.preventDefault();
+  document.getElementById('screenshotsArea').classList.remove('drag-over');
+  handleScreenshotFiles(event.dataTransfer.files);
+}
+
+// Ctrl+V paste from clipboard
+function handlePaste(event) {
+  // only when trade modal is open
+  if (!document.getElementById('modalTrade').classList.contains('open')) return;
+  const items = (event.clipboardData || event.originalEvent?.clipboardData)?.items;
+  if (!items) return;
+  let found = false;
+  Array.from(items).forEach(item => {
+    if (item.type.startsWith('image/')) {
+      found = true;
+      const blob = item.getAsFile();
+      const reader = new FileReader();
+      reader.onload = e => {
+        state.tradeScreenshots.push(e.target.result);
+        renderScreenshotsPreview();
+        updateAnalyzeBtn();
+        // flash the area to confirm paste
+        const area = document.getElementById('screenshotsArea');
+        area.style.borderColor = 'var(--green)';
+        setTimeout(() => area.style.borderColor = '', 600);
+      };
+      reader.readAsDataURL(blob);
+    }
+  });
+}
+document.addEventListener('paste', handlePaste);
+
+function renderScreenshotsPreview() {
+  const wrap = document.getElementById('screenshotsPreview');
+  if (!wrap) return;
+  wrap.innerHTML = state.tradeScreenshots.map((src, i) => `
+    <div class="screenshot-thumb" onclick="openLightboxCurrent(${i})">
+      <img src="${src}" alt="screenshot ${i+1}">
+      <span class="screenshot-thumb-remove" onclick="event.stopPropagation(); removeScreenshot(${i})">✕</span>
+    </div>
+  `).join('');
+}
+
+function updateAnalyzeBtn() {
+  const wrap = document.getElementById('analyzeWrap');
+  if (wrap) wrap.style.display = state.tradeScreenshots.length ? 'block' : 'none';
+}
+
+function openLightboxCurrent(idx) {
+  const src = state.tradeScreenshots[idx];
+  if (!src) return;
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function removeScreenshot(idx) {
+  state.tradeScreenshots.splice(idx, 1);
+  renderScreenshotsPreview();
+  updateAnalyzeBtn();
+}
+
+// ═══════════════════════════════════════════════
+// LIGHTBOX
+// ═══════════════════════════════════════════════
+
+function openLightbox(idxOrSrc) {
+  const src = typeof idxOrSrc === 'number' ? state.tradeScreenshots[idxOrSrc] : idxOrSrc;
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER SIDEBAR
+// ═══════════════════════════════════════════════
+
+function renderSidebar() {
+  const list = document.getElementById('sidebarList');
+  if (!state.backtests.length) {
+    list.innerHTML = '<div class="empty" style="padding:30px 16px"><div class="empty-icon">📂</div><div class="empty-text" style="font-size:12px">No backtests yet</div></div>';
+    return;
+  }
+  list.innerHTML = state.backtests.map(bt => {
+    const stats = calcBtStats(bt);
+    return `
+      <div class="backtest-card ${bt.id === state.activeBtId ? 'active' : ''}" onclick="selectBacktest('${bt.id}')">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:5px">
+          <span class="backtest-card-name" style="flex:1; margin:0">${esc(bt.name)}</span>
+          ${stats.total ? `<span style="font-size:11px; font-weight:700; color:${stats.winrate >= 70 ? 'var(--green)' : stats.winrate >= 50 ? 'var(--yellow)' : 'var(--red)'}">${stats.winrate}%</span>` : ''}
+          ${stats.total ? `<span style="font-size:11px; color:var(--text3)">${stats.avgRR}R</span>` : ''}
+          <button onclick="event.stopPropagation(); deleteBacktest('${bt.id}')" title="Delete backtest" style="background:none; border:none; cursor:pointer; color:var(--text3); font-size:13px; padding:2px 4px; border-radius:4px; line-height:1; opacity:.6; transition:opacity .15s, color .15s;" onmouseover="this.style.opacity='1';this.style.color='var(--red)'" onmouseout="this.style.opacity='.6';this.style.color='var(--text3)'">🗑</button>
+        </div>
+        <div class="backtest-card-meta">
+          <span class="tag tag-pair">${bt.pair}</span>
+          ${bt.strategy ? `<span class="tag tag-strategy">${esc(bt.strategy)}</span>` : ''}
+          ${bt.setup ? `<span style="color:var(--text3); font-size:11px">${esc(bt.setup)}</span>` : ''}
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px">
+          <span style="font-size:11px; color:var(--text3)">${bt.dateStart ? bt.dateStart.split('-').reverse().join('.') : '—'}${bt.dateEnd ? ' → ' + bt.dateEnd.split('-').reverse().join('.') : ''}</span>
+          <span style="font-size:11px; color:var(--text3)">${bt.trades.length} trades</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// RENDER ACTIVE BACKTEST
+// ═══════════════════════════════════════════════
+
+function renderActiveBacktest() {
+  const bt = getActiveBt();
+  const titleEl = document.getElementById('btPageTitle');
+  const actionsEl = document.getElementById('btPageActions');
+  const statsEl = document.getElementById('btStats');
+
+  if (!bt) {
+    titleEl.textContent = 'Select a Backtest';
+    actionsEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    document.getElementById('btTradesWrap').innerHTML = `<div class="empty" id="btEmptyState"><div class="empty-icon">📋</div><div class="empty-text">Select a backtest from the sidebar</div></div>`;
+    return;
+  }
+
+  titleEl.textContent = bt.name;
+  actionsEl.style.display = 'flex';
+  statsEl.style.display = 'block';
+
+  // Stats
+  const stats = calcBtStats(bt);
+  document.getElementById('btStatsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-value">${stats.total}</div></div>
+    <div class="stat-card"><div class="stat-label">Winrate</div><div class="stat-value ${stats.winrate >= 70 ? 'green' : stats.winrate >= 50 ? 'yellow' : 'red'}">${stats.winrate}%</div></div>
+    <div class="stat-card"><div class="stat-label">Avg RR</div><div class="stat-value ${stats.avgRR >= 0 ? 'green' : 'red'}">${stats.avgRR}R</div></div>
+    <div class="stat-card"><div class="stat-label">Best Trade</div><div class="stat-value green">${stats.best}R</div></div>
+    <div class="stat-card"><div class="stat-label">Worst Trade</div><div class="stat-value red">${stats.worst}R</div></div>
+    <div class="stat-card"><div class="stat-label">Skipped Ideas</div><div class="stat-value">${stats.skipped}</div></div>
+    <div class="stat-card"><div class="stat-label">Math Expectancy</div><div class="stat-value ${stats.expectancy >= 0 ? 'accent' : 'red'}">${stats.expectancy}</div></div>
+    <div class="stat-card"><div class="stat-label">Total RR</div><div class="stat-value ${stats.totalRR >= 0 ? 'purple' : 'red'}">${stats.totalRR}R</div></div>
+  `;
+
+  // Trades table
+  if (!bt.trades.length) {
+    document.getElementById('btTradesWrap').innerHTML = `<div class="empty"><div class="empty-icon">📈</div><div class="empty-text">No trades yet — click "+ Add Trade"</div></div>`;
+    return;
+  }
+
+  const rows = bt.trades.map((t, i) => {
+    const setupStr = buildSetupStr(t.setup);
+    const sessionCls = { london:'session-london', ny:'session-ny', 'ny-pm':'session-ny-pm', asia:'session-asia', other:'session-other' }[t.session] || '';
+    const sessionLabel = { london:'London', ny:'NY AM', 'ny-pm':'NY PM', asia:'Asia', other:'Other' }[t.session] || t.session;
+    const rrVal = t.rr !== null && t.rr !== undefined ? t.rr : '—';
+    const rrCls = t.rr > 0 ? 'rr-pos' : t.rr < 0 ? 'rr-neg' : '';
+    const screens = t.screenshots && t.screenshots.length ? t.screenshots.map((s,si) =>
+      `<div class="screenshot-thumb" style="width:50px;height:34px;" onclick="openLightboxDirect('${bt.id}','${t.id}',${si})"><img src="${s}"></div>`
+    ).join('') : '—';
+
+    return `
+      <tr>
+        <td style="color:var(--text3); font-size:11px">${i+1}</td>
+        <td style="font-size:12px; color:var(--text2)">${t.dateOpen ? t.dateOpen.replace('T',' ').slice(0,16) : '—'}</td>
+        <td style="font-size:12px; color:var(--text3); white-space:nowrap">${calcTimeInPosition(t.dateOpen, t.dateClose)}</td>
+        <td><span class="tag tag-pair">${t.pair}</span></td>
+        <td><span class="${sessionCls}">${sessionLabel}</span></td>
+        <td><span class="${t.direction === 'long' ? 'dir-long' : 'dir-short'}">${t.direction === 'long' ? '▲ Long' : '▼ Short'}</span></td>
+        <td><span class="result-badge result-${t.result}">${t.result.toUpperCase()}</span></td>
+        <td><span class="${rrCls}">${rrVal !== '—' ? rrVal : '—'}</span></td>
+        <td>${setupStr ? `<span class="setup-pill" onmouseenter="showSetupTooltip(event,'${encodeURIComponent(buildSetupTooltip(t.setup))}')" onmouseleave="hideSetupTooltip()">${setupStr}</span>` : '—'}</td>
+        <td>${buildTargetStr(t.targets) ? `<span class="setup-pill" style="border-color:var(--teal);color:var(--teal)" onmouseenter="showSetupTooltip(event,'${encodeURIComponent(buildTargetTooltip(t.targets))}')" onmouseleave="hideSetupTooltip()">${buildTargetStr(t.targets)}</span>` : '—'}</td>
+        <td>${t.mistakes && t.mistakes.length ? t.mistakes.map(m => `<span class="tag tag-red" style="margin:1px">${esc(m)}</span>`).join('') : '—'}</td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <button class="btn btn-ghost btn-icon btn-sm" onclick="openEditTrade('${t.id}')" title="Edit">✏️</button>
+            <button class="btn btn-ghost btn-icon btn-sm" onclick="deleteTrade('${t.id}')" title="Delete">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('btTradesWrap').innerHTML = `
+    <div class="section-header">
+      <div class="section-title">Trades (${bt.trades.length})</div>
+    </div>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Date Open</th><th>Time in Position</th><th>Pair</th><th>Session</th><th>Direction</th>
+            <th>Result</th><th>RR</th><th>Setup</th><th>Target</th><th>Mistakes</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function openLightboxDirect(btId, tradeId, idx) {
+  const bt = state.backtests.find(b => b.id === btId);
+  if (!bt) return;
+  const trade = bt.trades.find(t => t.id === tradeId);
+  if (!trade) return;
+  const src = trade.screenshots[idx];
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function buildSetupStr(setup) {
+  if (!setup) return '';
+  return TF_LIST.filter(tf => setup[tf] && setup[tf].length).join('-');
+}
+
+function buildSetupTooltip(setup) {
+  if (!setup) return '';
+  return TF_LIST.filter(tf => setup[tf] && setup[tf].length).map(tf =>
+    `<div class="setup-tooltip-row"><span class="setup-tooltip-tf">${tf}</span><span class="setup-tooltip-tools">${setup[tf].join(', ')}</span></div>`
+  ).join('');
+}
+
+function buildTargetStr(targets) {
+  if (!targets || Array.isArray(targets)) return '';
+  return TF_LIST.filter(tf => targets[tf] && targets[tf].length).join('-');
+}
+
+function buildTargetTooltip(targets) {
+  if (!targets || Array.isArray(targets)) return '';
+  return TF_LIST.filter(tf => targets[tf] && targets[tf].length).map(tf =>
+    `<div class="setup-tooltip-row"><span class="setup-tooltip-tf" style="color:var(--teal)">${tf}</span><span class="setup-tooltip-tools">${targets[tf].join(', ')}</span></div>`
+  ).join('');
+}
+
+// ═══════════════════════════════════════════════
+// STATISTICS
+// ═══════════════════════════════════════════════
+
+function calcBtStats(bt) {
+  const trades = bt.trades.filter(t => t.result !== 'skip');
+  const total = trades.length;
+  const wins = trades.filter(t => t.result === 'tp').length;
+  const losses = trades.filter(t => t.result === 'sl').length;
+  const winrate = total ? Math.round(wins / total * 100) : 0;
+  const rrs = trades.filter(t => t.rr !== null && t.rr !== undefined).map(t => t.rr);
+  const avgRR = rrs.length ? +(rrs.reduce((a,b) => a+b, 0) / rrs.length).toFixed(2) : 0;
+  const best = rrs.length ? Math.max(...rrs) : 0;
+  const worst = rrs.length ? Math.min(...rrs) : 0;
+  const totalRR = rrs.length ? +(rrs.reduce((a,b) => a+b, 0)).toFixed(2) : 0;
+  const skipped = bt.trades.filter(t => t.result === 'skip').length;
+  // Math expectancy = (WR * avgWin) + ((1-WR) * avgLoss)
+  const avgWin = wins ? +(rrs.filter(r=>r>0).reduce((a,b)=>a+b,0) / Math.max(wins,1)).toFixed(2) : 0;
+  const avgLoss = losses ? +(rrs.filter(r=>r<0).reduce((a,b)=>a+b,0) / Math.max(losses,1)).toFixed(2) : 0;
+  const wr = winrate / 100;
+  const expectancy = +((wr * avgWin) + ((1 - wr) * avgLoss)).toFixed(2);
+  return { total, wins, losses, winrate, avgRR, best, worst, totalRR, skipped, expectancy };
+}
+
+function renderStatistics() {
+  const container = document.getElementById('statsContent');
+  if (!state.backtests.length) {
+    container.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><div class="empty-text">No backtest data yet</div></div>';
+    return;
+  }
+
+  // Aggregate all trades (or per backtest based on filter)
+  const allTrades = state.backtests.flatMap(bt => bt.trades.map(t => ({ ...t, btName: bt.name })));
+  const realTrades = allTrades.filter(t => t.result !== 'skip');
+
+  // Session stats
+  const sessions = ['london','ny','ny-pm','asia','other'];
+  const sessionLabels = { london:'London', ny:'NY AM', 'ny-pm':'NY PM', asia:'Asia', other:'Other' };
+  const sessionData = sessions.map(s => {
+    const ts = realTrades.filter(t => t.session === s);
+    const wins = ts.filter(t => t.result === 'tp').length;
+    return { label: sessionLabels[s], total: ts.length, wins, wr: ts.length ? Math.round(wins/ts.length*100) : 0 };
+  }).filter(s => s.total > 0);
+
+  // TF tool stats
+  const toolStats = {};
+  realTrades.forEach(t => {
+    TF_LIST.forEach(tf => {
+      const tools = t.setup && t.setup[tf] ? t.setup[tf] : [];
+      tools.forEach(tool => {
+        const key = `${tf}: ${tool}`;
+        if (!toolStats[key]) toolStats[key] = { total: 0, wins: 0 };
+        toolStats[key].total++;
+        if (t.result === 'tp') toolStats[key].wins++;
+      });
+    });
+  });
+
+  const toolList = Object.entries(toolStats)
+    .map(([key, v]) => ({ key, ...v, wr: Math.round(v.wins/v.total*100) }))
+    .sort((a,b) => b.wr - a.wr || b.total - a.total);
+
+  // Direction stats
+  const longs = realTrades.filter(t => t.direction === 'long');
+  const shorts = realTrades.filter(t => t.direction === 'short');
+  const longWR = longs.length ? Math.round(longs.filter(t=>t.result==='tp').length/longs.length*100) : 0;
+  const shortWR = shorts.length ? Math.round(shorts.filter(t=>t.result==='tp').length/shorts.length*100) : 0;
+
+  // RR distribution per TF tool
+  const toolRR = Object.entries(toolStats).map(([key]) => {
+    const ts = realTrades.filter(t => {
+      return TF_LIST.some(tf => (t.setup?.[tf]||[]).some(tool => `${tf}: ${tool}` === key));
+    });
+    const rrs = ts.filter(t => t.rr !== null).map(t => t.rr);
+    return { key, avgRR: rrs.length ? +(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2) : 0 };
+  }).sort((a,b) => b.avgRR - a.avgRR);
+
+  const maxWR = toolList.length ? 100 : 1;
+
+  container.innerHTML = `
+    <div style="padding-top:8px">
+
+    <!-- Summary row -->
+    <div class="stats-grid" style="padding:0 0 16px">
+      ${[
+        ['Total Trades', realTrades.length, ''],
+        ['Wins', realTrades.filter(t=>t.result==='tp').length, 'green'],
+        ['Losses', realTrades.filter(t=>t.result==='sl').length, 'red'],
+        ['Overall WR', (realTrades.length ? Math.round(realTrades.filter(t=>t.result==='tp').length/realTrades.length*100) : 0) + '%', 'accent'],
+        ['Avg RR', (realTrades.filter(t=>t.rr!=null).length ? +(realTrades.filter(t=>t.rr!=null).map(t=>t.rr).reduce((a,b)=>a+b,0)/realTrades.filter(t=>t.rr!=null).length).toFixed(2) : 0) + 'R', 'green'],
+        ['Total RR', (realTrades.filter(t=>t.rr!=null).map(t=>t.rr).reduce((a,b)=>a+b,0)).toFixed(1) + 'R', 'purple'],
+      ].map(([l,v,c]) => `<div class="stat-card"><div class="stat-label">${l}</div><div class="stat-value ${c}">${v}</div></div>`).join('')}
+    </div>
+
+    <div class="stats-row">
+
+      <!-- Session Winrate -->
+      <div class="stats-card">
+        <div class="stats-card-title">Winrate by Session</div>
+        ${sessionData.length ? sessionData.map(s => `
+          <div class="bar-row">
+            <span class="bar-label">${s.label}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${s.wr}%; background: ${s.wr >= 70 ? 'var(--green)' : s.wr >= 50 ? 'var(--yellow)' : 'var(--red)'}"></div></div>
+            <span class="bar-value">${s.wr}% <span style="color:var(--text3);font-size:10px">(${s.total})</span></span>
+          </div>
+        `).join('') : '<span style="color:var(--text3)">No data</span>'}
+      </div>
+
+      <!-- Direction -->
+      <div class="stats-card">
+        <div class="stats-card-title">Long vs Short</div>
+        <div class="bar-row">
+          <span class="bar-label" style="color:var(--green)">▲ Long</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${longWR}%; background:var(--green)"></div></div>
+          <span class="bar-value">${longWR}% <span style="color:var(--text3);font-size:10px">(${longs.length})</span></span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label" style="color:var(--red)">▼ Short</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${shortWR}%; background:var(--red)"></div></div>
+          <span class="bar-value">${shortWR}% <span style="color:var(--text3);font-size:10px">(${shorts.length})</span></span>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:12px; color:var(--text3)">Avg RR Long: <span style="color:var(--green)">${
+          longs.filter(t=>t.rr!=null).length ? +(longs.filter(t=>t.rr!=null).map(t=>t.rr).reduce((a,b)=>a+b,0)/longs.filter(t=>t.rr!=null).length).toFixed(2) : 0
+        }R</span> &nbsp; Short: <span style="color:var(--red)">${
+          shorts.filter(t=>t.rr!=null).length ? +(shorts.filter(t=>t.rr!=null).map(t=>t.rr).reduce((a,b)=>a+b,0)/shorts.filter(t=>t.rr!=null).length).toFixed(2) : 0
+        }R</span></div>
+      </div>
+
+    </div>
+
+    <!-- TF Tool Winrate -->
+    <div class="stats-card" style="margin-bottom:16px">
+      <div class="stats-card-title">POI Tool Winrate by Timeframe</div>
+      ${toolList.length ? toolList.map(t => `
+        <div class="bar-row">
+          <span class="bar-label" style="min-width:120px; color:var(--text2)">${esc(t.key)}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${t.wr}%; background:${t.wr>=70?'var(--green)':t.wr>=50?'var(--yellow)':'var(--red)'}"></div></div>
+          <span class="bar-value">${t.wr}% <span style="color:var(--text3);font-size:10px">(${t.wins}/${t.total})</span></span>
+        </div>
+      `).join('') : '<span style="color:var(--text3)">No setup data yet — add trades with POIs</span>'}
+    </div>
+
+    <!-- TF Tool Avg RR -->
+    <div class="stats-card" style="margin-bottom:16px">
+      <div class="stats-card-title">Average RR by POI Tool</div>
+      ${toolRR.filter(t=>t.avgRR!==0).length ? toolRR.filter(t=>t.avgRR!==0).map(t => {
+        const max = Math.max(...toolRR.map(x=>Math.abs(x.avgRR)), 1);
+        return `
+          <div class="bar-row">
+            <span class="bar-label" style="min-width:120px; color:var(--text2)">${esc(t.key)}</span>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.abs(t.avgRR)/max*100}%; background:${t.avgRR>=0?'var(--accent)':'var(--red)'}"></div></div>
+            <span class="bar-value ${t.avgRR>=0?'rr-pos':'rr-neg'}">${t.avgRR}R</span>
+          </div>
+        `;
+      }).join('') : '<span style="color:var(--text3)">No RR data yet</span>'}
+    </div>
+
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+
+function showSetupTooltip(event, encodedHtml) {
+  const tooltip = document.getElementById('globalTooltip');
+  tooltip.innerHTML = decodeURIComponent(encodedHtml);
+  tooltip.style.display = 'block';
+  positionTooltip(event, tooltip);
+}
+
+function positionTooltip(event, tooltip) {
+  const margin = 12;
+  const tw = tooltip.offsetWidth || 220;
+  const th = tooltip.offsetHeight || 120;
+  let x = event.clientX + margin;
+  let y = event.clientY - th - margin;
+  // flip right→left if overflow
+  if (x + tw > window.innerWidth - margin) x = event.clientX - tw - margin;
+  // flip above→below if too high
+  if (y < margin) y = event.clientY + margin;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+
+function hideSetupTooltip() {
+  document.getElementById('globalTooltip').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════
+// SESSION AUTO-DETECT (London BST/GMT aware)
+// ═══════════════════════════════════════════════
+
+// Returns true if date is in BST (British Summer Time = UTC+1)
+// UK clocks go forward last Sunday of March, back last Sunday of October
+function isLondonBST(date) {
+  const year = date.getUTCFullYear();
+
+  // Last Sunday of March
+  const march31 = new Date(Date.UTC(year, 2, 31));
+  const marchLastSun = new Date(Date.UTC(year, 2, 31 - ((march31.getUTCDay() + 0) % 7)));
+  marchLastSun.setUTCHours(1, 0, 0, 0); // 01:00 UTC = clocks go forward
+
+  // Last Sunday of October
+  const oct31 = new Date(Date.UTC(year, 9, 31));
+  const octLastSun = new Date(Date.UTC(year, 9, 31 - ((oct31.getUTCDay() + 0) % 7)));
+  octLastSun.setUTCHours(1, 0, 0, 0); // 01:00 UTC = clocks go back
+
+  return date >= marchLastSun && date < octLastSun;
+}
+
+// Sessions defined in London local time (HH:MM–HH:MM)
+// Asia:    02:00–07:00 London
+// London:  07:00–12:00 London
+// NY AM:   13:30–17:00 London
+// NY PM:   18:00–22:00 London
+// Other:   everything else (22:00–02:00 = overnight/dead zone)
+const SESSION_SCHEDULE = [
+  { id: 'asia',    start: [2,  0],  end: [7,  0]  },
+  { id: 'london',  start: [7,  0],  end: [12, 0]  },
+  { id: 'ny',      start: [13, 30], end: [17, 0]  },
+  { id: 'ny-pm',   start: [18, 0],  end: [22, 0]  },
+];
+
+function autoDetectSession(datetimeLocalValue) {
+  if (!datetimeLocalValue) return;
+
+  // datetime-local gives us local browser time — treat as UTC for simplicity
+  // (user enters time as they see it on TradingView which is their local time)
+  const dt = new Date(datetimeLocalValue);
+  if (isNaN(dt)) return;
+
+  // Get London local time from UTC
+  const bst = isLondonBST(dt);
+  const londonOffsetMin = bst ? 60 : 0; // BST = UTC+1, GMT = UTC+0
+
+  // TradingView typically shows UTC time — so we work in UTC and convert to London
+  const utcH = dt.getUTCHours();
+  const utcM = dt.getUTCMinutes();
+  const totalUtcMin = utcH * 60 + utcM;
+  const totalLondonMin = (totalUtcMin + londonOffsetMin) % (24 * 60);
+
+  const lonH = Math.floor(totalLondonMin / 60);
+  const lonM = totalLondonMin % 60;
+
+  let detected = 'other';
+  for (const s of SESSION_SCHEDULE) {
+    const startMin = s.start[0] * 60 + s.start[1];
+    const endMin   = s.end[0]   * 60 + s.end[1];
+    const nowMin   = lonH * 60 + lonM;
+    if (nowMin >= startMin && nowMin < endMin) {
+      detected = s.id;
+      break;
+    }
+  }
+
+  document.getElementById('tradeSession').value = detected;
+
+  // Show "auto" badge
+  const tag = document.getElementById('sessionAutoTag');
+  const bstLabel = bst ? ' BST' : ' GMT';
+  tag.textContent = `auto · ${String(lonH).padStart(2,'0')}:${String(lonM).padStart(2,'0')} London${bstLabel}`;
+  tag.style.display = 'inline-flex';
+}
+
+// ═══════════════════════════════════════════════
+// TIME IN POSITION
+// ═══════════════════════════════════════════════
+
+function calcTimeInPosition(dateOpen, dateClose) {
+  if (!dateOpen || !dateClose) return '—';
+  const ms = new Date(dateClose) - new Date(dateOpen);
+  if (isNaN(ms) || ms < 0) return '—';
+  const totalMin = Math.floor(ms / 60000);
+  const days  = Math.floor(totalMin / 1440);
+  const hours = Math.floor((totalMin % 1440) / 60);
+  const mins  = totalMin % 60;
+  const parts = [];
+  if (days)  parts.push(days  + 'd');
+  if (hours) parts.push(hours + 'h');
+  if (mins || parts.length === 0) parts.push(mins + 'm');
+  return parts.join(' ');
+}
+
+// ═══════════════════════════════════════════════
+// SETTINGS (API key stored in IndexedDB)
+// ═══════════════════════════════════════════════
+
+async function openSettings() {
+  const key = await db.settings.get('apiKey');
+  const model = await db.settings.get('apiModel');
+  document.getElementById('apiKeyInput').value = key ? key.value : '';
+  document.getElementById('apiModelSelect').value = model ? model.value : 'claude-haiku-4-5-20251001';
+  document.getElementById('apiTestResult').style.display = 'none';
+  openModal('modalSettings');
+}
+
+async function saveSettings() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  const model = document.getElementById('apiModelSelect').value;
+  await db.settings.put({ key: 'apiKey', value: key });
+  await db.settings.put({ key: 'apiModel', value: model });
+  closeModal('modalSettings');
+}
+
+function toggleApiKeyVisibility() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function testApiKey() {
+  const keyRec = await db.settings.get('apiKey');
+  const key = keyRec ? keyRec.value : '';
+  const modelRec = await db.settings.get('apiModel');
+  const model = modelRec ? modelRec.value : 'claude-haiku-4-5-20251001';
+  const res = document.getElementById('apiTestResult');
+  res.style.display = 'block';
+  res.style.background = 'var(--bg4)';
+  res.style.color = 'var(--text2)';
+  res.textContent = '⏳ Testing connection…';
+  if (!key) { res.style.color = 'var(--red)'; res.textContent = '❌ No API key entered'; return; }
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model, max_tokens: 10, messages: [{ role: 'user', content: 'hi' }] })
+    });
+    if (r.ok) {
+      res.style.color = 'var(--green)';
+      res.textContent = '✅ Connected — ' + model;
+    } else {
+      const err = await r.json();
+      res.style.color = 'var(--red)';
+      res.textContent = '❌ ' + (err.error?.message || r.status);
+    }
+  } catch(e) {
+    res.style.color = 'var(--red)';
+    res.textContent = '❌ Network error: ' + e.message;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// CLAUDE HAIKU — SCREENSHOT ANALYSIS
+// ═══════════════════════════════════════════════
+
+const SMC_SYSTEM_PROMPT = `You are an expert Smart Money Concepts (SMC) / ICT trading analyst.
+You will be given one or more TradingView chart screenshots. Your job is to analyze them and extract structured trading data.
+
+Return ONLY valid JSON (no markdown, no explanation) in this exact schema:
+{
+  "timeframe": "H4",
+  "pair": "EURUSD",
+  "direction": "long",
+  "result": "tp",
+  "setup": {
+    "W1": [],
+    "D1": ["FVG", "OB"],
+    "H4": ["Sweep", "compression"],
+    "H1": ["OB", "shift"],
+    "M15": ["QM+FVG"]
+  },
+  "targets": ["fractal[D1]", "fvg[H4]"],
+  "session": "ny",
+  "rr": 3.2,
+  "mistakes": [],
+  "notes": []
+}
+
+Rules:
+- timeframe: the primary entry timeframe shown (W1/D1/H4/H1/M15)
+- direction: "long" or "short" based on trade bias/position shown
+- result: "tp" if price reached target, "sl" if stopped out, "be" if breakeven, null if unclear
+- setup[TF]: list tools/patterns VISIBLE on chart for that TF. Use exact terms: FVG, OB, i-FVG, RB, Sweep, compression, QM, shift, fractal, liquidity, imbalance
+- targets: what price targets are marked (e.g. "fractal[D1]", "fvg[H4]", "h4 ext liq")
+- session: "london", "ny", "ny-pm", "asia", "other" — based on time visible
+- rr: risk/reward ratio if visible as a number, else null
+- mistakes: any obvious SMC rule violations visible
+- notes: any relevant observations
+- If multiple screenshots show different timeframes, combine the setup across all of them
+- If something is unclear, omit it (use null or empty array)`;
+
+async function analyzeScreenshots() {
+  const keyRec = await db.settings.get('apiKey');
+  const key = keyRec ? keyRec.value : '';
+  if (!key) {
+    alert('Please set your Anthropic API key in ⚙️ Settings first');
+    openSettings();
+    return;
+  }
+  const modelRec = await db.settings.get('apiModel');
+  const model = modelRec ? modelRec.value : 'claude-haiku-4-5-20251001';
+
+  if (!state.tradeScreenshots.length) return;
+
+  const btn = document.getElementById('analyzeBtn');
+  const btnText = document.getElementById('analyzeBtnText');
+  const resultEl = document.getElementById('analyzeResult');
+  btn.disabled = true;
+  btnText.textContent = 'Analyzing…';
+  resultEl.style.display = 'none';
+
+  // Build content array — all screenshots
+  const imageContent = state.tradeScreenshots.map(src => {
+    const [header, data] = src.split(',');
+    const mediaType = header.match(/data:(.*);base64/)?.[1] || 'image/png';
+    return { type: 'image', source: { type: 'base64', media_type: mediaType, data } };
+  });
+  imageContent.push({ type: 'text', text: 'Analyze these TradingView chart screenshots and extract the SMC trade data.' });
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 1024,
+        system: SMC_SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: imageContent }]
+      })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || response.status);
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+
+    // Parse JSON from response
+    let parsed;
+    try {
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : text);
+    } catch(e) {
+      throw new Error('Could not parse JSON response: ' + text.slice(0, 200));
+    }
+
+    // Auto-fill form fields
+    _applyAnalysisToForm(parsed);
+
+    resultEl.style.display = 'block';
+    resultEl.style.color = 'var(--green)';
+    resultEl.innerHTML = '✅ Analysis complete — fields updated. Review and adjust as needed.';
+
+  } catch(e) {
+    resultEl.style.display = 'block';
+    resultEl.style.color = 'var(--red)';
+    resultEl.innerHTML = '❌ Error: ' + esc(e.message);
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Analyze with Claude Haiku';
+  }
+}
+
+function _applyAnalysisToForm(parsed) {
+  const bt = getActiveBt();
+  if (!parsed) return;
+
+  // Basic fields
+  if (parsed.timeframe) {/* informational only */}
+  if (parsed.pair) {
+    const sel = document.getElementById('tradePair');
+    if ([...sel.options].some(o => o.value === parsed.pair)) sel.value = parsed.pair;
+  }
+  if (parsed.direction && ['long','short'].includes(parsed.direction))
+    document.getElementById('tradeDirection').value = parsed.direction;
+  if (parsed.result && ['tp','sl','be','skip'].includes(parsed.result))
+    document.getElementById('tradeResult').value = parsed.result;
+  if (parsed.session && ['london','ny','ny-pm','asia','other'].includes(parsed.session))
+    document.getElementById('tradeSession').value = parsed.session;
+  if (parsed.rr !== null && parsed.rr !== undefined && !isNaN(parsed.rr))
+    document.getElementById('tradeRR').value = parsed.rr;
+
+  // Setup — merge without duplicates
+  if (parsed.setup && typeof parsed.setup === 'object') {
+    TF_LIST.forEach(tf => {
+      const tools = parsed.setup[tf];
+      if (!tools || !tools.length) return;
+      if (!state.tradeSetup[tf]) state.tradeSetup[tf] = [];
+      tools.forEach(t => {
+        if (!state.tradeSetup[tf].includes(t)) state.tradeSetup[tf].push(t);
+        if (!bt.dict.tfTools[tf]) bt.dict.tfTools[tf] = [];
+        if (!bt.dict.tfTools[tf].includes(t)) bt.dict.tfTools[tf].push(t);
+      });
+    });
+    buildSetupUI(bt, state.tradeSetup);
+  }
+
+  // Targets
+  if (parsed.targets && parsed.targets.length) {
+    if (!bt.dict.targets) bt.dict.targets = [];
+    parsed.targets.forEach(t => {
+      if (!state.tradeTargets.includes(t)) state.tradeTargets.push(t);
+      if (!bt.dict.targets.includes(t)) bt.dict.targets.push(t);
+    });
+    renderTargetUI(bt);
+  }
+
+  // Mistakes & Notes
+  if (parsed.mistakes && parsed.mistakes.length) {
+    parsed.mistakes.forEach(m => { if (!state.tradeMistakes.includes(m)) state.tradeMistakes.push(m); });
+    renderDictTags('mistakes');
+  }
+  if (parsed.notes && parsed.notes.length) {
+    parsed.notes.forEach(n => { if (!state.tradeNotes.includes(n)) state.tradeNotes.push(n); });
+    renderDictTags('notes');
+  }
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+
+// Async init
+(async () => {
+  await loadState();
+  renderSidebar();
+  renderActiveBacktest();
+})();
+</script>
+</body>
+</html>

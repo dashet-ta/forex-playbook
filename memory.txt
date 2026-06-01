@@ -1,0 +1,75 @@
+# Forex News Dashboard — Session Memory Log
+Last updated: 2026-04-13
+
+---
+
+## Project Overview
+A local forex economic calendar dashboard built for SMC/ICT trading.
+Folder: forex-news-dashboard/ (the user's selected workspace)
+
+### Key files
+- `forex-news-dashboard.html` — the main dashboard UI (~2159 lines)
+- `server.py` — Python CORS proxy server (~775 lines), run with `python3 server.py`
+- `SMC_Daily_Flow.pdf` / `SMC_Trading_Plan_UA.html` / `SMC_Trading_Plan_UA.pdf` — trading plan documents
+
+### How to run
+```
+python3 server.py
+# then open: http://localhost:8080/forex-news-dashboard.html
+```
+Server runs on port 8080.
+
+---
+
+## Architecture
+
+### server.py — proxy endpoints
+| Endpoint | Description |
+|---|---|
+| `/ping` | Health check |
+| `/proxy?url=...` | Proxies Forex Factory weekly JSON (whitelisted to nfs.faireconomy.media) |
+| `/event-history?title=&country=USD\|EUR\|GBP&year=` | Full year history for one indicator |
+| `/history?from=YYYY-MM-DD&to=YYYY-MM-DD` | Historical events from TradingView (max 60-day range) |
+
+### Data sources
+- **Primary**: TradingView Economic Calendar (`https://economic-calendar.tradingview.com/events`) — used for historical data and current week
+- **Fallback / legacy**: Forex Factory JSON feed (`nfs.faireconomy.media`) — used via `/proxy` endpoint
+- Country → currency mapping: US/EU/EMU/DE/FR/IT/ES/NL → EUR, GB → GBP, US → USD
+- Impact mapping: TV integer 1=Low, 2=Medium, 3=High; keywords override unrated (0) events
+
+### Key logic (server.py)
+- `get_ff_week()` — fetches FF weekly JSON with retry logic
+- `_fetch_tradingview()` — fetches TV calendar for a date range, normalises to FF schema
+- `_fetch_event_history()` — fetches full year of one indicator's releases
+- `week_bounds()` — calculates Mon–Fri date range for current or next week
+- `_HIGH_KEYWORDS` regex — marks unrated TV events as High impact if they match known high-impact event names (NFP, CPI, FOMC, ECB, BoE, GDP, etc.)
+- Chrome/146 User-Agent used to avoid bot detection
+- curl used if available, falls back to urllib
+
+---
+
+## Session Log
+
+### 2026-04-13 — Session start
+- User instructed to maintain this memory.txt file for cross-session continuity
+- Reviewed existing project state: server.py and dashboard HTML are present and appear complete
+- No new changes made this session — this file was created as the memory system
+
+---
+
+## Known Issues / Open Items
+(Update this section as work progresses)
+- None recorded yet
+
+---
+
+## Preferences / Notes
+- User is Dasha, Ukrainian family in UK, trades forex (SMC/ICT style)
+- Trading pairs of interest: EUR/USD, GBP/USD, XAU/USD, BTC/USD, USD/CAD
+- Dashboard is for personal use to track high-impact news events
+
+---
+
+## How to use this file
+At the start of a new session, tell Claude: "read memory.txt to get caught up"
+Claude will read this file and be fully up to speed without replaying past logs.

@@ -1,0 +1,2159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;
+  --border:#30363d;--border2:#21262d;
+  --text:#e6edf3;--text2:#8b949e;--text3:#484f58;
+  --green:#3fb950;--red:#f85149;--red-dim:#3a1a1a;
+  --yellow:#d29922;--cyan:#58a6ff;--cyan-dim:#0d2044;
+  --mono:'JetBrains Mono','Fira Code','Courier New',monospace;
+}
+html{height:100%}
+body{height:100%;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  font-size:13px;line-height:1.5;display:flex;flex-direction:column}
+.header{display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100}
+.hbrand{display:flex;align-items:center;gap:10px}
+.hdot{width:8px;height:8px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 6px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.htitle{font-family:var(--mono);font-size:15px;font-weight:700;letter-spacing:.08em}
+.htitle span{color:var(--cyan)}
+.hsub{font-size:11px;color:var(--text3);letter-spacing:.05em;text-transform:uppercase}
+.hclock{font-family:var(--mono);font-size:13px;color:var(--text2);letter-spacing:.06em}
+.hclock strong{color:var(--cyan)}
+.statusbar{padding:7px 20px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;font-size:12px}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.stext{color:var(--text2)}.stext strong{color:var(--green)}
+.btn-refresh{padding:3px 10px;background:transparent;
+  border:1px solid var(--border);border-radius:4px;color:var(--text2);
+  font-size:11px;cursor:pointer;transition:all .15s}
+.btn-refresh:hover{border-color:var(--cyan);color:var(--cyan)}
+.btn-refresh:disabled{opacity:.4;cursor:not-allowed}
+.errbanner{display:none;padding:10px 20px;background:var(--red-dim);
+  border-bottom:1px solid var(--red);color:var(--red);font-size:12px;
+  gap:8px;align-items:flex-start;line-height:1.7}
+.errbanner.on{display:flex}
+.errbanner code{background:rgba(255,255,255,.08);padding:1px 5px;border-radius:3px;
+  font-family:var(--mono);font-size:11px}
+.layout{display:flex;flex:1;min-height:0;overflow:hidden}
+.col-left{width:58%;min-width:520px;display:flex;flex-direction:column;
+  border-right:1px solid var(--border);overflow:hidden}
+.col-right{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.controls{padding:11px 16px;background:var(--bg2);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cgroup{display:flex;align-items:center;gap:8px}
+.clabel{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.dnav{display:flex;align-items:center;gap:4px}
+.btn-nav{width:26px;height:26px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;color:var(--text2);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s}
+.btn-nav:hover{background:var(--border);color:var(--text)}
+.ddisp{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--text);
+  background:var(--bg3);border:1px solid var(--border);border-radius:4px;
+  padding:4px 10px;cursor:pointer;letter-spacing:.04em;
+  transition:border-color .15s;position:relative;white-space:nowrap}
+.ddisp:hover{border-color:var(--cyan)}
+/* ── Calendar range picker overlay ── */
+.cal-picker{position:absolute;top:calc(100% + 6px);left:0;z-index:300;
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:12px;width:252px;box-shadow:0 8px 28px rgba(0,0,0,.65);
+  display:none;user-select:none}
+.cal-picker.open{display:block}
+.cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cal-mth{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--text);letter-spacing:.04em}
+.cal-arr{width:22px;height:22px;background:transparent;border:1px solid var(--border);
+  border-radius:3px;color:var(--text2);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;transition:all .15s}
+.cal-arr:hover{border-color:var(--cyan);color:var(--cyan)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cal-dow{font-size:9px;font-weight:700;letter-spacing:.06em;text-align:center;
+  color:var(--text3);padding:4px 0;text-transform:uppercase}
+.cal-day{font-family:var(--mono);font-size:11px;text-align:center;
+  padding:6px 2px 4px;border-radius:3px;cursor:pointer;color:var(--text2);transition:background .08s;
+  position:relative;line-height:1.2}
+.cal-day:hover{background:var(--bg3);color:var(--text)}
+.cal-day.other{color:var(--text3);opacity:.35;pointer-events:none}
+/* Holiday dot — shown below the day number */
+.cal-day.has-bh::after{content:'';display:block;width:4px;height:4px;border-radius:50%;
+  background:var(--yellow);margin:2px auto 0;opacity:.85}
+/* Weekend dimming in calendar */
+.cal-day.weekend{color:var(--text3);opacity:.45}
+/* Full market closed day (all 3 currencies) — red tint */
+.cal-day.mkt-closed{color:var(--red);opacity:.5}
+.cal-day.today{color:var(--cyan);font-weight:700}
+.cal-day.sel-s,.cal-day.sel-e{background:var(--cyan)!important;color:#000!important;font-weight:700;border-radius:3px}
+.cal-day.in-rng{background:var(--cyan-dim);color:var(--text);border-radius:0}
+.cal-day.sel-s:not(.sel-e){border-radius:3px 0 0 3px}
+.cal-day.sel-e:not(.sel-s){border-radius:0 3px 3px 0}
+.cal-hint{font-size:10px;color:var(--text3);text-align:center;margin-top:10px;
+  letter-spacing:.04em;min-height:14px}
+.cal-apply{display:block;width:100%;margin-top:8px;padding:6px;
+  background:var(--cyan);color:#000;border:none;border-radius:4px;
+  font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;cursor:pointer;transition:opacity .15s}
+.cal-apply:disabled{background:var(--border);color:var(--text3);cursor:not-allowed;opacity:.5}
+.btn-today{padding:4px 10px;background:transparent;border:1px solid var(--cyan);
+  border-radius:4px;color:var(--cyan);font-size:11px;font-weight:700;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn-today:hover,.btn-today.on{background:var(--cyan-dim)}
+.cbtns{display:flex;gap:4px}
+.btn-cur{padding:4px 10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;color:var(--text2);font-size:11px;font-weight:700;
+  letter-spacing:.06em;cursor:pointer;transition:all .15s}
+.btn-cur:hover{border-color:var(--text2);color:var(--text)}
+.btn-cur.on{background:var(--bg3);border-color:var(--cyan);color:var(--cyan)}
+.btn-cur.on.usd{background:#1e4a8c;border-color:#3a7ad6;color:#fff}
+.btn-cur.on.eur{background:#3a1e8c;border-color:#7a5ad6;color:#fff}
+.btn-cur.on.gbp{background:#1e6b3a;border-color:#3aaf6a;color:#fff}
+.sechead{padding:9px 16px;background:var(--bg3);border-bottom:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:space-between}
+.sectitle{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text2)}
+.secdot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:0 0 4px var(--red)}
+.evcnt{font-size:11px;color:var(--text3);background:var(--bg2);border:1px solid var(--border2);
+  border-radius:10px;padding:1px 8px;font-family:var(--mono)}
+.twrap{flex:1;overflow-y:auto;overflow-x:hidden}
+.twrap::-webkit-scrollbar{width:4px}
+.twrap::-webkit-scrollbar-track{background:var(--bg)}
+.twrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+table.nt{width:100%;border-collapse:collapse;table-layout:fixed}
+.nt thead{position:sticky;top:0;z-index:10}
+.nt th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--text3);
+  background:var(--bg2);border-bottom:1px solid var(--border);white-space:nowrap}
+.nt th:nth-child(1){width:100px}.nt th:nth-child(2){width:80px}
+.nt th:nth-child(4){width:70px}
+.nt th:nth-child(5){width:80px;text-align:right}
+.nt th:nth-child(6){width:80px;text-align:right}
+.nt th:nth-child(7){width:80px;text-align:right}
+.nt tbody tr{border-bottom:1px solid var(--border2);transition:opacity .3s,background .15s}
+.nt tbody tr:hover{background:var(--bg3)}
+.nt tbody tr.past{opacity:.38}.nt tbody tr.past:hover{opacity:.55}
+.nt td{padding:10px 12px;vertical-align:top}
+/* Date group header row (week mode) */
+tr.dg-row td{padding:0!important;border-bottom:1px solid var(--border)!important}
+tr.dg-row:hover{background:transparent!important}
+.date-ghdr{padding:6px 14px 5px;font-size:10px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--cyan);background:var(--bg2)}
+/* Time-group separator: slightly bolder bottom border after the last row of each group */
+tr.grp-last td{border-bottom:1px solid var(--border)!important}
+/* Time cell spans multiple rows — center vertically */
+td.td-time{vertical-align:middle}
+.ctime{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--text)}
+.csub{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.csub.cd{color:var(--cyan)}.csub.im{color:var(--yellow)}.csub.rl{color:var(--text3);font-style:italic}
+.badge{display:inline-block;padding:2px 6px;border-radius:3px;font-size:11px;font-weight:700;font-family:var(--mono);letter-spacing:.04em}
+.busd{background:#1e4a8c;color:#a8c4f0}.beur{background:#3a1e8c;color:#c4b0f5}.bgbp{background:#1e6b3a;color:#a0d4b8}
+.bh-pill{display:inline-flex;align-items:center;gap:3px;margin-left:5px;padding:1px 5px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:#2d1f00;border:1px solid #d29922;color:#d29922;vertical-align:middle;cursor:default}
+.bh-pill svg{flex-shrink:0}
+.ihigh{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--red)}
+.idot{width:6px;height:6px;border-radius:50%;background:var(--red)}
+.cevt{font-size:13px;color:var(--text);line-height:1.4}
+.cnum{font-family:var(--mono);font-size:13px;text-align:right;color:var(--text2)}
+.cact{font-weight:600}
+.cact.better{color:var(--green)}.cact.worse{color:var(--red)}.cact.neutral{color:var(--text)}.cact.pending{color:var(--text3);font-style:italic}
+.estate,.lstate{padding:60px 20px;text-align:center;color:var(--text3)}
+.spin{width:30px;height:30px;border:2px solid var(--border);border-top-color:var(--cyan);
+  border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 16px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.estate p,.lstate p{font-size:14px;margin-bottom:8px;color:var(--text2)}
+.estate small{font-size:12px;line-height:1.9;display:block}
+.tznote{padding:6px 16px;font-size:10px;color:var(--text3);background:var(--bg);border-top:1px solid var(--border2)}
+.tznote strong{color:var(--text2)}
+.rph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:40px;color:var(--text3)}
+.rph svg{opacity:.15}
+.rph h3{font-size:14px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
+.rph p{font-size:12px;text-align:center;max-width:200px;line-height:1.6}
+.pcards{display:flex;flex-direction:column;gap:8px;width:100%;max-width:240px}
+.pcard{background:var(--bg2);border:1px dashed var(--border2);border-radius:6px;padding:12px 16px;font-size:11px;color:var(--text3);letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.pcdot{width:4px;height:4px;border-radius:50%;background:var(--border)}
+/* ── Event detail row ── */
+@keyframes evIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.ev-detail-tr{animation:evIn .14s ease}
+.ev-detail-td{padding:0!important}
+.ev-detail-inner{display:flex;background:var(--bg2);min-height:148px}
+.ev-desc-box{flex:0 0 36%;padding:16px 18px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.ev-desc-name{font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.04em;line-height:1.4}
+.ev-desc-body{font-size:11px;color:var(--text2);line-height:1.7;flex:1}
+.ev-effect{font-size:11px;color:var(--text2);line-height:1.6;padding-top:8px;border-top:1px solid var(--border2)}
+.ev-effect strong{color:var(--green)}
+.ev-chart-box{flex:1;padding:12px 14px 6px;display:flex;flex-direction:column;gap:6px;min-width:0;overflow:hidden}
+.ev-chart-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.ev-chart-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;gap:8px}
+/* Clickable event title */
+.cevt{cursor:pointer;transition:color .12s}
+.cevt::before{content:'▸';font-size:9px;color:var(--text3);margin-right:6px;display:inline-block;transition:transform .18s,color .12s;vertical-align:1px}
+.cevt:hover{color:var(--cyan)!important}
+.cevt:hover::before{color:var(--cyan)}
+.cevt.open::before{transform:rotate(90deg);color:var(--cyan)}
+.cevt.open{color:var(--cyan)}
+/* ── Market session bar ── */
+.sess-bar{display:flex;align-items:center;gap:6px;padding:6px 20px;
+  background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
+.sess-bar::-webkit-scrollbar{height:3px}
+.sess-bar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.sess-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text3);
+  font-size:11px;font-weight:600;letter-spacing:.04em;white-space:nowrap;
+  transition:all .4s;flex-shrink:0}
+/* Per-session accent colours via data-s attribute */
+.sess-pill[data-s="asia"]     .sess-dot{background:#a371f7}
+.sess-pill[data-s="london"]   .sess-dot{background:#58a6ff}
+.sess-pill[data-s="premarket"].sess-dot{background:#f0883e}
+.sess-pill[data-s="nyam"]     .sess-dot{background:#3fb950}
+.sess-pill[data-s="nypm"]     .sess-dot{background:#d29922}
+.sess-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0;transition:all .4s}
+/* Active pill highlight */
+.sess-pill.on[data-s="asia"]     {border-color:#a371f7;background:#1a0e2e;color:var(--text)}
+.sess-pill.on[data-s="london"]   {border-color:#58a6ff;background:var(--cyan-dim);color:var(--text)}
+.sess-pill.on[data-s="premarket"]{border-color:#f0883e;background:#2d1708;color:var(--text)}
+.sess-pill.on[data-s="nyam"]     {border-color:#3fb950;background:#0d2814;color:var(--text)}
+.sess-pill.on[data-s="nypm"]     {border-color:#d29922;background:#2a1e04;color:var(--text)}
+.sess-pill.on .sess-dot{animation:pulse 1.4s infinite}
+.sess-cdown{font-family:var(--mono);font-size:10px;color:var(--text2);
+  background:rgba(255,255,255,.07);padding:1px 6px;border-radius:10px;
+  letter-spacing:.03em;margin-left:2px}
+.sess-after{margin-left:12px;font-size:11px;color:var(--text3);font-family:var(--mono);
+  letter-spacing:.03em;white-space:nowrap}
+.sess-after .sess-cdown{color:var(--yellow);background:rgba(210,153,34,.12)}
+/* ── Market closed state ── */
+.sess-bar.market-closed .sess-pill{opacity:.28;pointer-events:none}
+.sess-closed-badge{display:inline-flex;align-items:center;gap:7px;
+  padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--bg3);font-size:11px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--text3);white-space:nowrap;flex-shrink:0}
+.sess-closed-badge .sc-dot{width:7px;height:7px;border-radius:50%;background:var(--text3);flex-shrink:0}
+.sess-closed-reason{margin-left:10px;font-size:11px;color:var(--text3);font-family:var(--mono);
+  letter-spacing:.03em;white-space:nowrap}
+.sess-closed-reason strong{color:var(--yellow)}
+/* ── Position Calculator ─────────────────────────────────────── */
+.pcalc{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.pcalc-hd{padding:9px 16px;background:var(--bg3);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.pc-beta{font-size:9px;font-weight:700;letter-spacing:.08em;padding:2px 7px;
+  background:var(--cyan-dim);border:1px solid var(--cyan);color:var(--cyan);border-radius:3px}
+.pcalc-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:11px}
+.pcalc-body::-webkit-scrollbar{width:4px}
+.pcalc-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.pc-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:5px}
+.pc-lbl.sl{color:var(--red)}.pc-lbl.tp{color:var(--green)}
+.pc-opt{font-size:9px;color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0}
+.pc-sel{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;color:var(--text);font-size:13px;font-family:var(--mono);
+  cursor:pointer;transition:border-color .15s;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b949e'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+.pc-sel:focus,.pc-sel:hover{border-color:var(--cyan)}
+.pc-dir{display:flex;gap:6px}
+.pc-dir-btn{flex:1;padding:7px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;color:var(--text2);font-size:12px;font-weight:700;
+  letter-spacing:.04em;cursor:pointer;transition:all .15s}
+.pc-dir-btn.long.on{background:#0d2814;border-color:var(--green);color:var(--green)}
+.pc-dir-btn.short.on{background:var(--red-dim);border-color:var(--red);color:var(--red)}
+.pc-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pc-iwrap{position:relative;display:flex;align-items:center}
+.pc-pfx{position:absolute;left:9px;color:var(--text3);font-size:12px;pointer-events:none;z-index:1}
+.pc-sfx{position:absolute;right:9px;color:var(--text3);font-size:12px;pointer-events:none;z-index:1}
+.pc-inp{width:100%;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);
+  border-radius:4px;color:var(--text);font-size:13px;font-family:var(--mono);
+  outline:none;transition:border-color .15s;-moz-appearance:textfield}
+.pc-inp::-webkit-inner-spin-button,.pc-inp::-webkit-outer-spin-button{-webkit-appearance:none}
+.pc-inp:focus,.pc-inp:hover{border-color:var(--cyan)}
+.pc-inp.pfx{padding-left:22px}.pc-inp.sfx{padding-right:24px}
+.pc-inp.sl:focus{border-color:var(--red)}.pc-inp.tp:focus{border-color:var(--green)}
+.pc-ph{font-size:10px;color:var(--text3);margin-top:4px;font-family:var(--mono);letter-spacing:.03em;min-height:14px}
+.pc-qrow{display:flex;gap:4px}
+.pc-qbtn{flex:1;padding:5px 0;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:4px;color:var(--text3);font-size:10px;font-weight:700;letter-spacing:.05em;
+  cursor:pointer;transition:all .15s}
+.pc-qbtn:hover{border-color:var(--text2);color:var(--text2)}
+.pc-qbtn.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+.pc-div{height:1px;background:var(--border2);margin:2px 0}
+.pc-empty{font-size:12px;color:var(--text3);text-align:center;padding:24px 0;
+  letter-spacing:.04em;font-family:var(--mono)}
+/* Volume output box */
+.pc-vol{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:14px 16px}
+.pc-vol-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.pc-vol-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)}
+.pc-copy{padding:3px 10px;background:transparent;border:1px solid var(--border);
+  border-radius:4px;color:var(--text2);font-size:10px;cursor:pointer;
+  font-family:var(--mono);letter-spacing:.04em;transition:all .15s}
+.pc-copy:hover{border-color:var(--cyan);color:var(--cyan)}
+.pc-vol-num{font-family:var(--mono);font-size:36px;font-weight:700;color:var(--cyan);
+  letter-spacing:.04em;line-height:1.1}
+.pc-vol-unit{font-size:15px;color:var(--text2);font-weight:400;margin-left:5px;vertical-align:2px}
+.pc-chips{display:flex;gap:6px;margin-top:9px}
+.pc-chip{font-family:var(--mono);font-size:11px;padding:4px 10px;
+  background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text2)}
+/* Results container — uniform gap between all blocks */
+#pcResults{display:flex;flex-direction:column;gap:10px}
+/* Stats grid */
+.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.pc-stat{background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:10px 12px}
+.pc-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:4px}
+.pc-stat-val{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--text);line-height:1.1}
+.pc-stat-val.r{color:var(--red)}.pc-stat-val.g{color:var(--green)}
+.pc-stat-val.y{color:var(--yellow)}.pc-stat-val.c{color:var(--cyan)}
+.pc-stat-sub{font-size:10px;color:var(--text3);margin-top:3px;font-family:var(--mono)}
+.pc-warn{font-size:11px;color:var(--yellow);background:rgba(210,153,34,.1);
+  border:1px solid rgba(210,153,34,.3);border-radius:4px;padding:7px 10px}
+.pc-plat-row{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.pc-plat-btn{padding:4px 9px;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:4px;color:var(--text3);font-size:10px;font-weight:700;letter-spacing:.05em;
+  cursor:pointer;transition:all .15s;white-space:nowrap}
+.pc-plat-btn:hover{border-color:var(--text2);color:var(--text2)}
+.pc-plat-btn.active{border-color:var(--cyan);color:var(--cyan);background:var(--cyan-dim)}
+.pc-comm-note{font-size:10px;color:var(--text3);margin-top:5px;font-family:var(--mono);
+  letter-spacing:.02em;line-height:1.6;min-height:14px}
+.pc-stat-comm{grid-column:1/-1;background:rgba(248,81,73,.07);border-color:rgba(248,81,73,.25)}
+/* Break-even box */
+.pc-be{background:rgba(210,153,34,.07);border:1px solid rgba(210,153,34,.35);
+  border-radius:6px;padding:12px 16px}
+.pc-be-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--yellow);margin-bottom:4px}
+.pc-be-row{display:flex;align-items:baseline;gap:10px}
+.pc-be-num{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--yellow);
+  letter-spacing:.04em;line-height:1.1}
+.pc-be-entry{font-family:var(--mono);font-size:13px;color:var(--text3)}
+.pc-be-sub{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:5px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="hbrand">
+    <div class="hdot"></div>
+    <div>
+      <div class="htitle"><span>FX</span> NEWS</div>
+      <div class="hsub">Professional Trading Dashboard</div>
+    </div>
+  </div>
+  <div class="hclock" id="clk">—</div>
+</div>
+
+<div class="layout">
+  <div class="col-left">
+    <div class="statusbar">
+      <button class="btn-refresh" id="btnR">↻ Refresh</button>
+      <div class="sdot" id="sdot" style="background:var(--yellow)"></div>
+      <div class="stext" id="stxt">Connecting…</div>
+    </div>
+    <div class="sess-bar" id="sessBar"></div>
+    <div class="errbanner" id="err">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" style="flex-shrink:0;margin-top:2px">
+        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.25a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0V5a.75.75 0 0 1 .75-.75zm0 7a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+      </svg>
+      <span id="errtxt"></span>
+    </div>
+    <div class="controls">
+      <div class="cgroup">
+        <span class="clabel">Date</span>
+        <div class="dnav">
+          <button class="btn-nav" id="bPrev">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="6.5,1.5 3,5 6.5,8.5"/></svg>
+          </button>
+          <div class="ddisp" id="ddisp">
+            <span id="dtxt">—</span>
+            <div id="calPicker" class="cal-picker"></div>
+          </div>
+          <button class="btn-nav" id="bNext">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3.5,1.5 7,5 3.5,8.5"/></svg>
+          </button>
+        </div>
+        <button class="btn-today" id="bToday">Today</button>
+        <button class="btn-today" id="bThisWeek">This Week</button>
+      </div>
+      <div class="cgroup">
+        <span class="clabel">Currency</span>
+        <div class="cbtns">
+          <button class="btn-cur all on" data-c="ALL">ALL</button>
+          <button class="btn-cur usd"    data-c="USD">USD</button>
+          <button class="btn-cur eur"    data-c="EUR">EUR</button>
+          <button class="btn-cur gbp"    data-c="GBP">GBP</button>
+        </div>
+      </div>
+    </div>
+    <div class="sechead">
+      <div class="sectitle"><div class="secdot"></div>High-Impact News</div>
+      <div class="evcnt" id="cnt">—</div>
+    </div>
+    <div class="twrap">
+      <table class="nt">
+        <thead><tr>
+          <th>Time (London)</th><th>Currency</th><th>Event</th>
+          <th>Impact</th><th>Forecast</th><th>Previous</th><th>Actual</th>
+        </tr></thead>
+        <tbody id="tbody">
+          <tr><td colspan="7"><div class="lstate"><div class="spin"></div><p>Loading…</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tznote">
+      Source: <strong>Forex Factory</strong> · Times in <strong>London (GMT/BST)</strong> · Cached 30 min
+    </div>
+  </div>
+  <div class="col-right">
+    <div class="pcalc">
+      <div class="pcalc-hd">
+        <div class="sectitle">
+          <div class="secdot" style="background:var(--cyan);box-shadow:0 0 4px var(--cyan)"></div>
+          Position Calculator
+        </div>
+
+      </div>
+      <div class="pcalc-body">
+
+        <!-- Instrument -->
+        <div>
+          <div class="pc-lbl">Instrument</div>
+          <select id="pcInstr" class="pc-sel">
+            <option value="GER40">GER40</option>
+            <option value="GBPUSD">GBPUSD</option>
+            <option value="EURUSD">EURUSD</option>
+            <option value="XAU">XAU / Gold</option>
+            <option value="DXY">DXY</option>
+          </select>
+          <div class="pc-ph" id="pcHint"></div>
+        </div>
+
+        <!-- Direction -->
+        <div>
+          <div class="pc-lbl">Direction</div>
+          <div class="pc-dir">
+            <button class="pc-dir-btn long on" id="pcLong">↑ Long</button>
+            <button class="pc-dir-btn short" id="pcShort">↓ Short</button>
+          </div>
+        </div>
+
+        <!-- Balance & Risk -->
+        <div class="pc-row2">
+          <div>
+            <div class="pc-lbl">Balance</div>
+            <div class="pc-iwrap">
+              <span class="pc-pfx">$</span>
+              <input type="number" id="pcBalance" class="pc-inp pfx" value="10000" min="0" step="100">
+            </div>
+          </div>
+          <div>
+            <div class="pc-lbl">Risk %</div>
+            <div class="pc-iwrap">
+              <input type="number" id="pcRisk" class="pc-inp sfx" value="1" min="0.1" max="100" step="0.1">
+              <span class="pc-sfx">%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick risk presets -->
+        <div class="pc-qrow">
+          <button class="pc-qbtn" data-r="0.5">0.5%</button>
+          <button class="pc-qbtn active" data-r="1">1%</button>
+          <button class="pc-qbtn" data-r="2">2%</button>
+          <button class="pc-qbtn" data-r="3">3%</button>
+        </div>
+
+        <!-- Commission -->
+        <div>
+          <div class="pc-lbl">Commission <span class="pc-opt">($/lot · round turn)</span></div>
+          <div class="pc-iwrap">
+            <span class="pc-pfx">$</span>
+            <input type="number" id="pcComm" class="pc-inp pfx" value="0" min="0" step="0.01" placeholder="0">
+          </div>
+          <div class="pc-plat-row">
+            <button class="pc-plat-btn active" data-plat="none">No commission</button>
+            <button class="pc-plat-btn" data-plat="ftmo">FTMO</button>
+            <button class="pc-plat-btn" data-plat="fp-std">FP Standard</button>
+            <button class="pc-plat-btn" data-plat="fp-zero">FP Zero</button>
+          </div>
+          <div class="pc-comm-note" id="pcCommNote"></div>
+        </div>
+
+        <!-- Entry -->
+        <div>
+          <div class="pc-lbl">Entry Price</div>
+          <input type="number" id="pcEntry" class="pc-inp" style="width:100%" placeholder="0.00" step="any">
+        </div>
+
+        <!-- Stop Loss -->
+        <div>
+          <div class="pc-lbl sl">Stop Loss</div>
+          <input type="number" id="pcSL" class="pc-inp sl" style="width:100%" placeholder="0.00" step="any">
+          <div class="pc-ph" id="pcSLHint"></div>
+        </div>
+
+        <!-- Take Profit -->
+        <div>
+          <div class="pc-lbl tp">Take Profit <span class="pc-opt">(optional)</span></div>
+          <input type="number" id="pcTP" class="pc-inp tp" style="width:100%" placeholder="0.00" step="any">
+          <div class="pc-ph" id="pcTPHint"></div>
+        </div>
+
+        <div class="pc-div"></div>
+
+        <!-- Results injected here -->
+        <div id="pcResults">
+          <div class="pc-empty">Enter entry &amp; stop loss to calculate</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var FF_CDN = {
+  thisweek: 'https://nfs.faireconomy.media/ff_calendar_thisweek.json',
+  nextweek: 'https://nfs.faireconomy.media/ff_calendar_nextweek.json'
+};
+var SUPPORTED   = ['USD','EUR','GBP'];
+var CACHE_TTL   = 30 * 60 * 1000;  // 30 min — FF CDN rate-limit ~2 req/5 min
+var STALE_AFTER =  5 * 60 * 1000;  // minimum gap before forced refresh
+var EMPTY_RETRY =  5 * 60 * 1000;  // retry nextweek empty response after 5 min
+
+var S = {
+  date: new Date(),          // anchor date (week start when mode='week')
+  mode: 'day',               // 'day' | 'week'
+  weekBounds: null,          // {s:Date, e:Date} — set when mode === 'week'
+  cur:  'ALL',
+  cacheThis:        null,
+  cacheNext:        null,    // null = never fetched; [] = fetched but empty; [...] = has data
+  cacheThisAt:      0,
+  cacheNextAt:      0,       // set only when cacheNext has real data
+  cacheNextEmptyAt: 0,       // set when cacheNext = [] (short EMPTY_RETRY TTL)
+  nextweekAvailable: true,
+  cacheHist:    {},          // "from|to" → events[] for historical date ranges
+  cacheHistAt:  {},          // "from|to" → timestamp
+  cacheEvHist:  {},          // "title|country" → events[] for event detail chart
+  loading: false
+};
+var _openDetailKey = null;  // key of currently open event detail row (null = closed)
+
+// ── Utils ──────────────────────────────────────────────────────
+function pad(n){ return String(n).padStart(2,'0'); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
+function fmtDisp(d){ return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear(); }
+function fmtISO(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function isToday(d){ var n=new Date(); return d.getFullYear()===n.getFullYear()&&d.getMonth()===n.getMonth()&&d.getDate()===n.getDate(); }
+function isPast(d){ var t=new Date(); t=new Date(t.getFullYear(),t.getMonth(),t.getDate()); return new Date(d.getFullYear(),d.getMonth(),d.getDate())<t; }
+function msSince(ts){ return Date.now()-ts; }
+function sleep(ms){ return new Promise(function(r){setTimeout(r,ms);}); }
+
+// ── Date parsing ───────────────────────────────────────────────
+var MON={jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11,
+         january:0,february:1,march:2,april:3,june:5,july:6,august:7,september:8,october:9,november:10,december:11};
+function parseDate(s){
+  s=String(s||'').trim();
+  var m;
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3]);
+  m=s.match(/^([A-Za-z]+)\s+(\d{1,2}),?\s+(\d{4})/);
+  if(m){var mo=MON[m[1].toLowerCase()]??MON[m[1].substring(0,3).toLowerCase()];if(mo!=null)return new Date(+m[3],mo,+m[2]);}
+  m=s.match(/^(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})/);
+  if(m){var mo2=MON[m[2].toLowerCase()]??MON[m[2].substring(0,3).toLowerCase()];if(mo2!=null)return new Date(+m[3],mo2,+m[1]);}
+  return null;
+}
+
+// ── Event UTC time ─────────────────────────────────────────────
+function evUTC(ev){
+  var ds=String(ev.date||'').trim();
+  // Include optional milliseconds (\.\d+)? for TradingView's "12:30:00.000Z" format
+  if(/T\d{2}:\d{2}:\d{2}(\.\d+)?[Z+\-]/.test(ds)){var d=new Date(ds);if(!isNaN(d.getTime()))return d;}
+  var base=parseDate(ds); if(!base) return null;
+  var ts=String(ev.time||'').trim();
+  if(!ts||/^(all.?day|tentative)$/i.test(ts)) return null;
+  var t=parseTP(ts); if(!t) return null;
+  return new Date(Date.UTC(base.getFullYear(),base.getMonth(),base.getDate(),t.h+etOff(base),t.m));
+}
+function parseTP(s){
+  s=String(s||'').trim();var m;
+  m=s.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
+  if(m){var h=+m[1],mn=+m[2],ap=m[3].toLowerCase();if(ap==='pm'&&h!==12)h+=12;if(ap==='am'&&h===12)h=0;return{h,m:mn};}
+  m=s.match(/^(\d{1,2}):(\d{2})$/);if(m)return{h:+m[1],m:+m[2]};
+  m=s.match(/^(\d{1,2})\s*(am|pm)$/i);
+  if(m){var h2=+m[1],ap2=m[2].toLowerCase();if(ap2==='pm'&&h2!==12)h2+=12;if(ap2==='am'&&h2===12)h2=0;return{h:h2,m:0};}
+  return null;
+}
+function etOff(d){
+  var y=d.getFullYear();
+  var on=new Date(y,2,8+(7-new Date(y,2,1).getDay())%7);
+  var off=new Date(y,10,1+(7-new Date(y,10,1).getDay())%7);
+  return (d>=on&&d<off)?4:5;
+}
+
+// ── London (GMT/BST) time display ───────────────────────────────
+// BST: last Sunday of March 01:00 UTC → last Sunday of October 01:00 UTC
+function londonOff(dt){
+  var y=dt.getUTCFullYear();
+  var bstS=new Date(Date.UTC(y,2,31)); bstS.setUTCDate(31-bstS.getUTCDay()); bstS.setUTCHours(1);
+  var bstE=new Date(Date.UTC(y,9,31)); bstE.setUTCDate(31-bstE.getUTCDay()); bstE.setUTCHours(1);
+  return (dt>=bstS&&dt<bstE)?1:0;
+}
+function fmtLondon(dt){
+  var off=londonOff(dt),h=(dt.getUTCHours()+off)%24;
+  return pad(h)+':'+pad(dt.getUTCMinutes());
+}
+
+// ── Week ranges ────────────────────────────────────────────────
+// Returns Mon–Fri bounds for the trading week (+offset weeks).
+// IMPORTANT: Forex Factory's "thisweek" feed always covers the UPCOMING Mon–Fri
+// (the week that hasn't started yet or is currently in progress Mon–Fri).
+// On Saturday/Sunday the trading week has ended — FF "thisweek" has already
+// rolled to next Mon–Fri. So on weekends we shift the anchor forward by 1 week
+// so that weekBounds(0) = the coming Mon–Fri that FF calls "thisweek",
+// and the just-ended week falls into needsHistory() → historical fetch.
+function weekBounds(offset){
+  var n=new Date(),dow=n.getDay();
+  // On Sat(6) or Sun(0): FF "thisweek" = next Mon–Fri, so advance anchor by 1 week
+  var weekendShift=(dow===0||dow===6)?1:0;
+  // Monday of the current ISO week (Mon=1…Sat=6, Sun=0→treated as +1 week above)
+  var daysToMon=dow===0?6:dow-1; // days since last Monday
+  var mon=new Date(n.getFullYear(),n.getMonth(),n.getDate()-daysToMon+(offset+weekendShift)*7);
+  var fri=new Date(mon); fri.setDate(fri.getDate()+4);
+  return {s:mon,e:fri};
+}
+function inRange(d,b){
+  var dd=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  return dd>=new Date(b.s.getFullYear(),b.s.getMonth(),b.s.getDate())&&
+         dd<=new Date(b.e.getFullYear(),b.e.getMonth(),b.e.getDate());
+}
+function isThisWeek(d){ return inRange(d,weekBounds(0)); }
+function isNextWeek(d){ return inRange(d,weekBounds(1)); }
+
+// True when current view is entirely outside thisweek + nextweek feeds
+function needsHistory(){
+  if(S.mode==='week'&&S.weekBounds){
+    return !isThisWeek(S.weekBounds.s)&&!isThisWeek(S.weekBounds.e)&&
+           !isNextWeek(S.weekBounds.s)&&!isNextWeek(S.weekBounds.e);
+  }
+  return !isThisWeek(S.date)&&!isNextWeek(S.date);
+}
+// Cache key for the current view's date range
+function histRangeKey(){
+  if(S.mode==='week'&&S.weekBounds)
+    return fmtISO(S.weekBounds.s)+'|'+fmtISO(S.weekBounds.e);
+  return fmtISO(S.date)+'|'+fmtISO(S.date);
+}
+
+// Format "22.03 – 28.03.2026" for week range display
+function fmtDispRange(b){
+  var s=b.s, e=b.e;
+  var sy=s.getFullYear(), ey=e.getFullYear();
+  var sd=pad(s.getDate())+'.'+pad(s.getMonth()+1);
+  var ed=pad(e.getDate())+'.'+pad(e.getMonth()+1);
+  if(sy===ey) return sd+' – '+ed+'.'+ey;
+  return sd+'.'+sy+' – '+ed+'.'+ey;
+}
+
+// Day header for week grouping: "Monday  22 Mar"
+var _DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var _MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDayHeader(d){
+  return _DAYS[d.getDay()]+'  '+d.getDate()+' '+_MONS[d.getMonth()]+' '+d.getFullYear();
+}
+
+// ── Field helpers ──────────────────────────────────────────────
+function isHigh(ev){ var v=String(ev.impact||'').toLowerCase().trim(); return v==='high'||v==='3'; }
+function getActual(ev){
+  var v=ev.actual??ev.Actual??ev.actualValue??ev.released??'';
+  v=String(v).trim(); return (v===''||v==='null'||v==='undefined')?'':v;
+}
+function getForecast(ev){ return String(ev.estimate??ev.forecast??ev.Forecast??ev.consensus??'').trim(); }
+function getPrevious(ev){ return String(ev.previous??ev.Previous??'').trim(); }
+function actCls(a,f,title){
+  if(!a)return'pending';if(!f)return'neutral';
+  var av=parseFloat(String(a).replace(/[^0-9.\-]/g,'')),fv=parseFloat(String(f).replace(/[^0-9.\-]/g,''));
+  if(isNaN(av)||isNaN(fv))return'neutral';
+  var lb=/unemploy|claims|cpi|inflation|deficit/.test((title||'').toLowerCase());
+  return av===fv?'neutral':((lb?av<fv:av>fv)?'better':'worse');
+}
+function badge(c){var cl={USD:'busd',EUR:'beur',GBP:'bgbp'}[c]||'';return'<span class="badge '+cl+'">'+esc(c)+'</span>';}
+
+// ── Bank Holidays ──────────────────────────────────────────────
+// Key format: "YYYY-MM-DD"
+// USD = US Federal holidays, EUR = ECB/Eurozone (Germany/France major), GBP = England & Wales
+var BANK_HOLIDAYS = {
+  USD: [
+    '2026-01-01','2026-01-19','2026-02-16','2026-05-25',
+    '2026-06-19','2026-07-03','2026-07-04','2026-09-07',
+    '2026-10-12','2026-11-11','2026-11-26','2026-12-25'
+  ],
+  EUR: [
+    '2026-01-01','2026-04-03','2026-04-06','2026-05-01',
+    '2026-05-25','2026-06-05','2026-10-03','2026-12-24',
+    '2026-12-25','2026-12-26','2026-12-31'
+  ],
+  GBP: [
+    '2026-01-01','2026-04-03','2026-04-06','2026-05-04',
+    '2026-05-25','2026-08-31','2026-12-25','2026-12-28'
+  ]
+};
+// Returns holiday name string if the date is a bank holiday for that currency, else null
+var BANK_HOLIDAY_NAMES = {
+  USD: {
+    '2026-01-01':'New Year\'s Day','2026-01-19':'MLK Day','2026-02-16':'Presidents\' Day',
+    '2026-05-25':'Memorial Day','2026-06-19':'Juneteenth','2026-07-03':'Independence Day (obs.)',
+    '2026-07-04':'Independence Day','2026-09-07':'Labor Day','2026-10-12':'Columbus Day',
+    '2026-11-11':'Veterans Day','2026-11-26':'Thanksgiving','2026-12-25':'Christmas'
+  },
+  EUR: {
+    '2026-01-01':'New Year\'s Day','2026-04-03':'Good Friday','2026-04-06':'Easter Monday',
+    '2026-05-01':'Labour Day','2026-05-25':'Whit Monday','2026-06-05':'Corpus Christi',
+    '2026-10-03':'German Unity Day','2026-12-24':'Christmas Eve',
+    '2026-12-25':'Christmas Day','2026-12-26':'Boxing Day','2026-12-31':'New Year\'s Eve'
+  },
+  GBP: {
+    '2026-01-01':'New Year\'s Day','2026-04-03':'Good Friday','2026-04-06':'Easter Monday',
+    '2026-05-04':'Early May Bank Holiday','2026-05-25':'Spring Bank Holiday',
+    '2026-08-31':'Summer Bank Holiday','2026-12-25':'Christmas Day','2026-12-28':'Boxing Day (obs.)'
+  }
+};
+function getBankHoliday(currency, dateObj){
+  if(!dateObj) return null;
+  var key = fmtISO(dateObj);
+  var names = BANK_HOLIDAY_NAMES[currency];
+  if(names && names[key]) return names[key];
+  return null;
+}
+function bankHolidayPill(name){
+  return '<span class="bh-pill" title="'+esc(name)+'">'+
+    '<svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>'+
+    'BH</span>';
+}
+// ── Market closed detection ────────────────────────────────────
+// Returns array of {currency, name} for any holidays on a given ISO dateKey
+function getHolidaysForDate(dateKey){
+  var out=[];
+  ['USD','EUR','GBP'].forEach(function(c){
+    var n=BANK_HOLIDAY_NAMES[c][dateKey];
+    if(n) out.push({currency:c,name:n});
+  });
+  return out;
+}
+
+// Returns true when forex markets are fully closed:
+// weekends OR all three currencies simultaneously on holiday
+function _dateKeyFromLocal(dateObj){
+  // dateObj is a local-time Date (from new Date(y,m,d))
+  return dateObj.getFullYear()+'-'+pad(dateObj.getMonth()+1)+'-'+pad(dateObj.getDate());
+}
+function isDateMarketClosed(isoKey){
+  // Weekend check: parse the key into a local Date and check day
+  var p=isoKey.split('-');
+  var d=new Date(+p[0],+p[1]-1,+p[2]);
+  var dow=d.getDay(); // 0=Sun, 6=Sat
+  if(dow===0||dow===6) return true;
+  // All three currencies on holiday
+  var hols=getHolidaysForDate(isoKey);
+  return hols.length===3;
+}
+
+// For the live session bar — checks current real time
+function getMarketClosedReason(now){
+  var ukOff = londonOff(now);
+  var londonMs = now.getTime() + ukOff * 3600 * 1000;
+  var ld = new Date(londonMs);
+  var dow = ld.getUTCDay(); // 0=Sun, 6=Sat using shifted UTC = London local
+  if(dow === 0 || dow === 6){
+    return {reason: dow===6 ? 'Saturday' : 'Sunday', label:'Weekend — Markets Closed'};
+  }
+  var dateKey = ld.getUTCFullYear()+'-'+pad(ld.getUTCMonth()+1)+'-'+pad(ld.getUTCDate());
+  var hols = getHolidaysForDate(dateKey);
+  if(hols.length===3){
+    return {reason: hols[0].name, label:'Bank Holiday — Markets Closed'};
+  }
+  return null;
+}
+function isMarketClosed(now){ return getMarketClosedReason(now) !== null; }
+
+function cdown(ms){
+  if(ms<=0)return null;
+  var s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=s%60;
+  if(h>0)return h+'h '+pad(m)+'m';if(m>=5)return m+'m';if(m>0)return m+'m '+pad(sc)+'s';return sc+'s';
+}
+
+// ── Market session widget ──────────────────────────────────────
+// Chronological order: Asia → Pre-Market (07:00 London) → London (08:00) → NY AM → NY PM
+var SESS_DEFS = [
+  {id:'asia',      name:'Asia'},
+  {id:'premarket', name:'Pre-Market'},
+  {id:'london',    name:'London'},
+  {id:'nyam',      name:'NY AM'},
+  {id:'nypm',      name:'NY PM'}
+];
+var _sessId = null; // tracks active session; triggers full DOM rebuild on change
+
+// Returns UTC-second boundaries for today's sessions (DST-aware)
+// asiaStart = midnight London in UTC: 0 when GMT, 82800 (23:00 UTC) when BST
+function _sessBnds(now){
+  var uk = londonOff(now);
+  var et = etOff(new Date(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  var asiaStart = ((24 - uk) % 24) * 3600;     // 00:00 London → UTC
+  var preStart  = (7 - uk) * 3600;             // 07:00 London → UTC
+  var lonOpen   = (8 - uk) * 3600;             // 08:00 London → UTC
+  var nyAm      = 9 * 3600 + 1800 + et * 3600; // 09:30 ET → UTC
+  var nyNoon    = 12 * 3600 + et * 3600;        // 12:00 ET → UTC
+  var nyClose   = 16 * 3600 + et * 3600;        // 16:00 ET → UTC
+  return {asiaStart:asiaStart,preStart:preStart,lonOpen:lonOpen,nyAm:nyAm,nyNoon:nyNoon,nyClose:nyClose};
+}
+
+// Returns {id, secsLeft} — id is null during the after-hours gap (NY close → midnight London)
+function _curSessInfo(now){
+  var b = _sessBnds(now);
+  var s = now.getUTCHours()*3600 + now.getUTCMinutes()*60 + now.getUTCSeconds();
+  // Asia: [asiaStart, 86400) ∪ [0, preStart)  i.e. midnight London to 07:00 London
+  var inAsia = (b.asiaStart === 0) ? (s < b.preStart)
+                                   : (s >= b.asiaStart || s < b.preStart);
+  if(inAsia){
+    var asl = (s < b.preStart) ? b.preStart - s : (86400 - s) + b.preStart;
+    return {id:'asia', secsLeft:asl};
+  }
+  if(s < b.lonOpen)  return {id:'premarket', secsLeft: b.lonOpen - s};
+  if(s < b.nyAm)     return {id:'london',    secsLeft: b.nyAm - s};
+  if(s < b.nyNoon)   return {id:'nyam',      secsLeft: b.nyNoon - s};
+  if(s < b.nyClose)  return {id:'nypm',      secsLeft: b.nyClose - s};
+  // After-hours gap: NY close → midnight London
+  var gapEnd = (b.asiaStart === 0) ? 86400 : b.asiaStart;
+  return {id:null, secsLeft: gapEnd - s};
+}
+
+// Format seconds → "2h 34m 12s" / "34m 12s" / "12s"
+function _fmtSessTime(secs){
+  if(secs<=0) return '0s';
+  var h=Math.floor(secs/3600), m=Math.floor((secs%3600)/60), sc=secs%60;
+  if(h>0) return h+'h '+pad(m)+'m '+pad(sc)+'s';
+  if(m>0) return m+'m '+pad(sc)+'s';
+  return sc+'s';
+}
+
+// Update session bar — full DOM rebuild on session change, text-only update otherwise
+function updateSessBar(){
+  var bar=document.getElementById('sessBar');
+  if(!bar) return;
+  var now=new Date();
+
+  // ── Market closed (weekend or global bank holiday) ──
+  var closed=getMarketClosedReason(now);
+  var closedKey=closed?('__mktclosed__'+(closed.reason)):'__open__';
+  if(closed){
+    if(_sessId!==closedKey){
+      _sessId=closedKey;
+      bar.classList.add('market-closed');
+      // Render all pills dimmed + a prominent closed badge
+      var pills=SESS_DEFS.map(function(def){
+        return '<div class="sess-pill" data-s="'+def.id+'">'+
+          '<div class="sess-dot"></div>'+def.name+'</div>';
+      }).join('');
+      var badge='<span class="sess-closed-badge">'+
+        '<span class="sc-dot"></span>'+closed.label+'</span>';
+      // Determine next open: Monday 00:00 London for weekends, next day otherwise
+      var hint='';
+      var ukOff=londonOff(now);
+      var lonMs=now.getTime()+ukOff*3600*1000;
+      var ld=new Date(lonMs);
+      var dow=ld.getUTCDay();
+      if(dow===6){
+        var secsToMon=((2*86400)-(ld.getUTCHours()*3600+ld.getUTCMinutes()*60+ld.getUTCSeconds()));
+        hint='<span class="sess-closed-reason">Opens <strong>Monday</strong> · <span id="sessCdown">'+_fmtSessTime(secsToMon)+'</span></span>';
+      }else if(dow===0){
+        var secsToMon2=((86400)-(ld.getUTCHours()*3600+ld.getUTCMinutes()*60+ld.getUTCSeconds()));
+        hint='<span class="sess-closed-reason">Opens <strong>Monday</strong> · <span id="sessCdown">'+_fmtSessTime(secsToMon2)+'</span></span>';
+      }else{
+        hint='<span class="sess-closed-reason"><strong>'+esc(closed.reason)+'</strong></span>';
+      }
+      bar.innerHTML=pills+badge+hint;
+    } else {
+      // Just update countdown
+      var el=document.getElementById('sessCdown');
+      if(el){
+        var ukOff2=londonOff(now);
+        var lonMs2=now.getTime()+ukOff2*3600*1000;
+        var ld2=new Date(lonMs2);
+        var dow2=ld2.getUTCDay();
+        if(dow2===6){
+          var s2m=((2*86400)-(ld2.getUTCHours()*3600+ld2.getUTCMinutes()*60+ld2.getUTCSeconds()));
+          el.textContent=_fmtSessTime(s2m);
+        }else if(dow2===0){
+          var s2m2=((86400)-(ld2.getUTCHours()*3600+ld2.getUTCMinutes()*60+ld2.getUTCSeconds()));
+          el.textContent=_fmtSessTime(s2m2);
+        }
+      }
+    }
+    return;
+  }
+
+  // ── Market open ──
+  bar.classList.remove('market-closed');
+  var info=_curSessInfo(now);
+  var stateKey=info.id||'__closed__';
+  if(_sessId !== stateKey){
+    _sessId=stateKey;
+    var pills2=SESS_DEFS.map(function(def){
+      var on=def.id===info.id;
+      var cdown_html=on
+        ?'<span class="sess-cdown" id="sessCdown">'+_fmtSessTime(info.secsLeft)+'</span>'
+        :'';
+      return '<div class="sess-pill'+(on?' on':'')+'" data-s="'+def.id+'">'+
+        '<div class="sess-dot"></div>'+def.name+cdown_html+'</div>';
+    }).join('');
+    // After-hours: all pills greyed, show countdown to Asia open
+    var extra=info.id===null
+      ?'<span class="sess-after">Off-Session · Asia opens in <span id="sessCdown">'+
+        _fmtSessTime(info.secsLeft)+'</span></span>'
+      :'';
+    bar.innerHTML=pills2+extra;
+  } else {
+    var el2=document.getElementById('sessCdown');
+    if(el2) el2.textContent=_fmtSessTime(info.secsLeft);
+  }
+}
+
+// ── Event descriptions ─────────────────────────────────────────
+var EV_DESC=[
+  {m:/non.?farm.?payroll|nfp\b/i,
+   t:'Non-Farm Payrolls (NFP)',
+   d:'Measures the monthly net change in US paid employment, excluding farm workers and some government jobs. Released first Friday of each month by the Bureau of Labor Statistics.',
+   e:'Above forecast → USD rallies (strong labour market). Below forecast → USD falls. One of the biggest market movers — can cause 50–100+ pip swings.'},
+  {m:/average hourly earning/i,
+   t:'Average Hourly Earnings',
+   d:'Measures the month-on-month change in wages for non-farm payrolls employees. A leading gauge of wage-driven inflation.',
+   e:'Above forecast → USD bullish (wage inflation raises rate-hike expectations). Below forecast → USD bearish.'},
+  {m:/adp.*employ|nonfarm.*employ.*change/i,
+   t:'ADP / Employment Change',
+   d:'ADP\'s private-sector payrolls report, published two days before NFP. Tracks the monthly change in non-farm private employment.',
+   e:'Above forecast → USD bullish (strong NFP preview). Below forecast → USD bearish.'},
+  {m:/unemployment rate|jobless rate/i,
+   t:'Unemployment Rate',
+   d:'The percentage of the labour force that is jobless and actively seeking employment. A lagging indicator of labour-market health.',
+   e:'Below forecast (lower unemployment) → currency bullish. Above forecast → bearish.'},
+  {m:/claimant count/i,
+   t:'Claimant Count Change (UK)',
+   d:'Monthly change in the number of people claiming unemployment-related benefits in the UK. Released by the ONS alongside Average Earnings.',
+   e:'Below forecast (fewer claimants) → GBP bullish. Above forecast → GBP bearish.'},
+  {m:/core.*cpi|cpi.*core/i,
+   t:'Core CPI',
+   d:'Consumer Price Index excluding volatile food and energy. The metric central banks watch most closely as a stable inflation signal.',
+   e:'Above forecast → currency bullish (rate-hike expectations rise). Below forecast → bearish.'},
+  {m:/\bcpi\b|consumer price index/i,
+   t:'Consumer Price Index (CPI)',
+   d:'Measures the change in the price of a representative basket of consumer goods and services. The primary gauge of inflation used by central banks to set policy.',
+   e:'Above forecast → currency bullish (tightening bias). Below forecast → currency bearish (easing bias).'},
+  {m:/pce|personal consumption expenditure/i,
+   t:'PCE Price Index',
+   d:'The Federal Reserve\'s preferred inflation measure. Covers a broader range of spending than CPI and uses a chain-weighting method that updates the basket continuously.',
+   e:'Above forecast → USD bullish (higher rate path expected). Below forecast → USD bearish.'},
+  {m:/ppi|producer price index/i,
+   t:'Producer Price Index (PPI)',
+   d:'Measures inflation at the wholesale level — a leading signal for consumer CPI since producers pass rising costs forward.',
+   e:'Above forecast → currency bullish (inflation building). Below forecast → bearish.'},
+  {m:/gdp.*(advance|flash|prelim|growth)/i,
+   t:'GDP Growth Rate',
+   d:'The broadest measure of economic activity — the annualised rate of change in the total value of goods and services produced.',
+   e:'Above forecast → currency bullish (healthy growth). Below forecast → bearish (slowdown risk).'},
+  {m:/retail sales/i,
+   t:'Retail Sales',
+   d:'Measures the monthly change in the total value of sales at the retail level. A leading proxy for consumer spending, which drives 60–70% of GDP.',
+   e:'Above forecast → currency bullish (strong consumer demand). Below forecast → bearish.'},
+  {m:/fed funds|fomc\b|federal reserve.*(rate|decision)/i,
+   t:'Fed Funds Rate / FOMC Decision',
+   d:'The Federal Reserve\'s benchmark overnight lending rate, set 8 times per year. The most impactful single event for the USD and global risk assets.',
+   e:'Rate hike → USD bullish. Rate cut → USD bearish. Hawkish/dovish language in the statement often moves markets more than the rate decision itself.'},
+  {m:/ecb.*(rate|decision)|governing council.*decision/i,
+   t:'ECB Interest Rate Decision',
+   d:'The European Central Bank Governing Council sets the key policy rates. Decisions are accompanied by a monetary policy statement and a press conference.',
+   e:'Rate hike or hawkish tone → EUR bullish. Rate cut or dovish tone → EUR bearish.'},
+  {m:/boe.*rate|bank of england.*(rate|decision)|mpc.*(vote|decision)|bank rate/i,
+   t:'Bank of England Rate Decision',
+   d:'The Bank of England Monetary Policy Committee sets the Official Bank Rate, typically 8 times per year. Minutes and vote split are released simultaneously.',
+   e:'Rate hike → GBP bullish. Rate cut → GBP bearish. The MPC vote split (e.g. 7-2) signals the future direction.'},
+  {m:/ism.*manufacturing|manufacturing.*pmi/i,
+   t:'Manufacturing PMI',
+   d:'A Purchasing Managers\' Index survey of manufacturing sector conditions. Above 50 = expansion; below 50 = contraction. A leading indicator of industrial output.',
+   e:'Above 50 and beating forecast → currency bullish. Below 50 and missing → bearish.'},
+  {m:/ism.*services|services.*pmi|non.?mfg.*pmi/i,
+   t:'Services PMI',
+   d:'PMI survey of the services sector (finance, healthcare, retail, etc.), which accounts for 70–80% of developed economies. A strong leading indicator of GDP.',
+   e:'Above 50 and above forecast → currency bullish. Below 50 → bearish.'},
+  {m:/zew.*sentiment|zew.*economic/i,
+   t:'ZEW Economic Sentiment',
+   d:'Survey of ~350 German financial analysts rating the 6-month economic outlook for Germany. A widely-used leading indicator for the Eurozone.',
+   e:'Above forecast → EUR bullish. Below forecast → EUR bearish.'},
+  {m:/ifo.*business|business climate.*german|german.*business climate/i,
+   t:'German IFO Business Climate',
+   d:'Monthly survey of ~9,000 German companies on current and expected business conditions. Germany is the Eurozone\'s largest economy, making this a key EUR driver.',
+   e:'Above forecast → EUR bullish. Below forecast → EUR bearish.'},
+  {m:/michigan.*sentiment|consumer.*sentiment.*michigan/i,
+   t:'Michigan Consumer Sentiment',
+   d:'University of Michigan monthly survey of ~500 US households on personal finances and business conditions. Measures confidence and near-term spending intentions.',
+   e:'Above forecast → USD bullish. Below forecast → USD bearish.'},
+  {m:/durable goods/i,
+   t:'Durable Goods Orders',
+   d:'Measures new orders for goods designed to last 3+ years (aircraft, machinery, electronics). A proxy for business capital investment and industrial demand.',
+   e:'Above forecast → USD bullish. "Core" version (ex-transportation) is considered more reliable.'},
+  {m:/trade balance/i,
+   t:'Trade Balance',
+   d:'The difference between a country\'s exports and imports. A surplus means more goods/services sold abroad; a deficit means more imported.',
+   e:'Narrowing deficit or widening surplus → currency bullish. Widening deficit → bearish (more domestic currency sold to pay for imports).'},
+  {m:/housing starts|building permits/i,
+   t:'Housing Starts / Building Permits',
+   d:'Measures new residential construction activity. Housing is a significant part of GDP and a leading economic indicator — building drives demand for materials, appliances, and mortgages.',
+   e:'Above forecast → USD bullish. Below forecast → bearish.'},
+  {m:/industrial production/i,
+   t:'Industrial Production',
+   d:'Measures the change in output from manufacturing, mining, and utilities sectors. Indicates productive capacity and economic momentum.',
+   e:'Above forecast → currency bullish. Below forecast → bearish.'}
+];
+
+// ── Event detail helpers ────────────────────────────────────────
+function _parseNum(s){
+  if(!s) return null;
+  var n=parseFloat(String(s).replace(/[^0-9.\-]/g,''));
+  return isNaN(n)?null:n;
+}
+var _CMON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function _fmtChartDate(dt){ return _CMON[dt.getUTCMonth()]+' '+dt.getUTCDate(); }
+
+function _buildChart(events){
+  var pts=[];
+  events.forEach(function(ev){
+    var dt=new Date(ev.date); if(isNaN(dt.getTime())) return;
+    var a=_parseNum(ev.actual), f=_parseNum(ev.forecast);
+    pts.push({dt:dt,lbl:_fmtChartDate(dt),actual:a,aRaw:ev.actual||'',forecast:f,fRaw:ev.forecast||''});
+  });
+  pts.sort(function(a,b){return a.dt-b.dt;});
+  var ap=pts.filter(function(p){return p.actual!==null;});
+  if(!ap.length) return '<div class="ev-chart-empty">No released data yet for this year</div>';
+
+  var W=460,H=118,PL=8,PR=12,PT=22,PB=26;
+  var pw=W-PL-PR, ph=H-PT-PB;
+  var vals=ap.map(function(p){return p.actual;});
+  var yMn=Math.min.apply(null,vals), yMx=Math.max.apply(null,vals);
+  var yr=yMx-yMn; if(yr<0.001){yMn-=0.5;yMx+=0.5;yr=1;}
+  var yp=yr*0.22; yMn-=yp; yMx+=yp; yr=yMx-yMn;
+  var n=ap.length;
+  function xp(i){return PL+(n>1?(i/(n-1))*pw:pw/2);}
+  function yp2(v){return PT+ph-((v-yMn)/yr)*ph;}
+
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" height="'+H+'" xmlns="http://www.w3.org/2000/svg" style="display:block;overflow:visible">';
+
+  // Zero line
+  if(yMn<0&&yMx>0){var z=yp2(0).toFixed(1);svg+='<line x1="'+PL+'" y1="'+z+'" x2="'+(W-PR)+'" y2="'+z+'" stroke="#30363d" stroke-width="1" stroke-dasharray="3,3"/>';}
+
+  // Area fill
+  if(n>1){
+    var ap2=ap.map(function(p,i){return xp(i).toFixed(1)+','+yp2(p.actual).toFixed(1);});
+    var bY=(H-PB).toFixed(1);
+    svg+='<path d="M'+ap2[0]+' L'+ap2.slice(1).join(' L')+' L'+xp(n-1).toFixed(1)+','+bY+' L'+PL+','+bY+' Z" fill="#58a6ff" opacity="0.07"/>';
+  }
+
+  // Line
+  if(n>1){
+    svg+='<polyline points="'+ap.map(function(p,i){return xp(i).toFixed(1)+','+yp2(p.actual).toFixed(1);}).join(' ')+'" fill="none" stroke="#58a6ff" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>';
+  }
+
+  // Dots + labels
+  ap.forEach(function(p,i){
+    var x=xp(i).toFixed(1), y=yp2(p.actual).toFixed(1);
+    var clr=p.forecast!==null?(p.actual>p.forecast?'#3fb950':(p.actual<p.forecast?'#f85149':'#58a6ff')):'#58a6ff';
+    // Value label — place above dot unless near top
+    var ly=parseFloat(y)<PT+12?(parseFloat(y)+12).toFixed(1):(parseFloat(y)-7).toFixed(1);
+    svg+='<text x="'+x+'" y="'+ly+'" text-anchor="middle" font-size="8.5" fill="#8b949e" font-family="monospace">'+esc(p.aRaw)+'</text>';
+    // Dot
+    svg+='<circle cx="'+x+'" cy="'+y+'" r="4" fill="#161b22" stroke="'+clr+'" stroke-width="2"><title>'+esc(p.lbl+': '+p.aRaw+(p.fRaw?' · fcst '+p.fRaw:''))+'</title></circle>';
+    // Date label
+    svg+='<text x="'+x+'" y="'+(H-7)+'" text-anchor="middle" font-size="8" fill="#484f58" font-family="monospace">'+esc(p.lbl)+'</text>';
+  });
+
+  svg+='</svg>';
+  return svg;
+}
+
+// Toggle event detail row open/closed
+async function toggleDetail(evKey,title,country,trEl){
+  var prev=document.getElementById('ev-detail-row');
+  // Remove .open from any previously highlighted title
+  document.querySelectorAll('#tbody .cevt.open').forEach(function(el){el.classList.remove('open');});
+  if(prev){
+    prev.remove();
+    if(_openDetailKey===evKey){_openDetailKey=null;return;}
+  }
+  _openDetailKey=evKey;
+  var titleEl=trEl.querySelector('.cevt'); if(titleEl) titleEl.classList.add('open');
+
+  // Insert loading row immediately
+  var dtr=document.createElement('tr');
+  dtr.id='ev-detail-row'; dtr.className='ev-detail-tr';
+  dtr.innerHTML='<td colspan="7" class="ev-detail-td"><div class="ev-detail-inner"><div class="ev-chart-empty"><div class="spin" style="width:16px;height:16px;margin-right:8px"></div>Loading history…</div></div></td>';
+  trEl.parentNode.insertBefore(dtr,trEl.nextSibling);
+
+  // Find description match
+  var desc=null;
+  for(var i=0;i<EV_DESC.length;i++){if(EV_DESC[i].m.test(title)){desc=EV_DESC[i];break;}}
+
+  // Fetch event history (cached)
+  var ck=title+'|'+country;
+  if(!S.cacheEvHist[ck]){
+    try{
+      var yr=new Date().getFullYear();
+      var r=await fetch('http://localhost:8080/event-history?title='+encodeURIComponent(title)+'&country='+encodeURIComponent(country)+'&year='+yr,{cache:'no-store'});
+      S.cacheEvHist[ck]=r.ok?(await r.json()):[];
+    }catch(e){S.cacheEvHist[ck]=[];}
+  }
+
+  // Bail if detail row was closed or replaced while fetching
+  var dr=document.getElementById('ev-detail-row');
+  if(!dr||_openDetailKey!==evKey) return;
+
+  var hevts=S.cacheEvHist[ck]||[];
+  var descHtml=desc
+    ?'<div class="ev-desc-name">'+esc(desc.t)+'</div>'+
+      '<div class="ev-desc-body">'+esc(desc.d)+'</div>'+
+      '<div class="ev-effect"><strong>Market impact:</strong> '+esc(desc.e)+'</div>'
+    :'<div class="ev-desc-name">'+esc(title)+'</div>'+
+      '<div class="ev-desc-body" style="color:var(--text3)">No description available for this indicator.</div>';
+  var yr2=new Date().getFullYear();
+  var chartHtml=hevts.length?_buildChart(hevts):'<div class="ev-chart-empty">No data returned from server</div>';
+  dr.innerHTML='<td colspan="7" class="ev-detail-td"><div class="ev-detail-inner">'+
+    '<div class="ev-desc-box">'+descHtml+'</div>'+
+    '<div class="ev-chart-box">'+
+    '<div class="ev-chart-title">'+yr2+' Releases · '+esc(country)+'</div>'+
+    chartHtml+'</div></div></td>';
+}
+
+// ── Fetch ──────────────────────────────────────────────────────
+var PROXY='http://localhost:8080/proxy?url=';
+
+async function fetchFeed(cdnKey){
+  var url=FF_CDN[cdnKey];
+  var res=await fetch(PROXY+encodeURIComponent(url),{cache:'no-store'});
+  if(!res.ok) throw new Error('Server error HTTP '+res.status);
+  var data=await res.json();
+  if(!Array.isArray(data)) throw new Error('Unexpected format from server');
+  return data;
+}
+
+async function fetchAll(forceRefresh){
+  try{ await fetch('http://localhost:8080/ping',{cache:'no-store'}); }
+  catch(e){ throw new Error('server.py not running — open a terminal and run: python3 server.py'); }
+
+  var needThis = forceRefresh
+    ? msSince(S.cacheThisAt) > STALE_AFTER
+    : !S.cacheThis || msSince(S.cacheThisAt) > CACHE_TTL;
+
+  // Need nextweek when currently viewing next week's dates
+  // In week mode S.date is the week start (Sunday); isNextWeek(S.date) is sufficient.
+  // In custom range mode also check if week end falls into next week.
+  var viewNW = S.mode === 'week' && S.weekBounds
+    ? isNextWeek(S.weekBounds.s) || isNextWeek(S.weekBounds.e)
+    : isNextWeek(S.date);
+
+  var needNext = viewNW && (function(){
+    if(S.cacheNext === null) return true;
+    if(S.cacheNext.length > 0){
+      return forceRefresh ? msSince(S.cacheNextAt) > STALE_AFTER
+                          : msSince(S.cacheNextAt) > CACHE_TTL;
+    }
+    return forceRefresh ? true : msSince(S.cacheNextEmptyAt) > EMPTY_RETRY;
+  }());
+
+  // ── thisweek ──
+  if(needThis){
+    try{
+      S.cacheThis  = await fetchFeed('thisweek');
+      S.cacheThisAt = Date.now();
+      console.log('[FF] thisweek:', S.cacheThis.length, 'events');
+    }catch(e){
+      if(!S.cacheThis) throw e;
+      console.warn('[FF] thisweek refresh failed, using cache:', e.message);
+    }
+  }
+
+  // ── nextweek (optional — NEVER propagates errors) ──
+  if(needNext){
+    await sleep(800);
+    try{
+      var nwData = await fetchFeed('nextweek');
+      S.cacheNext = nwData;
+      if(nwData.length > 0){
+        S.cacheNextAt = Date.now();
+        S.nextweekAvailable = true;
+        console.log('[FF] nextweek:', nwData.length, 'events');
+      } else {
+        S.cacheNextEmptyAt = Date.now();
+        S.nextweekAvailable = false;
+        console.log('[FF] nextweek: empty (not yet published) — will retry in 5 min');
+      }
+    }catch(e){
+      S.nextweekAvailable = false;
+      console.warn('[FF] nextweek unavailable (non-fatal):', e.message);
+    }
+  }
+
+  // ── historical (TradingView) — when date is outside thisweek + nextweek ──
+  if(needsHistory()){
+    var hk=histRangeKey();
+    var needHist=!(hk in S.cacheHist)||msSince(S.cacheHistAt[hk]||0)>CACHE_TTL;
+    if(forceRefresh||needHist){
+      var hFrom,hTo;
+      if(S.mode==='week'&&S.weekBounds){hFrom=fmtISO(S.weekBounds.s);hTo=fmtISO(S.weekBounds.e);}
+      else{hFrom=hTo=fmtISO(S.date);}
+      try{
+        var hr=await fetch('http://localhost:8080/history?from='+hFrom+'&to='+hTo,{cache:'no-store'});
+        if(hr.ok){
+          var hdata=await hr.json();
+          if(Array.isArray(hdata)){
+            S.cacheHist[hk]=hdata;
+            S.cacheHistAt[hk]=Date.now();
+            console.log('[hist]',hdata.length,'events',hFrom,'→',hTo);
+          }
+        }
+      }catch(e){
+        console.warn('[hist] fetch failed:',e.message);
+        if(!(hk in S.cacheHist)) S.cacheHist[hk]=[];
+      }
+    }
+  }
+
+  var hk2=histRangeKey();
+  var merged=(S.cacheThis||[]).concat(S.cacheNext||[]).concat(S.cacheHist[hk2]||[]);
+  if(!merged.length) throw new Error('No data — check server.py logs');
+  return merged;
+}
+
+// ── Filter ─────────────────────────────────────────────────────
+// Filters by current S.mode (day or week) and currency
+function filter(data,cur){
+  return data.filter(function(ev){
+    if(!ev) return false;
+    var b=parseDate(String(ev.date||'')); if(!b) return false;
+    if(S.mode==='week'){
+      if(!S.weekBounds||!inRange(b,S.weekBounds)) return false;
+    } else {
+      if(fmtISO(b)!==fmtISO(S.date)) return false;
+    }
+    if(!isHigh(ev)) return false;
+    var c=(ev.country||'').toUpperCase();
+    return cur==='ALL'?SUPPORTED.indexOf(c)!==-1:c===cur;
+  });
+}
+
+// Count ALL events (any impact/currency) in current view — used for empty-state hints
+function countInView(data){
+  return data.filter(function(ev){
+    if(!ev) return false;
+    var b=parseDate(String(ev.date||'')); if(!b) return false;
+    if(S.mode==='week') return S.weekBounds&&inRange(b,S.weekBounds);
+    return fmtISO(b)===fmtISO(S.date);
+  }).length;
+}
+
+// ── Build holiday notice rows for a date range ─────────────────
+// Returns HTML string of notice <tr> rows (empty string if no holidays in range)
+function buildHolidayNotices(){
+  var rows='';
+  // Collect dates to check
+  var dates=[];
+  if(S.mode==='week'&&S.weekBounds){
+    var d=new Date(S.weekBounds.s);
+    while(d<=S.weekBounds.e){dates.push(new Date(d));d.setDate(d.getDate()+1);}
+  }else{
+    dates=[new Date(S.date)];
+  }
+  dates.forEach(function(d){
+    var iso=fmtISO(d);
+    var dow=d.getDay();
+    if(dow===0||dow===6) return; // skip weekends — already known
+    var hols=getHolidaysForDate(iso);
+    if(!hols.length) return;
+    var isFull=hols.length===3;
+    var dayLabel=_DAYS[dow]+' '+d.getDate()+' '+_MONS[d.getMonth()];
+    var tags=hols.map(function(h){
+      return '<span class="badge '+({USD:'busd',EUR:'beur',GBP:'bgbp'}[h.currency]||'')+'" style="margin-right:4px">'+esc(h.currency)+'</span>';
+    }).join('');
+    // Use the most representative name (prefer one that covers multiple currencies or the first)
+    var name=hols[0].name;
+    var holNames=hols.map(function(h){return h.name;});
+    // If all same name use that, else join unique
+    var uniqueNames=holNames.filter(function(n,i){return holNames.indexOf(n)===i;});
+    name=uniqueNames.join(' / ');
+    var bgCol=isFull?'rgba(248,81,73,.07)':'rgba(210,153,34,.06)';
+    var borderCol=isFull?'var(--red)':'var(--yellow)';
+    var icon='<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-right:5px"><path d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>';
+    var closedLabel=isFull
+      ?'<span style="color:var(--red);font-weight:700;margin-left:8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase">Markets Closed</span>'
+      :'<span style="color:var(--yellow);font-weight:700;margin-left:8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase">Reduced Liquidity</span>';
+    rows+='<tr style="border-bottom:1px solid var(--border2)">'+
+      '<td colspan="7" style="padding:6px 14px;background:'+bgCol+';border-left:2px solid '+borderCol+'">'+
+      '<div style="display:flex;align-items:center;font-size:11px;color:var(--text2)">'+
+      icon+'<strong style="color:var(--text);margin-right:8px">'+esc(dayLabel)+'</strong>'+
+      tags+'<span style="color:var(--text2)">'+esc(name)+'</span>'+closedLabel+
+      '</div></td></tr>';
+  });
+  return rows;
+}
+
+// ── Render ─────────────────────────────────────────────────────
+function render(evts,totalInView,inNW){
+  var tb=document.getElementById('tbody');
+  var now=Date.now();
+  // Close any open detail row — tbody is being fully rebuilt
+  _openDetailKey=null;
+
+  // Build holiday notices for currently viewed dates
+  var holNotices=buildHolidayNotices();
+
+  if(!evts||!evts.length){
+    document.getElementById('cnt').textContent='0 events';
+    var hint='';
+    if(inNW&&!S.nextweekAvailable){
+      hint='<strong>Next week\'s data is not yet published.</strong><br>'+
+           'Forex Factory publishes the upcoming week on Friday–Saturday.';
+    }else if(totalInView===0){
+      if(needsHistory()){
+        hint='No events found for this period.';
+      }else if(S.mode==='week'){
+        hint='No high-impact USD, EUR or GBP events this week.';
+      }else{
+        var inFeed=isThisWeek(S.date)||isNextWeek(S.date);
+        hint=inFeed
+          ?'No high-impact USD, EUR or GBP events on this date.'
+          :'No events found for this date.';
+      }
+    }else{
+      hint=S.mode==='week'
+        ?'No high-impact USD, EUR or GBP events this week.'
+        :'No high-impact USD, EUR or GBP events on this date.';
+    }
+    tb.innerHTML=holNotices+'<tr><td colspan="7"><div class="estate">'+
+      '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="margin:0 auto 12px;display:block;opacity:.3">'+
+      '<circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>'+
+      '<p>No high-impact events</p><small>'+hint+'</small></div></td></tr>';
+    return;
+  }
+
+  evts=evts.slice().sort(function(a,b2){
+    var ta=evUTC(a),tb2=evUTC(b2);
+    if(!ta&&!tb2)return 0;if(!ta)return 1;if(!tb2)return-1;
+    return ta.getTime()-tb2.getTime();
+  });
+  document.getElementById('cnt').textContent=evts.length+' event'+(evts.length!==1?'s':'');
+
+  // Prepend holiday notices at top of table even when events exist
+  var html=holNotices;
+  var lastDateKey=null;
+
+  // ── Pre-compute time-group sizes ──────────────────────────────
+  // Key: dateISO + "|" + londonTime  →  count of events at that slot
+  var tgCount={}, tgSeen={};
+  evts.forEach(function(ev){
+    var evDate=parseDate(String(ev.date||''));
+    var ut=evUTC(ev);
+    var td=ut?fmtLondon(ut):'allday';
+    var dk=evDate?fmtISO(evDate):'_';
+    var k=dk+'|'+td;
+    tgCount[k]=(tgCount[k]||0)+1;
+  });
+
+  evts.forEach(function(ev){
+    var evDateObj=parseDate(String(ev.date||''));
+    var dateKey=evDateObj?fmtISO(evDateObj):null;
+
+    // Week mode: insert date group header when date changes
+    if(S.mode==='week'&&dateKey&&dateKey!==lastDateKey){
+      lastDateKey=dateKey;
+      var dayHols=getHolidaysForDate(dateKey);
+      var dayHolTag=dayHols.length
+        ?'<span style="margin-left:10px;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--yellow);opacity:.85">'+
+          '📅 '+esc(dayHols.map(function(h){return h.currency;}).join('/'))+' Holiday'+'</span>'
+        :'';
+      html+='<tr class="dg-row"><td colspan="7"><div class="date-ghdr">'+
+        fmtDayHeader(evDateObj)+dayHolTag+'</div></td></tr>';
+    }
+
+    var todayV=evDateObj?isToday(evDateObj):false;
+    var pastV=evDateObj?isPast(evDateObj):false;
+    var ut=evUTC(ev);
+    var td=ut?fmtLondon(ut):'All Day';
+    var dif=ut?(ut.getTime()-now):null;
+    var ep=pastV||(todayV&&dif!==null&&dif<0);
+    var sl='',sc='';
+    if(ep){sl='Released';sc='rl';}
+    else if(todayV&&dif!==null&&dif>0){var cd=cdown(dif);if(cd){sl=cd;sc=dif<5*60000?'im':'cd';}}
+    var ar=getActual(ev),fr=getForecast(ev),pr=getPrevious(ev);
+    var ac='cnum cact '+(ar?actCls(ar,fr,ev.title):(ep?'neutral':'pending'));
+    var actualCell=ar?esc(ar)
+                     :ep?'<span style="color:var(--text3)">—</span>'
+                        :'<span style="color:var(--text3);font-style:italic;font-size:11px">Pending</span>';
+    var cur=(ev.country||'').toUpperCase();
+
+    // Time-group rowspan logic
+    var tgKey=(dateKey||'_')+'|'+(ut?fmtLondon(ut):'allday');
+    var grpTotal=tgCount[tgKey]||1;
+    var grpIdx=tgSeen[tgKey]||0;
+    tgSeen[tgKey]=grpIdx+1;
+    var isFirstInGrp=grpIdx===0;
+    var isLastInGrp=grpIdx===grpTotal-1;
+
+    var rowCls=(ep?'past ':'')+( isLastInGrp&&grpTotal>1?'grp-last':'');
+    rowCls=rowCls.trim();
+    html+='<tr'+(rowCls?' class="'+rowCls+'"':'')+( ut?' data-u="'+ut.getTime()+'"':'')+'>'+
+      // Time cell: only rendered for the first event in each time group
+      (isFirstInGrp
+        ?'<td class="td-time"'+(grpTotal>1?' rowspan="'+grpTotal+'"':'')+'>'+
+          '<div class="ctime">'+esc(td)+'</div>'+(sl?'<div class="csub '+sc+'">'+esc(sl)+'</div>':'')+
+          '</td>'
+        :''
+      )+
+      '<td style="white-space:nowrap">'+badge(cur)+(getBankHoliday(cur,evDateObj)?bankHolidayPill(getBankHoliday(cur,evDateObj)):'')+' </td>'+
+      '<td><div class="cevt" data-title="'+esc(ev.title||'')+'" data-country="'+esc(cur)+'">'+esc(ev.title||'')+'</div></td>'+
+      '<td><div class="ihigh"><div class="idot"></div>HIGH</div></td>'+
+      '<td class="cnum">'+esc(fr||'—')+'</td>'+
+      '<td class="cnum">'+esc(pr||'—')+'</td>'+
+      '<td class="'+ac+'">'+actualCell+'</td></tr>';
+  });
+  tb.innerHTML=html;
+}
+
+// ── Countdown tick ─────────────────────────────────────────────
+function tick(){
+  // In day mode: only run for today/past. In week mode: run if week contains today.
+  var weekHasToday=S.mode==='week'&&S.weekBounds&&inRange(new Date(),S.weekBounds);
+  if(!isToday(S.date)&&!isPast(S.date)&&!weekHasToday)return;
+  var now=Date.now();
+  var justReleased=false;
+  document.querySelectorAll('#tbody tr[data-u]').forEach(function(row){
+    var dif=+row.getAttribute('data-u')-now;
+    var p=dif<0;
+    var wasPast=row.classList.contains('past');
+    if(p){
+      if(!wasPast) justReleased=true;
+      row.classList.add('past');
+    }else{
+      row.classList.remove('past');
+    }
+    // Only update countdown label on rows that own the time cell (.ctime).
+    // Non-first rows in a time group have no time cell (rowspan merges them into the first row).
+    var timeEl=row.querySelector('.ctime');
+    if(!timeEl) return;
+    var td=timeEl.parentNode;
+    var s=td.querySelector('.csub');
+    if(p){
+      if(!s){s=document.createElement('div');td.appendChild(s);}
+      s.className='csub rl';s.textContent='Released';
+    }else{
+      if(!s){s=document.createElement('div');td.appendChild(s);}
+      var cd=cdown(dif);if(cd){s.className='csub '+(dif<5*60000?'im':'cd');s.textContent=cd;}else s.textContent='';
+    }
+  });
+  if(justReleased&&!S._releaseTimer){
+    S._releaseTimer=setTimeout(function(){
+      S._releaseTimer=null;
+      load(S.date,true);
+    },60*1000);
+  }
+}
+
+// ── Status / error ─────────────────────────────────────────────
+function setSt(html,k){
+  document.getElementById('stxt').innerHTML=html;
+  document.getElementById('sdot').style.background=
+    k==='ok'?'var(--green)':k==='err'?'var(--red)':'var(--yellow)';
+}
+function showErr(msg){ document.getElementById('errtxt').innerHTML=msg; document.getElementById('err').classList.add('on'); }
+function clearErr(){ document.getElementById('err').classList.remove('on'); }
+
+// ── Load ───────────────────────────────────────────────────────
+async function load(date,forceRefresh){
+  if(S.loading) return;
+  S.loading=true;
+  document.getElementById('btnR').disabled=true;
+  clearErr();
+
+  var hasCache=!!(S.cacheThis&&S.cacheThis.length);
+  if(!hasCache){
+    document.getElementById('tbody').innerHTML=
+      '<tr><td colspan="7"><div class="lstate"><div class="spin"></div><p>Loading…</p></div></td></tr>';
+    setSt('Fetching data…','warn');
+  }
+
+  try{
+    var data=await fetchAll(forceRefresh);
+    var viewNW = S.mode==='week'&&S.weekBounds
+      ? isNextWeek(S.weekBounds.s)||isNextWeek(S.weekBounds.e)
+      : isNextWeek(S.date);
+    render(filter(data,S.cur),countInView(data),viewNW);
+    var mAgo=S.cacheThisAt?Math.floor(msSince(S.cacheThisAt)/60000):0;
+    var nwNote=(!S.nextweekAvailable&&viewNW)
+      ?' · <span style="color:var(--yellow)">Next week pending</span>':'';
+    setSt('Connected · <strong>Forex Factory</strong> · cached '+mAgo+'m ago'+nwNote,'ok');
+  }catch(e){
+    var msg=e.message||'error';
+    var isSrv=msg.indexOf('server.py')!==-1||msg.indexOf('not running')!==-1;
+    showErr(isSrv
+      ?'server.py is not running — open a terminal and run: <code>python3 server.py</code>'
+      :'Could not load: '+esc(msg));
+    setSt('Load failed','err');
+    if(!hasCache){
+      document.getElementById('tbody').innerHTML=
+        '<tr><td colspan="7"><div class="estate"><p>Failed to load</p>'+
+        '<small>'+(isSrv?'Run <strong>python3 server.py</strong>':'Check server logs')+'</small></div></td></tr>';
+      document.getElementById('cnt').textContent='—';
+    }
+  }finally{
+    S.loading=false;
+    document.getElementById('btnR').disabled=false;
+  }
+}
+
+// ── Navigation helpers ─────────────────────────────────────────
+// Day-mode navigation: switch to day view for a specific date
+function navToDay(d){
+  S.mode='day';
+  S.weekBounds=null;
+  S.date=d;
+  syncUI();
+  var merged=(S.cacheThis||[]).concat(S.cacheNext||[]);
+  if(merged.length){
+    clearErr();
+    render(filter(merged,S.cur),countInView(merged),isNextWeek(d));
+    var nwStale=S.cacheNext===null||
+                (S.cacheNext.length===0&&msSince(S.cacheNextEmptyAt)>EMPTY_RETRY);
+    if(isNextWeek(d)&&nwStale) load(d,false);
+  }else{
+    load(d,false);
+  }
+}
+
+// Week-mode render from cache (after week bounds change without fetching)
+function renderWeekFromCache(){
+  var merged=(S.cacheThis||[]).concat(S.cacheNext||[]);
+  if(merged.length){
+    clearErr();
+    var viewNW=isNextWeek(S.weekBounds.s)||isNextWeek(S.weekBounds.e);
+    render(filter(merged,S.cur),countInView(merged),viewNW);
+    var nwStale=S.cacheNext===null||
+                (S.cacheNext.length===0&&msSince(S.cacheNextEmptyAt)>EMPTY_RETRY);
+    if(viewNW&&nwStale) load(S.date,false);
+  }else{
+    load(S.date,false);
+  }
+}
+
+// ── UI sync ────────────────────────────────────────────────────
+function syncUI(){
+  document.getElementById('dtxt').textContent=
+    (S.mode==='week'&&S.weekBounds)?fmtDispRange(S.weekBounds):fmtDisp(S.date);
+  document.getElementById('bToday').classList.toggle('on',S.mode==='day'&&isToday(S.date));
+  document.getElementById('bThisWeek').classList.toggle('on',S.mode==='week');
+}
+
+function tickClock(){
+  var n=new Date();
+  var off=londonOff(n);
+  var lh=(n.getUTCHours()+off)%24;
+  var tz=off?'BST':'GMT';
+  document.getElementById('clk').innerHTML=
+    '<strong>'+pad(lh)+':'+pad(n.getUTCMinutes())+':'+pad(n.getUTCSeconds())+'</strong> '+tz;
+}
+
+// ── Boot ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  // Default to This Week view
+  S.mode='week'; S.weekBounds=weekBounds(0); S.date=S.weekBounds.s;
+  syncUI(); tickClock(); updateSessBar(); load(S.date,false);
+  setInterval(tickClock,1000);
+  setInterval(tick,1000);
+  setInterval(updateSessBar,1000);
+  setInterval(function(){
+    var interval=isToday(S.date)?3*60*1000:30*60*1000;
+    if(msSince(S.cacheThisAt)>=interval) load(S.date,false);
+  },60*1000);
+
+  // Refresh button
+  document.getElementById('btnR').addEventListener('click',function(){ load(S.date,true); });
+
+  // Prev / Next arrows — move by 1 day in day mode, 1 week in week mode
+  document.getElementById('bPrev').addEventListener('click',function(){
+    if(S.mode==='week'){
+      S.weekBounds={s:addDays(S.weekBounds.s,-7),e:addDays(S.weekBounds.e,-7)};
+      S.date=S.weekBounds.s;
+      syncUI(); renderWeekFromCache();
+    } else {
+      navToDay(addDays(S.date,-1));
+    }
+  });
+  document.getElementById('bNext').addEventListener('click',function(){
+    if(S.mode==='week'){
+      S.weekBounds={s:addDays(S.weekBounds.s,+7),e:addDays(S.weekBounds.e,+7)};
+      S.date=S.weekBounds.s;
+      syncUI(); renderWeekFromCache();
+    } else {
+      navToDay(addDays(S.date,+1));
+    }
+  });
+
+  // Today — always returns to day mode
+  document.getElementById('bToday').addEventListener('click',function(){ navToDay(new Date()); });
+
+  // This Week — week mode, Sun–Sat of current week
+  document.getElementById('bThisWeek').addEventListener('click',function(){
+    S.mode='week';
+    S.weekBounds=weekBounds(0);
+    S.date=S.weekBounds.s;
+    syncUI();
+    var merged=(S.cacheThis||[]).concat(S.cacheNext||[]);
+    if(merged.length){
+      clearErr();
+      render(filter(merged,S.cur),countInView(merged),false);
+    } else {
+      load(S.date,false);
+    }
+  });
+
+
+  // ── Calendar range picker ────────────────────────────────────
+  var CP={open:false,s:null,e:null,h:null,vm:0,vy:0,step:0};
+  var CMONS=['January','February','March','April','May','June',
+             'July','August','September','October','November','December'];
+
+  // Lightweight highlight update — only toggles CSS classes, NEVER replaces DOM.
+  // Called during hover and after day clicks so click events always fire on live elements.
+  function calUpdateHighlight(){
+    var rS=CP.s, rE=(CP.step===1&&CP.h)?CP.h:CP.e;
+    if(rS&&rE&&rS.getTime()>rE.getTime()){var t=rS;rS=rE;rE=t;}
+    var rSISO=rS?fmtISO(rS):null, rEISO=rE?fmtISO(rE):null;
+    document.querySelectorAll('#calPicker .cal-day').forEach(function(el){
+      if(el.classList.contains('other'))return;
+      var iso=el.getAttribute('data-iso');
+      el.classList.remove('sel-s','sel-e','in-rng');
+      if(rSISO&&iso===rSISO) el.classList.add('sel-s');
+      if(rEISO&&iso===rEISO) el.classList.add('sel-e');
+      if(rSISO&&rEISO&&iso>rSISO&&iso<rEISO) el.classList.add('in-rng');
+    });
+    // Update hint text and Apply button state
+    var hint=document.getElementById('calHint');
+    var applyBtn=document.getElementById('calApply');
+    if(hint) hint.textContent=CP.step===0?'Select start date':'Now select end date';
+    if(applyBtn) applyBtn.disabled=!CP.s;
+  }
+
+  // Full DOM rebuild — only called on open and month navigation, NOT during hover.
+  function calRender(){
+    var el=document.getElementById('calPicker');
+    var tod=new Date();
+    // Compute initial highlight state
+    var rS=CP.s, rE=CP.e;
+    if(rS&&rE&&rS.getTime()>rE.getTime()){var t=rS;rS=rE;rE=t;}
+    var rSISO=rS?fmtISO(rS):null, rEISO=rE?fmtISO(rE):null;
+
+    var html='<div class="cal-hdr">'+
+      '<button class="cal-arr" id="calPrev"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="5,1 2,4 5,7"/></svg></button>'+
+      '<div class="cal-mth">'+CMONS[CP.vm]+' '+CP.vy+'</div>'+
+      '<button class="cal-arr" id="calNext"><svg width="8" height="8" viewBox="0 0 8 8" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="3,1 6,4 3,7"/></svg></button>'+
+      '</div><div class="cal-grid">';
+    ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach(function(d){html+='<div class="cal-dow">'+d+'</div>';});
+    // Mon-first: shift so Mon=0, Tue=1, … Sun=6
+    var firstDow=(new Date(CP.vy,CP.vm,1).getDay()+6)%7;
+    var lastDay=new Date(CP.vy,CP.vm+1,0).getDate();
+    for(var i=0;i<42;i++){
+      var dn=i-firstDow+1;
+      var d=new Date(CP.vy,CP.vm,dn);
+      var iso=fmtISO(d);
+      var isOther=dn<1||dn>lastDay;
+      var cls='cal-day';
+      if(isOther){cls+=' other';}
+      else{
+        if(d.getFullYear()===tod.getFullYear()&&d.getMonth()===tod.getMonth()&&d.getDate()===tod.getDate()) cls+=' today';
+        if(rSISO&&iso===rSISO) cls+=' sel-s';
+        if(rEISO&&iso===rEISO) cls+=' sel-e';
+        if(rSISO&&rEISO&&iso>rSISO&&iso<rEISO) cls+=' in-rng';
+        // Weekend dimming
+        var ddow=d.getDay();
+        if(ddow===0||ddow===6) cls+=' weekend';
+        // Holiday dot — any currency has a bank holiday on this day
+        var hols=getHolidaysForDate(iso);
+        if(hols.length>0) cls+=' has-bh';
+        if(hols.length===3) cls+=' mkt-closed';
+      }
+      // Build tooltip showing which currencies are on holiday
+      var holTip='';
+      if(!isOther){var hh=getHolidaysForDate(iso);if(hh.length){holTip=' title="'+esc(hh.map(function(h){return h.currency+': '+h.name;}).join(' · '))+'"';}}
+      html+='<div class="'+cls+'" data-iso="'+iso+'"'+holTip+'>'+d.getDate()+'</div>';
+      if(i===34&&dn>lastDay) break;
+    }
+    html+='</div>'+
+      '<div class="cal-hint" id="calHint">'+(CP.step===0?'Select start date':'Now select end date')+'</div>'+
+      '<button class="cal-apply" id="calApply"'+(CP.s?'':' disabled')+'>Apply</button>';
+    el.innerHTML=html;
+
+    // Month navigation — full re-render is fine here (no hover in progress)
+    document.getElementById('calPrev').addEventListener('click',function(ev){
+      ev.stopPropagation();CP.vm--;if(CP.vm<0){CP.vm=11;CP.vy--;}calRender();
+    });
+    document.getElementById('calNext').addEventListener('click',function(ev){
+      ev.stopPropagation();CP.vm++;if(CP.vm>11){CP.vm=0;CP.vy++;}calRender();
+    });
+
+    // Apply button
+    document.getElementById('calApply').addEventListener('click',function(ev){
+      ev.stopPropagation();
+      if(!CP.s) return;
+      var s=CP.s, e=CP.e||CP.s;
+      if(s.getTime()>e.getTime()){var tmp=s;s=e;e=tmp;}
+      calClose();
+      if(fmtISO(s)===fmtISO(e)){navToDay(s);}
+      else{S.mode='week';S.weekBounds={s:s,e:e};S.date=s;syncUI();renderWeekFromCache();}
+    });
+
+    // Day interactions — clicks update state via calUpdateHighlight (no DOM re-render)
+    el.querySelectorAll('.cal-day:not(.other)').forEach(function(dayEl){
+      dayEl.addEventListener('click',function(ev){
+        ev.stopPropagation();
+        var p=this.getAttribute('data-iso').split('-');
+        var d=new Date(+p[0],+p[1]-1,+p[2]);
+        if(CP.step===0){
+          // First click: set start date, wait for end
+          CP.s=d; CP.e=d; CP.h=null; CP.step=1;
+          calUpdateHighlight();
+        }else{
+          // Second click: set end date and auto-apply
+          var s=CP.s, e=d;
+          if(s.getTime()>e.getTime()){var tmp=s;s=e;e=tmp;}
+          CP.step=0; calClose();
+          if(fmtISO(s)===fmtISO(e)){navToDay(s);}
+          else{S.mode='week';S.weekBounds={s:s,e:e};S.date=s;syncUI();renderWeekFromCache();}
+        }
+      });
+      // Hover: update CSS classes only — never rebuilds DOM so clicks stay registered
+      dayEl.addEventListener('mouseenter',function(){
+        if(CP.step!==1) return;
+        var p=this.getAttribute('data-iso').split('-');
+        CP.h=new Date(+p[0],+p[1]-1,+p[2]);
+        calUpdateHighlight();
+      });
+    });
+    // Clear hover preview when mouse leaves the grid
+    el.querySelector('.cal-grid').addEventListener('mouseleave',function(){
+      if(CP.step!==1) return;
+      CP.h=null; calUpdateHighlight();
+    });
+  }
+
+  function calOpen(){
+    CP.s=(S.mode==='week'&&S.weekBounds)?new Date(S.weekBounds.s):new Date(S.date);
+    CP.e=(S.mode==='week'&&S.weekBounds)?new Date(S.weekBounds.e):new Date(S.date);
+    CP.h=null; CP.step=0;
+    CP.vm=CP.s.getMonth(); CP.vy=CP.s.getFullYear();
+    CP.open=true; calRender();
+    document.getElementById('calPicker').classList.add('open');
+  }
+  function calClose(){
+    CP.open=false; CP.h=null;
+    document.getElementById('calPicker').classList.remove('open');
+  }
+
+  document.getElementById('ddisp').addEventListener('click',function(e){
+    e.stopPropagation(); if(CP.open) calClose(); else calOpen();
+  });
+  document.getElementById('calPicker').addEventListener('click',function(e){e.stopPropagation();});
+  document.addEventListener('click',function(){if(CP.open) calClose();});
+
+  // Event detail expansion — click on event title cell
+  document.getElementById('tbody').addEventListener('click',function(e){
+    var titleEl=e.target.closest('.cevt');
+    if(!titleEl) return;
+    var tr=titleEl.closest('tr');
+    if(!tr||tr.id==='ev-detail-row') return;
+    var title=titleEl.getAttribute('data-title');
+    var country=titleEl.getAttribute('data-country');
+    if(!title||!country) return;
+    toggleDetail(title+'|'+country, title, country, tr);
+  });
+
+  // Currency filter
+  document.querySelectorAll('.btn-cur').forEach(function(b){
+    b.addEventListener('click',function(){
+      S.cur=this.getAttribute('data-c');
+      document.querySelectorAll('.btn-cur').forEach(function(x){x.classList.remove('on');});
+      this.classList.add('on');
+      var merged=(S.cacheThis||[]).concat(S.cacheNext||[]);
+      if(merged.length){
+        var viewNW=S.mode==='week'&&S.weekBounds
+          ?isNextWeek(S.weekBounds.s)||isNextWeek(S.weekBounds.e)
+          :isNextWeek(S.date);
+        render(filter(merged,S.cur),countInView(merged),viewNW);
+      } else {
+        load(S.date,false);
+      }
+    });
+  });
+});
+</script>
+
+<script>
+/* ── Position Calculator ──────────────────────────────────────── */
+(function(){
+  'use strict';
+
+  // Instrument specs: pip size, pip value per standard lot (USD), description, price decimals
+  // minLot = MT5 standard minimum volume (most brokers); some allow 0.001 for XAU
+  var INSTR = {
+    'GER40':  { pip:0.1,    pv:2.70, dec:1, minLot:0.01, desc:'Index CFD · Pip: 0.1 · $2.70/lot/pip'       },
+    'GBPUSD': { pip:0.0001, pv:10,   dec:5, minLot:0.01, desc:'Forex · Pip: 0.0001 · ~$10/lot/pip'         },
+    'EURUSD': { pip:0.0001, pv:10,   dec:5, minLot:0.01, desc:'Forex · Pip: 0.0001 · $10/lot/pip'          },
+    'XAU':    { pip:0.01,   pv:1,    dec:2, minLot:0.01, desc:'Gold (100 oz/lot) · Pip: 0.01 · $1/lot/pip' },
+    'DXY':    { pip:0.001,  pv:10,   dec:3, minLot:0.01, desc:'Dollar Index · Pip: 0.001 · ~$10/lot/pip'   }
+  };
+
+  // Commission per lot (round turn) by platform × instrument
+  // Sources: ftmo.com/symbols, fundingpips.com (March 2026)
+  var COMM_RATES = {
+    'none':    { GER40:0,    GBPUSD:0,    EURUSD:0,    XAU:0,    DXY:0    },
+    'ftmo':    { GER40:0,    GBPUSD:3,    EURUSD:3,    XAU:1.98, DXY:0    },
+    'fp-std':  { GER40:0,    GBPUSD:5,    EURUSD:5,    XAU:2,    DXY:0    },
+    'fp-zero': { GER40:0,    GBPUSD:7,    EURUSD:7,    XAU:5,    DXY:0    }
+  };
+  var COMM_DESC = {
+    'none':    '',
+    'ftmo':    'Forex $3 · Gold $1.98 · Indices $0 (per lot RT)',
+    'fp-std':  'Forex $5 · Metals $2 · Indices $0 (per lot RT)',
+    'fp-zero': 'Forex $7 · Metals $5 · Indices $0 (per lot RT)'
+  };
+  var activePlat = 'none';
+
+  var dir = 'long'; // 'long' | 'short'
+
+  function gi(id){ return document.getElementById(id); }
+  function fv(id){ return parseFloat(gi(id).value) || 0; }
+
+  function instr(){ return INSTR[gi('pcInstr').value]; }
+
+  function fmt$(n){ return '$' + n.toFixed(2); }
+  function fmtPct(n){ return n.toFixed(2) + '%'; }
+
+  function pcStat(lbl, val, sub, cls){
+    return '<div class="pc-stat">'
+      + '<div class="pc-stat-lbl">'+lbl+'</div>'
+      + '<div class="pc-stat-val'+(cls?' '+cls:'')+'">'+val+'</div>'
+      + '<div class="pc-stat-sub">'+sub+'</div>'
+      + '</div>';
+  }
+
+  function calc(){
+    var cfg    = instr();
+    var bal    = fv('pcBalance');
+    var riskPc = fv('pcRisk');
+    var entry  = parseFloat(gi('pcEntry').value);
+    var sl     = parseFloat(gi('pcSL').value);
+    var tp     = parseFloat(gi('pcTP').value);
+
+    // Instrument hint
+    gi('pcHint').textContent = cfg.desc;
+
+    // SL pip distance hint
+    if(!isNaN(entry) && !isNaN(sl) && entry>0 && sl>0 && sl!==entry){
+      var slPips = Math.abs(entry-sl)/cfg.pip;
+      gi('pcSLHint').textContent = '= '+slPips.toFixed(1)+' pips';
+    } else { gi('pcSLHint').textContent = ''; }
+
+    // TP pip distance hint
+    if(!isNaN(entry) && !isNaN(tp) && entry>0 && tp>0 && tp!==entry){
+      var tpPipsH = Math.abs(tp-entry)/cfg.pip;
+      gi('pcTPHint').textContent = '= '+tpPipsH.toFixed(1)+' pips';
+    } else { gi('pcTPHint').textContent = ''; }
+
+    // Need entry + SL to calculate
+    if(isNaN(entry)||isNaN(sl)||entry<=0||sl<=0||sl===entry||bal<=0||riskPc<=0){
+      gi('pcResults').innerHTML = '<div class="pc-empty">Enter entry &amp; stop loss to calculate</div>';
+      return;
+    }
+
+    var slPips = Math.abs(entry-sl)/cfg.pip;
+    var riskAmt = bal * riskPc / 100;
+    var comm = parseFloat(gi('pcComm').value) || 0;
+
+    // Formula includes commission: lots = riskAmt / (slPips×pipVal + commission)
+    // This ensures total loss at SL (price move + commission) = riskAmt
+    var lotsRaw = riskAmt / (slPips * cfg.pv + comm);
+    var lots = Math.max(0.001, Math.round(lotsRaw*1000)/1000);
+
+    // Recalculate with rounded lots for accuracy
+    var slMoveLoss   = slPips * cfg.pv * lots;          // loss from price movement
+    var commCost     = comm * lots;                      // commission cost (open + close)
+    var actualLoss   = slMoveLoss + commCost;            // total loss if SL hit
+    var actualLossPc = (actualLoss / bal) * 100;
+
+    var hasTP    = !isNaN(tp) && tp>0 && tp!==entry;
+    var tpPips   = hasTP ? Math.abs(tp-entry)/cfg.pip : null;
+    var tpGross  = hasTP ? tpPips * cfg.pv * lots : null;   // gross profit from price
+    var profit   = hasTP ? tpGross - commCost : null;        // net profit after commission
+    var profitPc = hasTP ? (profit/bal)*100 : null;
+    // True R:R accounts for commission on both sides
+    var rr = hasTP ? (tpGross - commCost) / (slMoveLoss + commCost) : null;
+
+    // Break-even price: pips needed to cover round-trip commission
+    // BE = entry ± (commission_per_lot / pipValue) × pip_size
+    var bePips  = comm > 0 ? comm / cfg.pv : 0;
+    var bePrice = dir === 'long'
+      ? entry + bePips * cfg.pip
+      : entry - bePips * cfg.pip;
+    // Decimal places: match instrument precision
+    var beDec = cfg.dec || (cfg.pip < 0.001 ? 5 : cfg.pip < 0.01 ? 3 : cfg.pip < 0.1 ? 2 : 1);
+
+    // Direction warnings
+    var slOk = dir==='long' ? sl<entry : sl>entry;
+    var tpOk = hasTP ? (dir==='long' ? tp>entry : tp<entry) : true;
+
+    // ── Minimum lot check ──
+    var minLot   = cfg.minLot || 0.01;
+    var belowMin = lots < minLot;
+    // Max SL price that fits minLot within the desired risk (used in warning)
+    var maxSlPips  = comm > 0 ? (riskAmt/minLot - comm)/cfg.pv : riskAmt/(minLot*cfg.pv);
+    var maxSlPrice = dir==='long' ? entry - maxSlPips*cfg.pip : entry + maxSlPips*cfg.pip;
+
+    var html = '';
+
+    // ── Below-minimum warning (shown above results, does not replace them) ──
+    if(belowMin){
+      html += '<div class="pc-warn" style="border-color:var(--red);background:rgba(248,81,73,.08);color:var(--red)">'
+        + '⚠ Stop too wide for this balance — ideal size '+lots.toFixed(2)+' lots is below MT5 minimum (0.01). '
+        + 'Tighten SL to <strong style="font-family:var(--mono)">'+maxSlPrice.toFixed(cfg.dec)+'</strong> or closer.'
+        + '</div>';
+    }
+
+    // ── Main volume box ──
+    html += '<div class="pc-vol">';
+    html += '<div class="pc-vol-top">';
+    html += '<div class="pc-vol-lbl">MT5 Volume (Lots)</div>';
+    html += '<button class="pc-copy" onclick="window._pcCopy(\''+lots.toFixed(2)+'\',this)">⧉ Copy</button>';
+    html += '</div>';
+    html += '<div class="pc-vol-num">'+lots.toFixed(2)+'<span class="pc-vol-unit">lots</span></div>';
+    html += '<div class="pc-chips">';
+    html += '<span class="pc-chip">Standard: '+lots.toFixed(2)+'</span>';
+    html += '<span class="pc-chip">Micro: '+(lots*100).toFixed(1)+'</span>';
+    if(hasTP){
+      var rrCls2 = rr>=2?'var(--green)':rr>=1?'var(--yellow)':'var(--red)';
+      html += '<span class="pc-chip" style="margin-left:auto;border-color:'+rrCls2+';color:'+rrCls2+'">R:R&nbsp; 1 : '+rr.toFixed(2)+'</span>';
+    }
+    html += '</div>';
+    html += '</div>';
+
+    // ── Break-even box ──
+    html += '<div class="pc-be">';
+    html += '<div class="pc-be-lbl">Break-even Price</div>';
+    html += '<div class="pc-be-row">';
+    if(comm > 0){
+      html += '<div class="pc-be-num">'+bePrice.toFixed(beDec)+'</div>';
+      html += '<div class="pc-be-entry">entry: '+entry.toFixed(beDec)+'</div>';
+    } else {
+      html += '<div class="pc-be-num">'+entry.toFixed(beDec)+'</div>';
+      html += '<div class="pc-be-entry">= entry (no commission)</div>';
+    }
+    html += '</div>';
+    if(comm > 0){
+      var beDir = dir==='long' ? 'above' : 'below';
+      html += '<div class="pc-be-sub">'+bePips.toFixed(1)+' pips '+beDir+' entry · commission covered at this price</div>';
+    }
+    html += '</div>';
+
+    // ── Warnings ──
+    if(!slOk){
+      html += '<div class="pc-warn">⚠ Stop loss should be '+(dir==='long'?'below':'above')+' entry for a '+dir+' trade</div>';
+    }
+    if(hasTP && !tpOk){
+      html += '<div class="pc-warn">⚠ Take profit should be '+(dir==='long'?'above':'below')+' entry for a '+dir+' trade</div>';
+    }
+
+    // ── Stats grid ──
+    html += '<div class="pc-stats">';
+
+    // Loss breakdown
+    if(comm > 0){
+      html += pcStat('If SL Hits — Loss',
+        '-'+fmt$(actualLoss),
+        'price '+fmt$(slMoveLoss)+' + comm '+fmt$(commCost), 'r');
+    } else {
+      html += pcStat('If SL Hits — Loss',
+        '-'+fmt$(actualLoss),
+        '-'+fmtPct(actualLossPc)+' of balance', 'r');
+    }
+
+    // Profit (if TP set)
+    if(hasTP){
+      if(comm > 0){
+        html += pcStat('If TP Hits — Profit',
+          '+'+fmt$(profit),
+          'gross '+fmt$(tpGross)+' − comm '+fmt$(commCost), 'g');
+      } else {
+        html += pcStat('If TP Hits — Profit',
+          '+'+fmt$(profit),
+          '+'+fmtPct(profitPc)+' of balance', 'g');
+      }
+    }
+
+    // Commission row (only when set)
+    if(comm > 0){
+      html += '<div class="pc-stat pc-stat-comm">'
+        + '<div class="pc-stat-lbl">Commission Cost</div>'
+        + '<div class="pc-stat-val r">-'+fmt$(commCost)+'</div>'
+        + '<div class="pc-stat-sub">'+fmt$(comm)+'/lot × '+lots.toFixed(2)+' lots (RT)</div>'
+        + '</div>';
+    }
+
+    html += '</div>'; // /pc-stats
+
+    gi('pcResults').innerHTML = html;
+  }
+
+  // Copy to clipboard
+  window._pcCopy = function(v, btn){
+    navigator.clipboard.writeText(v).catch(function(){});
+    var orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'var(--green)';
+    setTimeout(function(){
+      btn.textContent = orig;
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }, 1600);
+  };
+
+  // Direction toggle
+  gi('pcLong').addEventListener('click', function(){
+    dir='long';
+    this.classList.add('on'); gi('pcShort').classList.remove('on');
+    calc();
+  });
+  gi('pcShort').addEventListener('click', function(){
+    dir='short';
+    this.classList.add('on'); gi('pcLong').classList.remove('on');
+    calc();
+  });
+
+  // Platform commission presets
+  function applyPlatComm(plat){
+    activePlat = plat;
+    var instr = gi('pcInstr').value;
+    var rate = COMM_RATES[plat] ? COMM_RATES[plat][instr] : 0;
+    gi('pcComm').value = rate !== undefined ? rate : 0;
+    gi('pcCommNote').textContent = COMM_DESC[plat] || '';
+    document.querySelectorAll('.pc-plat-btn').forEach(function(x){ x.classList.remove('active'); });
+    document.querySelector('.pc-plat-btn[data-plat="'+plat+'"]').classList.add('active');
+    calc();
+  }
+  document.querySelectorAll('.pc-plat-btn').forEach(function(b){
+    b.addEventListener('click', function(){ applyPlatComm(this.getAttribute('data-plat')); });
+  });
+
+  // Instrument selector — also re-apply platform commission for new instrument
+  gi('pcInstr').addEventListener('change', function(){
+    if(activePlat !== 'none') applyPlatComm(activePlat);
+    else calc();
+  });
+
+  // Manual commission edit clears platform active state
+  gi('pcComm').addEventListener('input', function(){
+    activePlat = 'none';
+    document.querySelectorAll('.pc-plat-btn').forEach(function(x){ x.classList.remove('active'); });
+    document.querySelector('.pc-plat-btn[data-plat="none"]').classList.add('active');
+    gi('pcCommNote').textContent = '';
+    calc();
+  });
+
+  // Quick risk presets
+  document.querySelectorAll('.pc-qbtn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.pc-qbtn').forEach(function(x){ x.classList.remove('active'); });
+      this.classList.add('active');
+      gi('pcRisk').value = this.getAttribute('data-r');
+      calc();
+    });
+  });
+
+  // All inputs trigger recalc (pcComm and pcInstr handled separately above)
+  ['pcBalance','pcRisk','pcEntry','pcSL','pcTP'].forEach(function(id){
+    gi(id).addEventListener('input', function(){ saveState(); calc(); });
+  });
+
+  // ── Persist state in localStorage ──────────────────────────────
+  var LS_KEY = 'pc_state';
+
+  function saveState(){
+    try{
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        instr:   gi('pcInstr').value,
+        dir:     dir,
+        balance: gi('pcBalance').value,
+        risk:    gi('pcRisk').value,
+        comm:    gi('pcComm').value,
+        plat:    activePlat,
+        entry:   gi('pcEntry').value,
+        sl:      gi('pcSL').value,
+        tp:      gi('pcTP').value
+      }));
+    }catch(e){}
+  }
+
+  function loadState(){
+    try{
+      var raw = localStorage.getItem(LS_KEY);
+      if(!raw) return false;
+      var s = JSON.parse(raw);
+      if(s.instr)   gi('pcInstr').value   = s.instr;
+      if(s.balance) gi('pcBalance').value  = s.balance;
+      if(s.risk)    gi('pcRisk').value     = s.risk;
+      if(s.entry)   gi('pcEntry').value    = s.entry;
+      if(s.sl)      gi('pcSL').value       = s.sl;
+      if(s.tp)      gi('pcTP').value       = s.tp;
+      // Direction
+      if(s.dir === 'short'){
+        dir = 'short';
+        gi('pcShort').classList.add('on'); gi('pcLong').classList.remove('on');
+      }
+      // Platform / commission (use applyPlatComm to set both value + note + button)
+      if(s.plat && s.plat !== 'none'){
+        applyPlatComm(s.plat);  // sets commission from table
+      } else {
+        // Manual commission value saved
+        if(s.comm !== undefined) gi('pcComm').value = s.comm;
+        // Sync quick-risk button highlight
+        document.querySelectorAll('.pc-qbtn').forEach(function(b){
+          b.classList.toggle('active', b.getAttribute('data-r') === s.risk);
+        });
+      }
+      return true;
+    }catch(e){ return false; }
+  }
+
+  // Patch existing event handlers to also save state
+  gi('pcLong').addEventListener('click',  saveState);
+  gi('pcShort').addEventListener('click', saveState);
+  gi('pcInstr').addEventListener('change', saveState);
+  gi('pcComm').addEventListener('input',  saveState);
+  document.querySelectorAll('.pc-qbtn').forEach(function(b){
+    b.addEventListener('click', saveState);
+  });
+  document.querySelectorAll('.pc-plat-btn').forEach(function(b){
+    b.addEventListener('click', saveState);
+  });
+
+  // ── Initial render (restore or blank) ──────────────────────────
+  if(!loadState()) calc();
+  else calc();
+})();
+</script>
+</body>
+</html>

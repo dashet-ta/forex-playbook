@@ -1162,8 +1162,14 @@ async function loadState() {
     if (!state.activeBtId && state.backtests.length) {
       state.activeBtId = state.backtests[0].id;
     }
+
+    // If server is available, push local state up (covers the case where
+    // server was empty or had older data and we merged in local-only items)
+    if (_serverAvailable) {
+      _syncToServer().catch(() => {});
+    }
   } catch(e) {
-    console.warn('DB load error:', e);
+    console.warn('DB load load error:', e);
   }
 }
 
@@ -1244,9 +1250,25 @@ async function _loadFromServer() {
     const r = await fetch(`${SERVER}/api/data`, { signal: AbortSignal.timeout(1500) });
     if (!r.ok) return false;
     const data = await r.json();
-    if (!data.backtests || !data.backtests.length) return false;
 
-    // Write into IndexedDB so the rest of the app works normally
+    // Server is reachable — mark available so future saves go to server
+    _serverAvailable = true;
+
+    if (!data.backtests || !data.backtests.length) {
+      // Server is up but empty — keep whatever is in IndexedDB and push it up
+      console.log('✅ Server available (empty) — will push local IndexedDB data to server');
+      return false; // let loadState read from IndexedDB, then _syncToServer will push it
+    }
+
+    // Merge: server is source of truth for existing IDs, but keep local-only items
+    const serverIds = new Set(data.backtests.map(bt => bt.id));
+    const localBts  = await db.backtests.toArray();
+    const localOnly = localBts.filter(bt => !serverIds.has(bt.id));
+    const localOnlyTrades = localOnly.length
+      ? await db.trades.where('btId').anyOf(localOnly.map(b => b.id)).toArray()
+      : [];
+
+    // Rewrite server data into IndexedDB
     await db.backtests.clear();
     await db.trades.clear();
     for (const bt of data.backtests) {
@@ -1256,10 +1278,20 @@ async function _loadFromServer() {
         await db.trades.put({ ...t, btId: bt.id });
       }
     }
+    // Re-insert local-only backtests that weren't on server yet
+    for (const bt of localOnly) {
+      await db.backtests.put(bt);
+    }
+    for (const t of localOnlyTrades) {
+      await db.trades.put(t);
+    }
+    if (localOnly.length) {
+      console.log(`🔀 Kept ${localOnly.length} local-only backtest(s) not yet on server`);
+    }
+
     if (data.activeBtId) {
       await db.settings.put({ key: 'activeBtId', value: data.activeBtId });
     }
-    _serverAvailable = true;
     console.log('✅ Loaded from server:', data.backtests.length, 'backtests');
     return true;
   } catch (e) {

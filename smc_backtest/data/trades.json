@@ -509,8 +509,31 @@
           "btId": "mo1je4rmjopwn"
         }
       ]
+    },
+    {
+      "id": "mpwctkne3u6u4",
+      "dict": {
+        "mistakes": [],
+        "notes": [],
+        "targets": [],
+        "tfTools": {
+          "W1": [],
+          "D1": [],
+          "H4": [],
+          "H1": [],
+          "M15": []
+        }
+      },
+      "name": "Intraweek cad",
+      "dateStart": "",
+      "dateEnd": "",
+      "pair": "EURUSD",
+      "strategy": "",
+      "setup": "",
+      "idea": "",
+      "trades": []
     }
   ],
   "activeBtId": "mo1je4rmjopwn",
-  "savedAt": "2026-05-01T10:02:44.570Z"
+  "savedAt": "2026-06-02T08:34:34.395Z"
 }

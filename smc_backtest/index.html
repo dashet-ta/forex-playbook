@@ -709,6 +709,45 @@
 
   .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+  .group-header-row td {
+    background: var(--bg2);
+    color: var(--text2);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .group-header-row .group-mini-stats {
+    display: inline-flex;
+    gap: 10px;
+    margin-left: 12px;
+    font-weight: 400;
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  .group-header-row .gms-win { color: var(--green); }
+  .group-header-row .gms-loss { color: var(--red); }
+  .group-header-row .gms-rr { color: var(--accent); }
+
+  .month-subheader-row td {
+    background: var(--bg3);
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 10px 4px 22px;
+    border-top: 1px solid var(--border);
+    letter-spacing: 0.03em;
+  }
+  .month-subheader-row .group-mini-stats {
+    display: inline-flex;
+    gap: 10px;
+    margin-left: 10px;
+    font-size: 11px;
+  }
+
   /* ── Divider ── */
   .divider { height: 1px; background: var(--border); margin: 12px 0; }
 
@@ -1125,6 +1164,7 @@ let state = {
   tradeMistakes: [],
   tradeNotes: [],
   tradeTargets: {},   // { W1: [], D1: ['fractal','fvg'], H4: ['ext liq'], ... }
+  btGrouping: 'none', // 'none' | 'month' | 'quarter' | 'both'
 };
 
 // ── DB helpers ──
@@ -2181,16 +2221,12 @@ function renderActiveBacktest() {
     return;
   }
 
-  const rows = bt.trades.map((t, i) => {
+  function tradeRow(t, i) {
     const setupStr = buildSetupStr(t.setup);
     const sessionCls = { london:'session-london', ny:'session-ny', 'ny-pm':'session-ny-pm', asia:'session-asia', other:'session-other' }[t.session] || '';
     const sessionLabel = { london:'London', ny:'NY AM', 'ny-pm':'NY PM', asia:'Asia', other:'Other' }[t.session] || t.session;
     const rrVal = t.rr !== null && t.rr !== undefined ? t.rr : '—';
     const rrCls = t.rr > 0 ? 'rr-pos' : t.rr < 0 ? 'rr-neg' : '';
-    const screens = t.screenshots && t.screenshots.length ? t.screenshots.map((s,si) =>
-      `<div class="screenshot-thumb" style="width:50px;height:34px;" onclick="openLightboxDirect('${bt.id}','${t.id}',${si})"><img src="${s}"></div>`
-    ).join('') : '—';
-
     return `
       <tr>
         <td style="color:var(--text3); font-size:11px">${i+1}</td>
@@ -2212,11 +2248,123 @@ function renderActiveBacktest() {
         </td>
       </tr>
     `;
-  }).join('');
+  }
+
+  function groupMiniStats(trades) {
+    const real = trades.filter(t => t.result !== 'skip');
+    const wins = real.filter(t => t.result === 'tp').length;
+    const losses = real.filter(t => t.result === 'sl').length;
+    const rrArr = real.filter(t => t.rr != null).map(t => t.rr);
+    const totalRR = rrArr.length ? rrArr.reduce((a,b)=>a+b,0).toFixed(1) : null;
+    const wr = real.length ? Math.round(wins/real.length*100) : 0;
+    return `<span class="group-mini-stats">
+      <span>${real.length} trades</span>
+      <span class="gms-win">✓${wins}</span>
+      <span class="gms-loss">✗${losses}</span>
+      <span style="color:var(--text3)">${wr}% WR</span>
+      ${totalRR !== null ? `<span class="gms-rr">${totalRR}R</span>` : ''}
+    </span>`;
+  }
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function getTradeDate(t) {
+    return t.dateOpen ? new Date(t.dateOpen) : null;
+  }
+  function quarterLabel(d) {
+    return `Q${Math.floor(d.getMonth()/3)+1} ${d.getFullYear()}`;
+  }
+  function monthKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+  function quarterKey(d) {
+    return `${d.getFullYear()}-Q${Math.floor(d.getMonth()/3)+1}`;
+  }
+
+  let rows = '';
+  const grouping = state.btGrouping;
+
+  if (grouping === 'none') {
+    rows = bt.trades.map((t,i) => tradeRow(t, i)).join('');
+  } else {
+    // Sort trades by date ascending for grouping
+    const sorted = [...bt.trades].sort((a,b) => {
+      const da = a.dateOpen ? new Date(a.dateOpen) : new Date(0);
+      const db = b.dateOpen ? new Date(b.dateOpen) : new Date(0);
+      return da - db;
+    });
+
+    if (grouping === 'month') {
+      // Group by month only
+      const groups = new Map();
+      sorted.forEach(t => {
+        const d = getTradeDate(t);
+        const key = d ? monthKey(d) : 'unknown';
+        if (!groups.has(key)) groups.set(key, { label: d ? `${MONTHS[d.getMonth()]} ${d.getFullYear()}` : 'Unknown', trades: [] });
+        groups.get(key).trades.push(t);
+      });
+      let globalIdx = 0;
+      groups.forEach(({ label, trades }) => {
+        rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(trades)}</td></tr>`;
+        trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
+      });
+
+    } else if (grouping === 'quarter') {
+      // Group by quarter only
+      const groups = new Map();
+      sorted.forEach(t => {
+        const d = getTradeDate(t);
+        const key = d ? quarterKey(d) : 'unknown';
+        if (!groups.has(key)) groups.set(key, { label: d ? quarterLabel(d) : 'Unknown', trades: [] });
+        groups.get(key).trades.push(t);
+      });
+      let globalIdx = 0;
+      groups.forEach(({ label, trades }) => {
+        rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(trades)}</td></tr>`;
+        trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
+      });
+
+    } else if (grouping === 'both') {
+      // Group by quarter, then by month inside each quarter
+      const qGroups = new Map();
+      sorted.forEach(t => {
+        const d = getTradeDate(t);
+        const qKey = d ? quarterKey(d) : 'unknown';
+        const mKey = d ? monthKey(d) : 'unknown';
+        if (!qGroups.has(qKey)) qGroups.set(qKey, { label: d ? quarterLabel(d) : 'Unknown', months: new Map(), allTrades: [] });
+        const qg = qGroups.get(qKey);
+        qg.allTrades.push(t);
+        if (!qg.months.has(mKey)) qg.months.set(mKey, { label: d ? `${MONTHS[d.getMonth()]} ${d.getFullYear()}` : 'Unknown', trades: [] });
+        qg.months.get(mKey).trades.push(t);
+      });
+      let globalIdx = 0;
+      qGroups.forEach(({ label, months, allTrades }) => {
+        rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(allTrades)}</td></tr>`;
+        months.forEach(({ label: mLabel, trades }) => {
+          rows += `<tr class="month-subheader-row"><td colspan="12">${mLabel}${groupMiniStats(trades)}</td></tr>`;
+          trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
+        });
+      });
+    }
+  }
+
+  const groupingOptions = [
+    { val: 'none', label: 'No grouping' },
+    { val: 'month', label: 'By Month' },
+    { val: 'quarter', label: 'By Quarter' },
+    { val: 'both', label: 'Quarter + Month' },
+  ];
 
   document.getElementById('btTradesWrap').innerHTML = `
-    <div class="section-header">
+    <div class="section-header" style="padding:14px 20px 10px">
       <div class="section-title">Trades (${bt.trades.length})</div>
+      <div class="toggle-group" style="align-items:center;gap:4px">
+        <span style="font-size:11px;color:var(--text3);margin-right:4px">Group:</span>
+        ${groupingOptions.map(o =>
+          `<button class="toggle-btn${state.btGrouping === o.val ? ' active' : ''}" onclick="setBtGrouping('${o.val}')">${o.label}</button>`
+        ).join('')}
+      </div>
     </div>
     <div style="overflow-x:auto">
       <table>
@@ -2230,6 +2378,11 @@ function renderActiveBacktest() {
       </table>
     </div>
   `;
+}
+
+function setBtGrouping(val) {
+  state.btGrouping = val;
+  renderActiveBacktest();
 }
 
 function openLightboxDirect(btId, tradeId, idx) {

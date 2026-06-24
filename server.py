@@ -47,7 +47,13 @@ _USD_WHITELIST = re.compile(
     r'fed chair|powell speaks|fomc statement|fed press conf|'
     r'ism services pmi|ism.*services|ism non.?farm|'
     r'jolts job openings|job openings.*labor|'
-    r'core retail sales|retail sales.*(m/?m|y/?y|mom|yoy)',
+    r'core retail sales|retail sales.*(m/?m|y/?y|mom|yoy)|'
+    r'core pce|pce price index|personal consumption expenditure|'
+    r'personal income.*(m/?m|y/?y|mom|yoy)|personal income\b|'
+    r'personal spending.*(m/?m|y/?y|mom|yoy)|personal spending\b|'
+    r'durable goods orders|durable goods.*(m/?m|y/?y|mom|yoy)|'
+    r'gdp.*(growth|rate|q/?q|y/?y|qoq|yoy|flash|prelim|second|third|final|advance)|'
+    r'gross domestic product',
     re.IGNORECASE
 )
 
@@ -174,11 +180,11 @@ def _decompress(body, enc):
 def _urllib(url, headers):
     ctx = ssl.create_default_context()
     req = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(req, timeout=20, context=ctx) as r:
+    with urllib.request.urlopen(req, timeout=10, context=ctx) as r:
         return r.status, _decompress(r.read(), r.headers.get('Content-Encoding', ''))
 
 def _curl(url, headers, is_json=False):
-    cmd = ['curl', '-s', '-L', '--compressed', '--max-time', '20']
+    cmd = ['curl', '-s', '-L', '--compressed', '--max-time', '10']
     if is_json:
         cmd += ['--http1.1']  # CDN sometimes behaves better with HTTP/1.1
     for k, v in headers.items():
@@ -765,7 +771,7 @@ def get_ff_week(cdn_url, week_offset):
     """
     label = "nextweek" if week_offset == 1 else "thisweek"
 
-    CDN_RETRY_DELAYS = [0, 3, 6]  # seconds before each attempt
+    CDN_RETRY_DELAYS = [0, 2]  # seconds before each attempt
 
     for attempt, delay in enumerate(CDN_RETRY_DELAYS, start=1):
         if delay:

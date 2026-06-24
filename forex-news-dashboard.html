@@ -1137,7 +1137,12 @@ var PROXY='http://localhost:8080/proxy?url=';
 
 async function fetchFeed(cdnKey){
   var url=FF_CDN[cdnKey];
-  var res=await fetch(PROXY+encodeURIComponent(url),{cache:'no-store'});
+  var ctrl=new AbortController();
+  var tid=setTimeout(function(){ ctrl.abort(); }, 35000);
+  var res;
+  try{
+    res=await fetch(PROXY+encodeURIComponent(url),{cache:'no-store',signal:ctrl.signal});
+  }finally{ clearTimeout(tid); }
   if(!res.ok) throw new Error('Server error HTTP '+res.status);
   var data=await res.json();
   if(!Array.isArray(data)) throw new Error('Unexpected format from server');

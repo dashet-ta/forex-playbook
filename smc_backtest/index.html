@@ -1592,9 +1592,10 @@ async function saveTrade() {
     tradeId = uid();
     bt.trades.push({ id: tradeId, ...trade });
   }
-  // Persist to IndexedDB
+  // Persist to IndexedDB + server
   await saveTradeRecord({ id: tradeId, ...trade }, bt.id);
   await saveBacktestMeta(bt); // save updated dict
+  _syncToServer().catch(() => {}); // push to server so refresh doesn't lose data
   closeModal('modalTrade');
   renderActiveBacktest();
 }
@@ -1605,6 +1606,7 @@ async function deleteTrade(tradeId) {
   if (!confirm('Delete this trade?')) return;
   bt.trades = bt.trades.filter(t => t.id !== tradeId);
   await deleteTradeRecord(tradeId);
+  _syncToServer().catch(() => {}); // keep server in sync
   renderActiveBacktest();
 }
 

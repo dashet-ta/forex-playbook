@@ -1131,7 +1131,7 @@
       ]
     },
     {
-      "id": "mq8as6ez4dff5",
+      "id": "mqtcnbihh4bho",
       "dict": {
         "mistakes": [],
         "notes": [],
@@ -1144,7 +1144,7 @@
           "M15": []
         }
       },
-      "name": "Intraday  3 candels entry model",
+      "name": "EUR h4-m15 entry models test",
       "dateStart": "",
       "dateEnd": "",
       "pair": "EURUSD",
@@ -1154,6 +1154,6 @@
       "trades": []
     }
   ],
-  "activeBtId": "mq8as6ez4dff5",
-  "savedAt": "2026-06-24T14:04:08.870Z"
+  "activeBtId": "mqtcnbihh4bho",
+  "savedAt": "2026-06-25T12:35:40.950Z"
 }

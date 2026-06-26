@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SMC Trading Suite</title>
+<title>💹 SMC Suite</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💹</text></svg>">
 <style>
   :root {
     --bg:      #0d0f14;
@@ -128,11 +129,14 @@
 </div>
 
 <script>
+  const TAB_LABELS = { fxnews: 'FX News', backtest: 'SMC Backtest', plan: 'Trading Plan' };
+
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     document.getElementById('frame-' + name).classList.add('active');
+    document.title = '💹 ' + (TAB_LABELS[name] || 'SMC Suite');
     // persist last active tab across reloads
     localStorage.setItem('smc_suite_tab', name);
   }

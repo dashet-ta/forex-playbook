@@ -1129,8 +1129,31 @@
           "btId": "mq7xq013uvy6j"
         }
       ]
+    },
+    {
+      "id": "mq8as6ez4dff5",
+      "dict": {
+        "mistakes": [],
+        "notes": [],
+        "targets": [],
+        "tfTools": {
+          "W1": [],
+          "D1": [],
+          "H4": [],
+          "H1": [],
+          "M15": []
+        }
+      },
+      "name": "Intraday  3 candels entry model",
+      "dateStart": "",
+      "dateEnd": "",
+      "pair": "EURUSD",
+      "strategy": "",
+      "setup": "",
+      "idea": "",
+      "trades": []
     }
   ],
   "activeBtId": "mo1je4rmjopwn",
-  "savedAt": "2026-06-25T14:01:46.250Z"
+  "savedAt": "2026-06-26T10:57:42.512Z"
 }

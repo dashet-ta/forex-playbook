@@ -661,6 +661,76 @@
   .journal-text { font-size: 0.78rem; color: var(--ink); padding-top: 1px; }
   .journal-sub  { font-size: 0.71rem; color: var(--ink2); }
 
+  /* ── SUB-TABS ── */
+  .sub-tab-bar {
+    display: flex; gap: 0;
+    margin: 12px 0 0;
+    border-bottom: 2px solid var(--border);
+  }
+  .sub-tab-btn {
+    padding: 8px 22px;
+    font-size: 0.73rem; font-weight: 700;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    background: none; border: none;
+    color: var(--ink3); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: color 0.15s;
+  }
+  .sub-tab-btn:hover { color: var(--ink); }
+  .sub-tab-btn.active { color: var(--ink); border-bottom-color: var(--wd); }
+  .sub-section { display: block; }
+  .sub-section.hidden { display: none; }
+
+  /* ── STEPPER ── */
+  .stepper-bar {
+    display: flex; align-items: center;
+    gap: 0; margin: 16px 0 18px;
+  }
+  .stepper-step { display: flex; align-items: center; cursor: pointer; }
+  .stepper-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+    background: var(--bg3); border: 1.5px solid var(--border);
+    color: var(--ink3); transition: all 0.2s; flex-shrink: 0;
+  }
+  .stepper-dot.active { background: var(--wd); border-color: var(--wd); color: #0d1117; }
+  .stepper-dot.done   { background: var(--bg3); border-color: var(--h4); color: var(--h4); }
+  .stepper-label {
+    font-size: 0.68rem; color: var(--ink3);
+    margin-left: 7px; white-space: nowrap;
+  }
+  .stepper-label.active { color: var(--ink); font-weight: 700; }
+  .stepper-label.done   { color: var(--h4); }
+  .stepper-line {
+    flex: 1; height: 1.5px; background: var(--border2);
+    margin: 0 12px; min-width: 16px;
+  }
+  .stepper-line.done { background: var(--h4); }
+  .step-content { display: none; }
+  .step-content.active { display: block; }
+  .stepper-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 22px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .step-nav-btn {
+    padding: 8px 22px;
+    font-family: var(--sans); font-size: 0.78rem; font-weight: 700;
+    border-radius: var(--radius); cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg2); color: var(--ink2);
+    transition: all 0.15s; letter-spacing: 0.04em;
+  }
+  .step-nav-btn:hover:not(:disabled) { border-color: var(--wd); color: var(--wd); }
+  .step-nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .step-nav-btn.next {
+    background: rgba(88,166,255,0.1);
+    color: var(--wd); border-color: rgba(88,166,255,0.4);
+  }
+  .step-nav-btn.next:hover { background: rgba(88,166,255,0.2); }
+
   @media print {
     body { max-width: 100%; padding: 0 12px; background: white; color: #111; }
     :root {
@@ -697,6 +767,42 @@
 <!-- ══ MAIN TRADING PLAN ══ -->
 <div id="plan-main" class="plan-section">
 
+<!-- Sub-tab bar -->
+<div class="sub-tab-bar">
+  <button class="sub-tab-btn active" id="stab-analysis"    onclick="switchSubTab('analysis',this)">📊 Аналіз</button>
+  <button class="sub-tab-btn"        id="stab-checklist"   onclick="switchSubTab('checklist',this)">✅ Чекліст</button>
+  <button class="sub-tab-btn"        id="stab-management"  onclick="switchSubTab('management',this)">📐 Менеджмент</button>
+</div>
+
+<!-- ════════════════════════════════════════════════ АНАЛІЗ SUB-TAB -->
+<div id="sub-analysis" class="sub-section">
+
+<!-- Stepper bar -->
+<div class="stepper-bar">
+  <div class="stepper-step" onclick="goToStep(0)">
+    <div class="stepper-dot active" id="sdot-0">0</div>
+    <span class="stepper-label active" id="slabel-0">Фаза</span>
+  </div>
+  <div class="stepper-line" id="sline-0"></div>
+  <div class="stepper-step" onclick="goToStep(1)">
+    <div class="stepper-dot" id="sdot-1">01</div>
+    <span class="stepper-label" id="slabel-1">HTF Контекст</span>
+  </div>
+  <div class="stepper-line" id="sline-1"></div>
+  <div class="stepper-step" onclick="goToStep(2)">
+    <div class="stepper-dot" id="sdot-2">02</div>
+    <span class="stepper-label" id="slabel-2">Модель входу</span>
+  </div>
+  <div class="stepper-line" id="sline-2"></div>
+  <div class="stepper-step" onclick="goToStep(3)">
+    <div class="stepper-dot" id="sdot-3">◦</div>
+    <span class="stepper-label" id="slabel-3">Тригери</span>
+  </div>
+</div>
+
+<!-- ════ STEP 0: Фаза + Cover ════ -->
+<div class="step-content active" id="step-0">
+
 <!-- ═══════════════════════════════════════════════════════════════════ COVER -->
 <div class="cover">
   <div class="cover-title">
@@ -708,7 +814,7 @@
     <ul class="kv-list">
       <li><span class="k">Тип</span>       <span class="v">Intraweek — утримання 5–7 днів</span></li>
       <li><span class="k">Ризик</span>     <span class="v">1% стандарт / 0.5% знижений</span></li>
-      <li><span class="k">Ціль RR</span>   <span class="v">Мінімум 1:3 на угоду</span></li>
+      <li><span class="k">Ціль RR</span>   <span class="v">&gt;2 RR на угоду</span></li>
     </ul>
   </div>
   <div>
@@ -748,6 +854,61 @@
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════ БОКОВИК (collapsible) -->
+<details style="margin-top:10px">
+  <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg2);border:1px solid rgba(196,138,10,0.25);border-radius:var(--radius);user-select:none">
+    <span style="font-family:var(--mono);font-size:0.62rem;font-weight:700;background:rgba(196,138,10,0.15);color:var(--gold);padding:2px 7px;border-radius:3px">АЛТ</span>
+    <span style="font-size:0.82rem;font-weight:700;color:var(--gold)">Боковик / Консолідація</span>
+    <span style="font-size:0.7rem;color:var(--ink3);margin-left:4px">— Range / Inside Bar</span>
+    <span style="margin-left:auto;font-size:0.68rem;color:var(--ink3)">▾</span>
+  </summary>
+  <div style="background:var(--bg2);border:1px solid rgba(196,138,10,0.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:12px 14px">
+    <p style="font-size:0.8rem;color:var(--ink2);margin-bottom:10px">Якщо на D1/W1 визначено Inside Bar або боковик — не шукаємо OF.</p>
+    <div class="subsec" style="margin-top:0;margin-bottom:5px">Ознаки консолідації</div>
+    <table style="margin-bottom:10px">
+      <tbody>
+        <tr><td style="width:18px;color:var(--ink3)">1</td><td>Свічки звужують діапазон — «затухання тренду»</td></tr>
+        <tr><td style="color:var(--ink3)">2</td><td>Досягнення HTF рівнів ліквідності або POI</td></tr>
+        <tr><td style="color:var(--ink3)">3</td><td>Inside Bar на W / D. <span style="color:var(--ink3)">Валідація: D1 — <b style="color:var(--ink2)">2+ свічки</b> всередині; W1/M1 — <b style="color:var(--ink2)">1 свічка</b>.</span></td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
+        <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point A</span>
+        <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Девіація за Inside Low/High → зняття SSL/BSL.</p>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
+        <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point B</span>
+        <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Зона 0.5 ренджа.</p>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(196,138,10,0.2);margin:8px 0 12px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Стратегія 1 — Всередині</div>
+        <div class="step"><div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div><div class="step-body"><div class="step-title" style="color:var(--wd)">D1 — визначити боковик</div><div class="step-desc">Відмітити Range High, Range Low, 0.5 Range.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div><div class="step-body"><div class="step-title" style="color:var(--h4)">H4 — чекати девіацію</div><div class="step-desc">Вихід за Range Low/High → зняття SSL/BSL (Point A).</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">3</div><div class="step-body"><div class="step-title" style="color:var(--wd)">D1/H4 — FTA і зони</div><div class="step-desc">Проставити FTA та ключові зони — можуть розвернути ціну до досягнення 0.5 Range.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">4</div><div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — повернення + злам</div><div class="step-desc">Market Shift або i-FVG → ТВХ.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">5</div><div class="step-body"><div class="step-title" style="color:var(--gold)">Таргети</div><div class="step-desc">1-й: <b>0.5 Range</b>. 2-й: протилежна границя.</div></div></div>
+        <div style="margin-top:6px;font-size:0.72rem;color:var(--red);font-weight:600">⚠ Від 0.5 Range нових позицій не відкриваємо.</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--wd);margin-bottom:8px">Стратегія 2 — Пробій</div>
+        <div class="step"><div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div><div class="step-body"><div class="step-title" style="color:var(--wd)">H4/D1 — ідентифікація пробою</div><div class="step-desc">Різкий імпульс → продавлює Range High або Low.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div><div class="step-body"><div class="step-title" style="color:var(--h4)">H4/H1 — підтвердження FVG пробою</div><div class="step-desc">FVG витримує тест після пробою. Ціна повертається → FVG тримається = пробій підтверджено. Якщо пройшла FVG назад — пробій хибний.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">3</div><div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — тест POI після зламу</div><div class="step-desc">FVG / i-FVG / OB що сформувалось при пробої → ТВХ.</div></div></div>
+        <div class="step"><div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">4</div><div class="step-body"><div class="step-title" style="color:var(--gold)">Точка B — ціль за межами</div><div class="step-desc">POI або ліквідність на W1/D1. Не ціль всередині діапазону.</div></div></div>
+      </div>
+    </div>
+  </div>
+</details>
+
+</div><!-- end step-0 -->
+
+<!-- ════ STEP 1: HTF Контекст ════ -->
+<div class="step-content" id="step-1">
 
 <!-- ═══════════════════════════════════════════════════════ 01 — HTF КОНТЕКСТ -->
 <div class="section">
@@ -800,6 +961,11 @@
 
   </div>
 </div>
+
+</div><!-- end step-1 -->
+
+<!-- ════ STEP 2: Модель входу ════ -->
+<div class="step-content" id="step-2">
 
 <!-- ═══════════════════════════════════════════════ 02 — МОДЕЛЬ ВХОДУ (Тренд) -->
 <div class="section">
@@ -882,12 +1048,11 @@
         <div class="tf-block" style="margin-bottom:0">
           <div class="tf-block-label m15">M15</div>
           <div class="tf-block-body">
-            <div class="tf-block-role">Точний вхід / Добір</div>
+            <div class="tf-block-role">M15 вхід / добір позиції</div>
             <ul class="tf-block-bullets">
-              <li>H4 POI + QM M15.</li>
-              <li>Asia session sweep / M15 shift → добір до H4 зони.</li>
-              <li>Вхід: ліміт від 0.5 FVG / QM зони M15.</li>
-              <li>Для добору: наявність H4 shift.</li>
+              <li>Asia session sweep / M15 shift.</li>
+              <li>Ліміт від FVG зони M15.</li>
+              <li>Ліміт від OB M15.</li>
             </ul>
           </div>
         </div>
@@ -898,94 +1063,11 @@
   </div><!-- end .two-col -->
 </div>
 
-<!-- ═══════════════════════════════════════════════ БОКОВИК (collapsible) -->
-<details style="margin-top:10px">
-  <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;padding:9px 16px;background:var(--bg2);border:1px solid rgba(196,138,10,0.25);border-radius:var(--radius);user-select:none">
-    <span style="font-family:var(--mono);font-size:0.62rem;font-weight:700;background:rgba(196,138,10,0.15);color:var(--gold);padding:2px 7px;border-radius:3px">АЛТ</span>
-    <span style="font-size:0.82rem;font-weight:700;color:var(--gold)">Боковик / Консолідація</span>
-    <span style="font-size:0.7rem;color:var(--ink3);margin-left:4px">— Range / Inside Bar</span>
-    <span style="margin-left:auto;font-size:0.68rem;color:var(--ink3)">▾</span>
-  </summary>
-  <div style="background:var(--bg2);border:1px solid rgba(196,138,10,0.2);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:12px 14px">
 
-    <p style="font-size:0.8rem;color:var(--ink2);margin-bottom:10px">
-      Якщо на D1/W1 визначено Inside Bar або боковик — не шукаємо OF.
-    </p>
+</div><!-- end step-2 -->
 
-    <div class="subsec" style="margin-top:0;margin-bottom:5px">Ознаки консолідації</div>
-    <table style="margin-bottom:10px">
-      <tbody>
-        <tr><td style="width:18px;color:var(--ink3)">1</td><td>Свічки звужують діапазон — «затухання тренду»</td></tr>
-        <tr><td style="color:var(--ink3)">2</td><td>Досягнення HTF рівнів ліквідності або POI</td></tr>
-        <tr><td style="color:var(--ink3)">3</td><td>Inside Bar на W / D. <span style="color:var(--ink3)">Валідація: D1 — <b style="color:var(--ink2)">2+ свічки</b> всередині; W1/M1 — <b style="color:var(--ink2)">1 свічка</b>.</span></td></tr>
-      </tbody>
-    </table>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
-        <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point A</span>
-        <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Девіація за Inside Low/High → зняття SSL/BSL.</p>
-      </div>
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:8px 10px">
-        <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink3)">Point B</span>
-        <p style="font-size:0.8rem;color:var(--ink);margin:3px 0 0">Зона 0.5 ренджа.</p>
-      </div>
-    </div>
-
-    <div style="border-top:1px solid rgba(196,138,10,0.2);margin:8px 0 12px"></div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-
-      <!-- Стратегія 1 -->
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
-        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Стратегія 1 — Всередині</div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div>
-          <div class="step-body"><div class="step-title" style="color:var(--wd)">D1 — визначити боковик</div><div class="step-desc">Відмітити Range High, Range Low, 0.5 Range.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div>
-          <div class="step-body"><div class="step-title" style="color:var(--h4)">H4 — чекати девіацію</div><div class="step-desc">Вихід за Range Low/High → зняття SSL/BSL (Point A).</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">3</div>
-          <div class="step-body"><div class="step-title" style="color:var(--wd)">D1/H4 — FTA і зони</div><div class="step-desc">Проставити FTA та ключові зони — можуть розвернути ціну до досягнення 0.5 Range.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">4</div>
-          <div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — повернення + злам</div><div class="step-desc">Market Shift або i-FVG → ТВХ.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">5</div>
-          <div class="step-body"><div class="step-title" style="color:var(--gold)">Таргети</div><div class="step-desc">1-й: <b>0.5 Range</b>. 2-й: протилежна границя.</div></div>
-        </div>
-        <div style="margin-top:6px;font-size:0.72rem;color:var(--red);font-weight:600">⚠ Від 0.5 Range нових позицій не відкриваємо.</div>
-      </div>
-
-      <!-- Стратегія 2 -->
-      <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);padding:10px">
-        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--wd);margin-bottom:8px">Стратегія 2 — Пробій</div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(88,166,255,0.15);color:var(--wd)">1</div>
-          <div class="step-body"><div class="step-title" style="color:var(--wd)">H4/D1 — ідентифікація пробою</div><div class="step-desc">Різкий імпульс → продавлює Range High або Low.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(63,182,139,0.15);color:var(--h4)">2</div>
-          <div class="step-body"><div class="step-title" style="color:var(--h4)">H4/H1 — підтвердження FVG пробою</div><div class="step-desc">FVG витримує тест після пробою. Ціна повертається → FVG тримається = пробій підтверджено. Якщо пройшла FVG назад — пробій хибний.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(167,139,250,0.15);color:var(--h1)">3</div>
-          <div class="step-body"><div class="step-title" style="color:var(--h1)">H1 — тест POI після зламу</div><div class="step-desc">FVG / i-FVG / OB що сформувалось при пробої → ТВХ.</div></div>
-        </div>
-        <div class="step">
-          <div class="step-num" style="background:rgba(196,138,10,0.15);color:var(--gold)">4</div>
-          <div class="step-body"><div class="step-title" style="color:var(--gold)">Точка B — ціль за межами</div><div class="step-desc">POI або ліквідність на W1/D1. Не ціль всередині діапазону.</div></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</details>
+<!-- ════ STEP 3: Тригери ════ -->
+<div class="step-content" id="step-3">
 
 <!-- ══════════════════════════════════════════════════ Ієрархія тригерів -->
 <div class="section" style="margin-top:12px">
@@ -1079,11 +1161,68 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════ Два блоки: лівий + правий -->
-<div class="mgmt-row" style="margin-top:12px">
+</div><!-- end step-3 -->
 
-  <!-- ПРАВИЙ: Менеджмент + Правила пропуску -->
-  <div class="ref-card" style="order:2">
+<!-- stepper nav — outside all steps, always visible -->
+<div class="stepper-nav">
+  <button class="step-nav-btn" id="step-prev" onclick="stepNav(-1)" disabled>← Назад</button>
+  <div id="step-counter" style="font-size:0.72rem;color:var(--ink3);font-family:var(--mono)">1 / 4</div>
+  <button class="step-nav-btn next" id="step-next" onclick="stepNav(1)">Далі →</button>
+</div>
+
+</div><!-- end #sub-analysis -->
+
+<!-- ════════════════════════════════════════════ ЧЕКЛІСТ SUB-TAB -->
+<div id="sub-checklist" class="sub-section hidden" style="margin-top:16px">
+  <div class="ref-card">
+    <div class="ref-card-header">
+      <span class="ref-card-icon">Чекліст</span>
+      <span class="ref-card-title">Чекліст входу</span>
+      <div style="margin-left:auto;display:flex;gap:4px">
+        <button id="chk-tab-1" onclick="switchChkType(1)" style="padding:3px 10px;font-family:var(--mono);font-size:0.62rem;font-weight:700;border-radius:3px;cursor:pointer;border:1px solid rgba(167,139,250,0.4);background:rgba(167,139,250,0.18);color:var(--h1)">ТИП 1</button>
+        <button id="chk-tab-2" onclick="switchChkType(2)" style="padding:3px 10px;font-family:var(--mono);font-size:0.62rem;font-weight:700;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--ink3)">ТИП 2</button>
+      </div>
+    </div>
+    <div class="ref-card-body">
+      <p style="font-size:0.75rem;color:var(--ink2);margin-bottom:10px">Якщо хоча б один <b style="color:var(--red)">ОБОВЯЗКОВИЙ</b> не виконано — угоду пропустити.</p>
+      <div id="chk-type1">
+        <div class="checklist">
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">ФАЗА</span><span class="chk-text">Тренд / Імпульс визначено</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">A → B</span><span class="chk-text">Точки A та B на W1 визначені</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">D1 POI</span><span class="chk-text">Є D1 POI (OB / FVG / RB) у зоні реакції</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H4✓</span><span class="chk-text">H4 не інвалідовано (ключовий свінг не перебитий)</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag" style="background:rgba(167,139,250,0.12);color:var(--h1)">H1 МОДЕЛЬ</span><span class="chk-text">OF inv / i-FVG / Market Shift на H1</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">D1/H4 FTA</span><span class="chk-text">Немає FTA зони що блокує рух до B</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">SL</span><span class="chk-text">SL за H1: остання маніпуляція або точка інвалідації OF</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">КОМПРЕСІЯ</span><span class="chk-text">Compression на H1 або M15</span><span class="chk-req opt">+ доп.</span></label>
+        </div>
+        <div class="alert-red" style="margin-top:10px">СТОП: немає D1 POI &nbsp;·&nbsp; H4 інвалідовано</div>
+        <button onclick="document.querySelectorAll('.chk1').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути</button>
+      </div>
+      <div id="chk-type2" style="display:none">
+        <div class="checklist">
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">ФАЗА</span><span class="chk-text">Тренд / Імпульс визначено</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">A → B</span><span class="chk-text">Точки A та B на W1 визначені</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">D1 POI</span><span class="chk-text">Є D1 POI (OB / FVG / RB) у зоні реакції</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(63,182,139,0.12);color:var(--h4)">H4 POI</span><span class="chk-text">H4 зона підтвердження: OB / FVG визначено</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H4 BIAS</span><span class="chk-text">H4 bias = D1 bias (узгоджені)</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(227,179,65,0.12);color:var(--m15)">M15 ВХД</span><span class="chk-text">QM M15 / Asia sweep / M15 shift підтверджено</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">D1/H4 FTA</span><span class="chk-text">Немає FTA зони що блокує рух до B</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">SL</span><span class="chk-text">SL за H4 POI або точкою інвалідації OF</span><span class="chk-req req">✓ обов.</span></label>
+          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">КОМПРЕСІЯ</span><span class="chk-text">Compression на H4 → сильний додатковий фактор</span><span class="chk-req opt">+ доп.</span></label>
+        </div>
+        <div class="alert-red" style="margin-top:10px">СТОП: немає H4 POI &nbsp;·&nbsp; H4 bias ≠ D1 bias</div>
+        <button onclick="document.querySelectorAll('.chk2').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути</button>
+      </div>
+    </div>
+  </div>
+</div><!-- end #sub-checklist -->
+
+<!-- ════════════════════════════════════════════ МЕНЕДЖМЕНТ SUB-TAB -->
+<div id="sub-management" class="sub-section hidden" style="margin-top:16px">
+
+  <!-- Менеджмент + Правила пропуску -->
+  <div class="ref-card">
     <div class="ref-card-header">
       <span class="ref-card-icon">Менеджмент</span>
       <span class="ref-card-title">Менеджмент позиції</span>
@@ -1147,56 +1286,8 @@
     </div>
   </div>
 
-  <!-- ЛІВИЙ: Чекліст входу -->
-  <div class="ref-card" style="order:1">
-    <div class="ref-card-header">
-      <span class="ref-card-icon">Чекліст</span>
-      <span class="ref-card-title">Чекліст входу</span>
-      <div style="margin-left:auto;display:flex;gap:4px">
-        <button id="chk-tab-1" onclick="switchChkType(1)" style="padding:3px 10px;font-family:var(--mono);font-size:0.62rem;font-weight:700;border-radius:3px;cursor:pointer;border:1px solid rgba(167,139,250,0.4);background:rgba(167,139,250,0.18);color:var(--h1);transition:opacity 0.12s">ТИП 1</button>
-        <button id="chk-tab-2" onclick="switchChkType(2)" style="padding:3px 10px;font-family:var(--mono);font-size:0.62rem;font-weight:700;border-radius:3px;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--ink3);transition:opacity 0.12s">ТИП 2</button>
-      </div>
-    </div>
-    <div class="ref-card-body">
-      <p style="font-size:0.75rem;color:var(--ink2);margin-bottom:6px">Якщо хоча б один <b style="color:var(--red)">ОБОВЯЗКОВИЙ</b> не виконано — угоду пропустити.</p>
 
-      <!-- TYPE 1 CHECKLIST -->
-      <div id="chk-type1">
-        <div class="checklist">
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">ФАЗА</span><span class="chk-text">Тренд / Імпульс визначено</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">A → B</span><span class="chk-text">Точки A та B на W1 визначені</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">D1 POI</span><span class="chk-text">Є D1 POI (OB / FVG / RB) у зоні реакції</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H4✓</span><span class="chk-text">H4 не інвалідовано (ключовий свінг не перебитий)</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag" style="background:rgba(167,139,250,0.12);color:var(--h1)">H1 МОДЕЛЬ</span><span class="chk-text">OF inv / i-FVG / Market Shift на H1</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">D1/H4 FTA</span><span class="chk-text">Немає FTA зони що блокує рух до B</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">SL</span><span class="chk-text">SL за H1: остання маніпуляція або точка інвалідації OF</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk1"><span class="chk-tag">КОМПРЕСІЯ</span><span class="chk-text">Compression на H1 або M15</span><span class="chk-req opt">+ доп.</span></label>
-        </div>
-        <div class="alert-red" style="margin-top:8px">СТОП: немає D1 POI &nbsp;·&nbsp; H4 інвалідовано</div>
-        <button onclick="document.querySelectorAll('.chk1').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути</button>
-      </div>
-
-      <!-- TYPE 2 CHECKLIST -->
-      <div id="chk-type2" style="display:none">
-        <div class="checklist">
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">ФАЗА</span><span class="chk-text">Тренд / Імпульс визначено</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">A → B</span><span class="chk-text">Точки A та B на W1 визначені</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">D1 POI</span><span class="chk-text">Є D1 POI (OB / FVG / RB) у зоні реакції</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(63,182,139,0.12);color:var(--h4)">H4 POI</span><span class="chk-text">H4 зона підтвердження: OB / FVG визначено</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(63,182,139,0.1);color:var(--h4)">H4 BIAS</span><span class="chk-text">H4 bias = D1 bias (узгоджені)</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag" style="background:rgba(227,179,65,0.12);color:var(--m15)">M15 ВХД</span><span class="chk-text">QM M15 / Asia sweep / M15 shift підтверджено</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">D1/H4 FTA</span><span class="chk-text">Немає FTA зони що блокує рух до B</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">SL</span><span class="chk-text">SL за H4 POI або точкою інвалідації OF</span><span class="chk-req req">✓ обов.</span></label>
-          <label class="chk-row"><input type="checkbox" class="chk-box chk2"><span class="chk-tag">КОМПРЕСІЯ</span><span class="chk-text">Compression на H4 → сильний додатковий фактор</span><span class="chk-req opt">+ доп.</span></label>
-        </div>
-        <div class="alert-red" style="margin-top:8px">СТОП: немає H4 POI &nbsp;·&nbsp; H4 bias ≠ D1 bias</div>
-        <button onclick="document.querySelectorAll('.chk2').forEach(c=>c.checked=false)" style="margin-top:8px;padding:4px 12px;font-size:0.7rem;font-family:var(--sans);font-weight:600;color:var(--ink3);background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;letter-spacing:0.04em;">↺ скинути</button>
-      </div>
-
-    </div>
-  </div>
-
-</div><!-- end .mgmt-row -->
+</div><!-- end #sub-management -->
 
 <footer>
   SMC Intraweek Trading Plan &nbsp;·&nbsp; Dasha &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Персональний план
@@ -1628,41 +1719,89 @@
 </div><!-- end #plan-btc -->
 
 <script>
-  function switchChkType(t) {
-    document.getElementById('chk-type1').style.display = t === 1 ? '' : 'none';
-    document.getElementById('chk-type2').style.display = t === 2 ? '' : 'none';
-    var b1 = document.getElementById('chk-tab-1');
-    var b2 = document.getElementById('chk-tab-2');
-    if (t === 1) {
-      b1.style.background = 'rgba(167,139,250,0.18)'; b1.style.color = 'var(--h1)'; b1.style.borderColor = 'rgba(167,139,250,0.4)';
-      b2.style.background = 'var(--bg3)'; b2.style.color = 'var(--ink3)'; b2.style.borderColor = 'var(--border)';
-    } else {
-      b2.style.background = 'rgba(227,179,65,0.15)'; b2.style.color = 'var(--m15)'; b2.style.borderColor = 'rgba(227,179,65,0.4)';
-      b1.style.background = 'var(--bg3)'; b1.style.color = 'var(--ink3)'; b1.style.borderColor = 'var(--border)';
-    }
-    try { localStorage.setItem('chkType', t); } catch(e) {}
-  }
-  // restore checklist type
-  try {
-    var savedChk = localStorage.getItem('chkType');
-    if (savedChk === '2') switchChkType(2);
-  } catch(e) {}
-
+  /* ── Top-level tab: Trading Plan / BTC ── */
   function switchPlanTab(tab, btn) {
     document.querySelectorAll('.plan-section').forEach(s => s.classList.add('hidden'));
     document.querySelectorAll('.plan-tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('plan-' + tab).classList.remove('hidden');
     btn.classList.add('active');
-    // persist choice
     try { localStorage.setItem('planTab', tab); } catch(e) {}
   }
-  // restore last tab on load
-  try {
-    var saved = localStorage.getItem('planTab');
-    if (saved && saved !== 'main') {
-      var btn = document.querySelector('.plan-tab-btn.btc-tab');
-      if (btn) switchPlanTab(saved, btn);
+
+  /* ── Sub-tabs: Аналіз / Чекліст / Менеджмент ── */
+  function switchSubTab(tab, btn) {
+    document.querySelectorAll('.sub-section').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('sub-' + tab).classList.remove('hidden');
+    btn.classList.add('active');
+    try { localStorage.setItem('subTab', tab); } catch(e) {}
+  }
+
+  /* ── Stepper ── */
+  var currentStep = 0;
+  var TOTAL_STEPS = 4;
+
+  function goToStep(n) {
+    if (n < 0 || n >= TOTAL_STEPS) return;
+    document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+    for (var i = 0; i < TOTAL_STEPS; i++) {
+      var dot   = document.getElementById('sdot-' + i);
+      var label = document.getElementById('slabel-' + i);
+      if (!dot) continue;
+      dot.className   = 'stepper-dot'   + (i < n ? ' done' : i === n ? ' active' : '');
+      label.className = 'stepper-label' + (i < n ? ' done' : i === n ? ' active' : '');
     }
+    for (var i = 0; i < TOTAL_STEPS - 1; i++) {
+      var line = document.getElementById('sline-' + i);
+      if (line) line.className = 'stepper-line' + (i < n ? ' done' : '');
+    }
+    currentStep = n;
+    var prev = document.getElementById('step-prev');
+    var next = document.getElementById('step-next');
+    var ctr  = document.getElementById('step-counter');
+    if (prev) prev.disabled = (n === 0);
+    if (next) next.disabled = (n === TOTAL_STEPS - 1);
+    if (ctr)  ctr.textContent = (n + 1) + ' / ' + TOTAL_STEPS;
+    try { localStorage.setItem('stepperStep', n); } catch(e) {}
+  }
+
+  function stepNav(dir) { goToStep(currentStep + dir); }
+
+  /* ── Checklist type toggle ── */
+  function switchChkType(t) {
+    document.getElementById('chk-type1').style.display = t === 1 ? '' : 'none';
+    document.getElementById('chk-type2').style.display = t === 2 ? '' : 'none';
+    var b1 = document.getElementById('chk-tab-1');
+    var b2 = document.getElementById('chk-tab-2');
+    if (b1 && b2) {
+      if (t === 1) {
+        b1.style.cssText += ';background:rgba(167,139,250,0.18);color:var(--h1);border-color:rgba(167,139,250,0.4)';
+        b2.style.cssText += ';background:var(--bg3);color:var(--ink3);border-color:var(--border)';
+      } else {
+        b2.style.cssText += ';background:rgba(227,179,65,0.15);color:var(--m15);border-color:rgba(227,179,65,0.4)';
+        b1.style.cssText += ';background:var(--bg3);color:var(--ink3);border-color:var(--border)';
+      }
+    }
+    try { localStorage.setItem('chkType', t); } catch(e) {}
+  }
+
+  /* ── Restore state on load ── */
+  try {
+    var savedPlan = localStorage.getItem('planTab');
+    if (savedPlan && savedPlan !== 'main') {
+      var btn = document.querySelector('.plan-tab-btn.btc-tab');
+      if (btn) switchPlanTab(savedPlan, btn);
+    }
+    var savedSub = localStorage.getItem('subTab');
+    if (savedSub && savedSub !== 'analysis') {
+      var sbtn = document.getElementById('stab-' + savedSub);
+      if (sbtn) switchSubTab(savedSub, sbtn);
+    }
+    var savedStep = parseInt(localStorage.getItem('stepperStep') || '0');
+    if (savedStep > 0) goToStep(savedStep);
+    var savedChk = parseInt(localStorage.getItem('chkType') || '1');
+    if (savedChk === 2) switchChkType(2);
   } catch(e) {}
 </script>
 

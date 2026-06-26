@@ -1129,31 +1129,8 @@
           "btId": "mq7xq013uvy6j"
         }
       ]
-    },
-    {
-      "id": "mqtcnbihh4bho",
-      "dict": {
-        "mistakes": [],
-        "notes": [],
-        "targets": [],
-        "tfTools": {
-          "W1": [],
-          "D1": [],
-          "H4": [],
-          "H1": [],
-          "M15": []
-        }
-      },
-      "name": "EUR h4-m15 entry models test",
-      "dateStart": "",
-      "dateEnd": "",
-      "pair": "EURUSD",
-      "strategy": "",
-      "setup": "",
-      "idea": "",
-      "trades": []
     }
   ],
-  "activeBtId": "mqtcnbihh4bho",
-  "savedAt": "2026-06-25T12:35:40.950Z"
+  "activeBtId": "mo1je4rmjopwn",
+  "savedAt": "2026-06-25T14:01:46.250Z"
 }

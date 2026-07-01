@@ -784,6 +784,40 @@
   .session-ny-pm { color: #a78bfa; }
   .session-asia { color: #38bdf8; }
   .session-other { color: var(--text3); }
+
+  /* ── Quick Test chips ── */
+  .chip-group { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .chip {
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1.5px solid var(--border2);
+    background: var(--bg3);
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.12s;
+    white-space: nowrap;
+    line-height: 1.4;
+  }
+  .chip:hover { background: var(--bg4); border-color: var(--accent); color: var(--text); }
+  .chip.active { background: rgba(59,130,246,0.15); border-color: var(--accent); color: #93c5fd; }
+  .chip.chip-long.active  { background: rgba(34,197,94,0.12);  border-color: var(--green);  color: #86efac; }
+  .chip.chip-short.active { background: rgba(239,68,68,0.12);  border-color: var(--red);    color: #fca5a5; }
+  .chip.chip-tp.active    { background: rgba(34,197,94,0.12);  border-color: var(--green);  color: #86efac; }
+  .chip.chip-sl.active    { background: rgba(239,68,68,0.12);  border-color: var(--red);    color: #fca5a5; }
+  .chip.chip-be.active    { background: rgba(234,179,8,0.12);  border-color: var(--yellow); color: #fde68a; }
+  .chip.chip-skip.active  { background: var(--bg4); border-color: var(--border2); color: var(--text3); }
+
+  .qt-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
 </style>
 </head>
 <body>
@@ -819,7 +853,8 @@
           <div class="page-title" id="btPageTitle">Select a Backtest</div>
           <div id="btPageActions" style="display:none; gap:8px; display:none">
             <button class="btn btn-secondary btn-sm" onclick="openEditBacktest()">✏️ Edit</button>
-            <button class="btn btn-primary btn-sm" onclick="openAddTrade()">+ Add Trade</button>
+            <button class="btn btn-secondary btn-sm" onclick="openQuickTest()">⚡ Quick Test</button>
+          <button class="btn btn-primary btn-sm" onclick="openAddTrade()">+ Add Trade</button>
           </div>
         </div>
 
@@ -1122,6 +1157,103 @@
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('modalSettings')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: Quick Test
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modalQuickTest">
+  <div class="modal" style="max-width: 520px;">
+    <div class="modal-header">
+      <div class="modal-title">⚡ Quick Test</div>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('modalQuickTest')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Direction -->
+        <div>
+          <div class="qt-section-label">Direction</div>
+          <div class="chip-group" id="qt-direction">
+            <button class="chip chip-long" onclick="qtSelect('direction','long',this)">▲ Long</button>
+            <button class="chip chip-short" onclick="qtSelect('direction','short',this)">▼ Short</button>
+          </div>
+        </div>
+
+        <!-- Day of week -->
+        <div>
+          <div class="qt-section-label">День тижня</div>
+          <div class="chip-group" id="qt-day">
+            <button class="chip" onclick="qtSelect('day',0,this)">Пн</button>
+            <button class="chip" onclick="qtSelect('day',1,this)">Вт</button>
+            <button class="chip" onclick="qtSelect('day',2,this)">Ср</button>
+            <button class="chip" onclick="qtSelect('day',3,this)">Чт</button>
+            <button class="chip" onclick="qtSelect('day',4,this)">Пт</button>
+            <button class="chip" onclick="qtSelect('day',5,this)">Сб</button>
+            <button class="chip" onclick="qtSelect('day',6,this)">Нд</button>
+          </div>
+        </div>
+
+        <!-- Open / Close time -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px">
+          <div class="field">
+            <label>Open Time (UTC)</label>
+            <input type="time" id="qt-openTime">
+          </div>
+          <div class="field">
+            <label>Close Time (UTC)</label>
+            <input type="time" id="qt-closeTime">
+          </div>
+        </div>
+
+        <!-- H4 POI -->
+        <div>
+          <div class="qt-section-label">H4 POI <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(multi)</span></div>
+          <div class="chip-group" id="qt-h4poi">
+            <button class="chip" onclick="qtMulti('h4poi','FVG',this)">FVG</button>
+            <button class="chip" onclick="qtMulti('h4poi','iFVG',this)">iFVG</button>
+            <button class="chip" onclick="qtMulti('h4poi','OB',this)">OB</button>
+            <button class="chip" onclick="qtMulti('h4poi','RB',this)">RB</button>
+            <button class="chip" onclick="qtMulti('h4poi','Sweep Liq',this)">Sweep Liq</button>
+          </div>
+        </div>
+
+        <!-- M15 Entry Model -->
+        <div>
+          <div class="qt-section-label">M15 Entry Model <span style="color:var(--text3);font-weight:400;text-transform:none;letter-spacing:0">(multi)</span></div>
+          <div class="chip-group" id="qt-m15model">
+            <button class="chip" onclick="qtMulti('m15model','QM (Shift)',this)">QM (Shift)</button>
+            <button class="chip" onclick="qtMulti('m15model','SMR + FVG',this)">SMR + FVG</button>
+            <button class="chip" onclick="qtMulti('m15model','SMR + iFVG',this)">SMR + iFVG</button>
+            <button class="chip" onclick="qtMulti('m15model','OB + FVG',this)">OB + FVG</button>
+            <button class="chip" onclick="qtMulti('m15model','Continuation',this)">Continuation</button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div>
+          <div class="qt-section-label">Result</div>
+          <div class="chip-group" id="qt-result">
+            <button class="chip chip-tp" onclick="qtSelect('result','tp',this)">TP</button>
+            <button class="chip chip-sl" onclick="qtSelect('result','sl',this)">SL</button>
+            <button class="chip chip-be" onclick="qtSelect('result','be',this)">BE</button>
+            <button class="chip chip-skip" onclick="qtSelect('result','skip',this)">Skip</button>
+          </div>
+        </div>
+
+        <!-- RR -->
+        <div class="field">
+          <label>RR</label>
+          <input type="number" id="qt-rr" step="0.1" placeholder="e.g. 3.5">
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modalQuickTest')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveQuickTest()">Save Quick Test</button>
     </div>
   </div>
 </div>
@@ -2239,6 +2371,8 @@ function renderActiveBacktest() {
         <td><span class="${t.direction === 'long' ? 'dir-long' : 'dir-short'}">${t.direction === 'long' ? '▲ Long' : '▼ Short'}</span></td>
         <td><span class="result-badge result-${t.result}">${t.result.toUpperCase()}</span></td>
         <td><span class="${rrCls}">${rrVal !== '—' ? rrVal : '—'}</span></td>
+        <td>${(t.setup && t.setup['H4'] && t.setup['H4'].length) ? t.setup['H4'].map(p => `<span style="display:inline-flex;align-items:center;padding:1px 6px;background:rgba(251,191,36,0.12);border:1.5px solid #f59e0b;border-radius:4px;font-size:11px;font-weight:600;color:#fbbf24;margin:1px">${esc(p)}</span>`).join('') : '<span style="color:var(--text3)">—</span>'}</td>
+        <td>${(t.setup && t.setup['M15'] && t.setup['M15'].length) ? t.setup['M15'].map(p => `<span style="display:inline-flex;align-items:center;padding:1px 6px;background:rgba(99,102,241,0.12);border:1.5px solid #818cf8;border-radius:4px;font-size:11px;font-weight:600;color:#a5b4fc;margin:1px">${esc(p)}</span>`).join('') : '<span style="color:var(--text3)">—</span>'}</td>
         <td>${setupStr ? `<span class="setup-pill" onmouseenter="showSetupTooltip(event,'${encodeURIComponent(buildSetupTooltip(t.setup))}')" onmouseleave="hideSetupTooltip()">${setupStr}</span>` : '—'}</td>
         <td>${buildTargetStr(t.targets) ? `<span class="setup-pill" style="border-color:var(--teal);color:var(--teal)" onmouseenter="showSetupTooltip(event,'${encodeURIComponent(buildTargetTooltip(t.targets))}')" onmouseleave="hideSetupTooltip()">${buildTargetStr(t.targets)}</span>` : '—'}</td>
         <td>${t.mistakes && t.mistakes.length ? t.mistakes.map(m => `<span class="tag tag-red" style="margin:1px">${esc(m)}</span>`).join('') : '—'}</td>
@@ -2308,7 +2442,7 @@ function renderActiveBacktest() {
       });
       let globalIdx = 0;
       groups.forEach(({ label, trades }) => {
-        rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(trades)}</td></tr>`;
+        rows += `<tr class="group-header-row"><td colspan="14">${label}${groupMiniStats(trades)}</td></tr>`;
         trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
       });
 
@@ -2323,7 +2457,7 @@ function renderActiveBacktest() {
       });
       let globalIdx = 0;
       groups.forEach(({ label, trades }) => {
-        rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(trades)}</td></tr>`;
+        rows += `<tr class="group-header-row"><td colspan="14">${label}${groupMiniStats(trades)}</td></tr>`;
         trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
       });
 
@@ -2344,7 +2478,7 @@ function renderActiveBacktest() {
       qGroups.forEach(({ label, months, allTrades }) => {
         rows += `<tr class="group-header-row"><td colspan="12">${label}${groupMiniStats(allTrades)}</td></tr>`;
         months.forEach(({ label: mLabel, trades }) => {
-          rows += `<tr class="month-subheader-row"><td colspan="12">${mLabel}${groupMiniStats(trades)}</td></tr>`;
+          rows += `<tr class="month-subheader-row"><td colspan="14">${mLabel}${groupMiniStats(trades)}</td></tr>`;
           trades.forEach(t => { rows += tradeRow(t, ++globalIdx); });
         });
       });
@@ -2373,7 +2507,7 @@ function renderActiveBacktest() {
         <thead>
           <tr>
             <th>#</th><th>Date Open</th><th>Time in Position</th><th>Pair</th><th>Session</th><th>Direction</th>
-            <th>Result</th><th>RR</th><th>Setup</th><th>Target</th><th>Mistakes</th><th>Actions</th>
+            <th>Result</th><th>RR</th><th>H4 POI</th><th>M15 Entry</th><th>Setup</th><th>Target</th><th>Mistakes</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
@@ -2936,6 +3070,146 @@ function _applyAnalysisToForm(parsed) {
     parsed.notes.forEach(n => { if (!state.tradeNotes.includes(n)) state.tradeNotes.push(n); });
     renderDictTags('notes');
   }
+}
+
+// ═══════════════════════════════════════════════
+// QUICK TEST
+// ═══════════════════════════════════════════════
+
+const _qtState = {
+  direction: 'long',
+  day: null,    // 0=Mon … 6=Sun
+  h4poi: [],    // multi-select
+  m15model: [], // multi-select
+  result: 'tp',
+};
+
+function openQuickTest() {
+  if (!getActiveBt()) return;
+
+  // Reset state
+  _qtState.direction = 'long';
+  _qtState.h4poi     = [];
+  _qtState.m15model  = [];
+  _qtState.result    = 'tp';
+
+  // Reset all chips
+  document.querySelectorAll('#modalQuickTest .chip').forEach(c => c.classList.remove('active'));
+
+  // Default direction & result
+  document.querySelector('#qt-direction .chip-long').classList.add('active');
+  document.querySelector('#qt-result .chip-tp').classList.add('active');
+
+  // Default times
+  document.getElementById('qt-openTime').value  = '10:00';
+  document.getElementById('qt-closeTime').value = '11:00';
+  document.getElementById('qt-rr').value        = '';
+
+  // Auto-select today's weekday (Mon=0)
+  const todayDow  = (new Date().getDay() + 6) % 7;
+  const dayBtns   = document.querySelectorAll('#qt-day .chip');
+  if (dayBtns[todayDow]) {
+    dayBtns[todayDow].classList.add('active');
+    _qtState.day = todayDow;
+  }
+
+  openModal('modalQuickTest');
+}
+
+// Single-select chip
+function qtSelect(field, val, btn) {
+  _qtState[field] = val;
+  btn.closest('.chip-group').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Multi-select chip
+function qtMulti(field, val, btn) {
+  const arr = _qtState[field];
+  const idx = arr.indexOf(val);
+  if (idx >= 0) { arr.splice(idx, 1); btn.classList.remove('active'); }
+  else          { arr.push(val);       btn.classList.add('active'); }
+}
+
+// Return YYYY-MM-DD for the selected weekday within the current week (Mon-anchored)
+function _qtDayToDate(dayIdx) {
+  const today    = new Date();
+  const todayDow = (today.getDay() + 6) % 7; // 0=Mon
+  const diff     = dayIdx - todayDow;
+  const target   = new Date(today);
+  target.setDate(today.getDate() + diff);
+  return target.toISOString().slice(0, 10);
+}
+
+// Session detection from UTC time string "HH:MM"
+function _qtDetectSession(timeStr) {
+  if (!timeStr) return 'other';
+  const [h, m]          = timeStr.split(':').map(Number);
+  const bst             = isLondonBST(new Date());
+  const londonMin       = (h * 60 + m + (bst ? 60 : 0)) % (24 * 60);
+  for (const s of SESSION_SCHEDULE) {
+    const start = s.start[0] * 60 + s.start[1];
+    const end   = s.end[0]   * 60 + s.end[1];
+    if (londonMin >= start && londonMin < end) return s.id;
+  }
+  return 'other';
+}
+
+async function saveQuickTest() {
+  const bt = getActiveBt();
+  if (!bt) return;
+
+  if (_qtState.day === null) { alert('Оберіть день тижня'); return; }
+
+  const dateStr  = _qtDayToDate(_qtState.day);
+  const openTime = document.getElementById('qt-openTime').value  || '00:00';
+  const closeTime= document.getElementById('qt-closeTime').value || '';
+  const dateOpen = `${dateStr}T${openTime}`;
+  const dateClose= closeTime ? `${dateStr}T${closeTime}` : '';
+
+  // Build setup: H4 POIs + M15 entry model
+  const setup = {};
+  TF_LIST.forEach(tf => setup[tf] = []);
+  if (_qtState.h4poi.length)    setup['H4']  = [..._qtState.h4poi];
+  if (_qtState.m15model.length) setup['M15'] = [..._qtState.m15model];
+
+  const rrRaw = parseFloat(document.getElementById('qt-rr').value);
+  const rr    = isNaN(rrRaw)
+    ? (_qtState.result === 'sl' ? -1 : _qtState.result === 'be' ? 0 : null)
+    : rrRaw;
+
+  const trade = {
+    dateOpen,
+    dateClose,
+    pair:       bt.pair || 'EURUSD',
+    session:    _qtDetectSession(openTime),
+    direction:  _qtState.direction,
+    result:     _qtState.result,
+    rr,
+    risk:       1,
+    setup,
+    mistakes:   [],
+    notes:      [],
+    targets:    {},
+    screenshots:[],
+    quickTest:  true,
+  };
+
+  // Update bt dict so POIs appear in autocomplete
+  TF_LIST.forEach(tf => {
+    const tools = setup[tf] || [];
+    if (!bt.dict.tfTools[tf]) bt.dict.tfTools[tf] = [];
+    tools.forEach(t => { if (!bt.dict.tfTools[tf].includes(t)) bt.dict.tfTools[tf].push(t); });
+  });
+
+  const tradeId = uid();
+  bt.trades.push({ id: tradeId, ...trade });
+  await saveTradeRecord({ id: tradeId, ...trade }, bt.id);
+  await saveBacktestMeta(bt);
+  _syncToServer().catch(() => {});
+
+  closeModal('modalQuickTest');
+  renderActiveBacktest();
 }
 
 function esc(str) {

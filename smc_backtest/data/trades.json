@@ -1131,7 +1131,7 @@
       ]
     },
     {
-      "id": "mq8as6ez4dff5",
+      "id": "mqv0dr4eyaxl0",
       "dict": {
         "mistakes": [],
         "notes": [],
@@ -1139,21 +1139,206 @@
         "tfTools": {
           "W1": [],
           "D1": [],
+          "H4": [
+            "iFVG",
+            "OB",
+            "Sweep Liq",
+            "FVG"
+          ],
+          "H1": [],
+          "M15": [
+            "SMR + FVG",
+            "Continuation",
+            "OB + FVG"
+          ]
+        },
+        "targetTools": {
+          "W1": [],
+          "D1": [],
           "H4": [],
           "H1": [],
           "M15": []
         }
       },
-      "name": "Intraday  3 candels entry model",
-      "dateStart": "",
+      "name": "Тест моделей входу",
+      "dateStart": "2026-05-01",
       "dateEnd": "",
-      "pair": "EURUSD",
-      "strategy": "",
+      "pair": "BTCUSD",
+      "strategy": "intraweek w-d-h4-m15",
       "setup": "",
       "idea": "",
-      "trades": []
+      "trades": [
+        {
+          "id": "mqv1g3fj837o7",
+          "dateOpen": "2026-06-25T08:45",
+          "dateClose": "",
+          "pair": "BTCUSD",
+          "session": "london",
+          "direction": "long",
+          "result": "tp",
+          "rr": 2.4,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "OB"
+            ],
+            "H1": [],
+            "M15": [
+              "Continuation"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {},
+          "screenshots": [],
+          "quickTest": true
+        },
+        {
+          "id": "mqv1p82tc0v8t",
+          "dateOpen": "2026-06-26T15:30",
+          "dateClose": "2026-06-26T11:00",
+          "pair": "BTCUSD",
+          "session": "ny",
+          "direction": "long",
+          "result": "tp",
+          "rr": 2.78,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "Sweep Liq"
+            ],
+            "H1": [],
+            "M15": [
+              "SMR + FVG"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {},
+          "screenshots": [],
+          "quickTest": true
+        },
+        {
+          "id": "mqv1txldr3nai",
+          "dateOpen": "2026-06-26T10:00",
+          "dateClose": "2026-06-26T11:00",
+          "pair": "BTCUSD",
+          "session": "london",
+          "direction": "short",
+          "result": "tp",
+          "rr": 2.02,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "Sweep Liq"
+            ],
+            "H1": [],
+            "M15": [
+              "OB + FVG"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {},
+          "screenshots": [],
+          "quickTest": true
+        },
+        {
+          "id": "mqv23b7igk7f1",
+          "dateOpen": "2026-06-23T16:45",
+          "dateClose": "2026-06-23T11:00",
+          "pair": "BTCUSD",
+          "session": "other",
+          "direction": "long",
+          "result": "tp",
+          "rr": 4.98,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "FVG"
+            ],
+            "H1": [],
+            "M15": [
+              "OB + FVG"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mqv29a44u4lv2",
+          "dateOpen": "2026-06-26T10:00",
+          "dateClose": "2026-06-26T11:00",
+          "pair": "BTCUSD",
+          "session": "london",
+          "direction": "long",
+          "result": "tp",
+          "rr": 3.12,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "FVG",
+              "Sweep Liq"
+            ],
+            "H1": [],
+            "M15": [
+              "OB + FVG"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {},
+          "screenshots": [],
+          "quickTest": true
+        },
+        {
+          "id": "mqv2owabl8l06",
+          "dateOpen": "2026-06-22T18:15",
+          "dateClose": "2026-06-22T11:00",
+          "pair": "BTCUSD",
+          "session": "ny-pm",
+          "direction": "long",
+          "result": "tp",
+          "rr": 2.05,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "Sweep Liq"
+            ],
+            "H1": [],
+            "M15": [
+              "Continuation"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {},
+          "screenshots": [],
+          "quickTest": true
+        }
+      ]
     }
   ],
-  "activeBtId": "mo1je4rmjopwn",
-  "savedAt": "2026-06-26T10:57:42.512Z"
+  "activeBtId": "mqv0dr4eyaxl0",
+  "savedAt": "2026-06-26T15:15:23.128Z"
 }

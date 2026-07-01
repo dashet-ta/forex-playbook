@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💹 SMC Suite</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💹</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230d1117'/><line x1='6' y1='3' x2='6' y2='29' stroke='%2322c55e' stroke-width='2'/><rect x='3' y='9' width='6' height='9' rx='1.5' fill='%2322c55e'/><line x1='16' y1='2' x2='16' y2='29' stroke='%23ef4444' stroke-width='2'/><rect x='13' y='5' width='6' height='11' rx='1.5' fill='%23ef4444'/><line x1='26' y1='5' x2='26' y2='29' stroke='%2322c55e' stroke-width='2'/><rect x='23' y='11' width='6' height='10' rx='1.5' fill='%2322c55e'/></svg>">
 <style>
   :root {
     --bg:      #0d0f14;
@@ -130,16 +130,33 @@
 
 <script>
   const TAB_LABELS = { fxnews: 'FX News', backtest: 'SMC Backtest', plan: 'Trading Plan' };
+  let currentTab = 'fxnews';
 
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('iframe').forEach(f => f.classList.remove('active'));
     document.getElementById('tab-' + name).classList.add('active');
     document.getElementById('frame-' + name).classList.add('active');
-    document.title = '💹 ' + (TAB_LABELS[name] || 'SMC Suite');
-    // persist last active tab across reloads
+    currentTab = name;
+    document.title = '📊 ' + (TAB_LABELS[name] || 'SMC Suite');
     localStorage.setItem('smc_suite_tab', name);
   }
+
+  // Blink title when tab is in background
+  let blinkInterval = null;
+  let blinkState = false;
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      blinkInterval = setInterval(() => {
+        const label = TAB_LABELS[currentTab] || 'SMC Suite';
+        document.title = blinkState ? '🟢 ' + label : '⚡ ' + label;
+        blinkState = !blinkState;
+      }, 1000);
+    } else {
+      clearInterval(blinkInterval);
+      document.title = '📊 ' + (TAB_LABELS[currentTab] || 'SMC Suite');
+    }
+  });
 
   // Restore last tab on load
   const saved = localStorage.getItem('smc_suite_tab');

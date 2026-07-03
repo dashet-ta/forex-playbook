@@ -105,11 +105,14 @@
           },
           "mistakes": [],
           "notes": [],
-          "targets": [
-            "Int. Liquidity"
-          ],
-          "screenshots": [],
-          "btId": "mo1je4rmjopwn"
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
         },
         {
           "id": "mo1nfcnxmhvdw",
@@ -952,185 +955,6 @@
       ]
     },
     {
-      "id": "mq7xq013uvy6j",
-      "dict": {
-        "mistakes": [
-          "неуважність"
-        ],
-        "notes": [
-          "Вхід ліміткою від M15 FVG",
-          "Пропустила h1 вхід, продовжила зв'язку h4-m15",
-          "Контртренд - корекція",
-          "0.5 зони імбаланса",
-          "Лімітка"
-        ],
-        "targets": [],
-        "tfTools": {
-          "W1": [
-            "Ext.liq. sweep",
-            "FVG"
-          ],
-          "D1": [
-            "OB",
-            "Sweep"
-          ],
-          "H4": [
-            "Int. liq. sweep"
-          ],
-          "H1": [
-            "OB",
-            "FVG"
-          ],
-          "M15": [
-            "ob",
-            "QM + FVG",
-            "fvg"
-          ]
-        },
-        "targetTools": {
-          "W1": [],
-          "D1": [
-            "Liquidity"
-          ],
-          "H4": [
-            "fvg"
-          ],
-          "H1": [],
-          "M15": []
-        }
-      },
-      "name": "Intraweek+ solva entry model",
-      "dateStart": "",
-      "dateEnd": "",
-      "pair": "EURUSD",
-      "strategy": "",
-      "setup": "",
-      "idea": "TDA--> POI--> 3 candels pattern--> ob+fvg model\nd1h1\nh4m15",
-      "trades": [
-        {
-          "id": "mq7yhy74m8adb",
-          "dateOpen": "2018-06-04T16:00",
-          "dateClose": "2018-06-07T08:00",
-          "pair": "EURUSD",
-          "session": "ny",
-          "direction": "long",
-          "result": "tp",
-          "rr": 2.21,
-          "risk": 1,
-          "setup": {
-            "W1": [
-              "Ext.liq. sweep",
-              "FVG"
-            ],
-            "D1": [
-              "OB"
-            ],
-            "H4": [
-              "Int. liq. sweep"
-            ],
-            "H1": [],
-            "M15": [
-              "ob",
-              "QM + FVG"
-            ]
-          },
-          "mistakes": [],
-          "notes": [
-            "Вхід ліміткою від M15 FVG"
-          ],
-          "targets": {
-            "W1": [],
-            "D1": [
-              "Liquidity"
-            ],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": [],
-          "btId": "mq7xq013uvy6j"
-        },
-        {
-          "id": "mq7ywb0tzf78n",
-          "dateOpen": "2018-06-08T01:00",
-          "dateClose": "2018-06-08T11:00",
-          "pair": "EURUSD",
-          "session": "other",
-          "direction": "short",
-          "result": "tp",
-          "rr": 3.1,
-          "risk": 1,
-          "setup": {
-            "W1": [],
-            "D1": [
-              "Sweep"
-            ],
-            "H4": [],
-            "H1": [
-              "OB",
-              "FVG"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [
-            "Контртренд - корекція",
-            "0.5 зони імбаланса",
-            "Лімітка"
-          ],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [
-              "fvg"
-            ],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": [],
-          "btId": "mq7xq013uvy6j"
-        },
-        {
-          "id": "mq7zu3zpk2lv7",
-          "dateOpen": "2018-06-11T16:00",
-          "dateClose": "2018-06-11T23:00",
-          "pair": "EURUSD",
-          "session": "ny",
-          "direction": "long",
-          "result": "sl",
-          "rr": -1,
-          "risk": 1,
-          "setup": {
-            "W1": [],
-            "D1": [
-              "OB"
-            ],
-            "H4": [
-              "Int. liq. sweep"
-            ],
-            "H1": [],
-            "M15": [
-              "ob",
-              "fvg"
-            ]
-          },
-          "mistakes": [
-            "неуважність"
-          ],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": [],
-          "btId": "mq7xq013uvy6j"
-        }
-      ]
-    },
-    {
       "id": "mqv0dr4eyaxl0",
       "dict": {
         "mistakes": [],
@@ -1143,13 +967,17 @@
             "iFVG",
             "OB",
             "Sweep Liq",
-            "FVG"
+            "FVG",
+            "Int. liq. sweep"
           ],
           "H1": [],
           "M15": [
             "SMR + FVG",
             "Continuation",
-            "OB + FVG"
+            "OB + FVG",
+            "ob",
+            "QM",
+            "Liquidity sweep"
           ]
         },
         "targetTools": {
@@ -1193,7 +1021,8 @@
           "notes": [],
           "targets": {},
           "screenshots": [],
-          "quickTest": true
+          "quickTest": true,
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mqv1p82tc0v8t",
@@ -1220,7 +1049,8 @@
           "notes": [],
           "targets": {},
           "screenshots": [],
-          "quickTest": true
+          "quickTest": true,
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mqv1txldr3nai",
@@ -1247,7 +1077,8 @@
           "notes": [],
           "targets": {},
           "screenshots": [],
-          "quickTest": true
+          "quickTest": true,
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mqv23b7igk7f1",
@@ -1279,7 +1110,8 @@
             "H1": [],
             "M15": []
           },
-          "screenshots": []
+          "screenshots": [],
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mqv29a44u4lv2",
@@ -1307,7 +1139,8 @@
           "notes": [],
           "targets": {},
           "screenshots": [],
-          "quickTest": true
+          "quickTest": true,
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mqv2owabl8l06",
@@ -1334,11 +1167,300 @@
           "notes": [],
           "targets": {},
           "screenshots": [],
-          "quickTest": true
+          "quickTest": true,
+          "btId": "mqv0dr4eyaxl0"
+        },
+        {
+          "id": "mr277njiffsmj",
+          "dateOpen": "2026-07-01T12:30",
+          "dateClose": "",
+          "pair": "BTCUSD",
+          "session": "other",
+          "direction": "long",
+          "result": "tp",
+          "rr": 4.17,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "Int. liq. sweep"
+            ],
+            "H1": [],
+            "M15": [
+              "ob"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mr29ce1o8536e",
+          "dateOpen": "2026-07-01T08:45",
+          "dateClose": "",
+          "pair": "BTCUSD",
+          "session": "london",
+          "direction": "long",
+          "result": "tp",
+          "rr": 4.76,
+          "risk": 1,
+          "setup": {
+            "W1": [],
+            "D1": [],
+            "H4": [
+              "OB"
+            ],
+            "H1": [],
+            "M15": [
+              "ob",
+              "Continuation",
+              "Liquidity sweep"
+            ]
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
         }
       ]
+    },
+    {
+      "id": "mr3kr9jep8lzg",
+      "trades": [
+        {
+          "id": "mr3l3rwyd6ma9",
+          "dateOpen": "2022-08-27T08:00",
+          "dateClose": "20200-08-31T06:00",
+          "pair": "Other",
+          "session": "london",
+          "direction": "long",
+          "result": "tp",
+          "rr": 3.64,
+          "risk": 2,
+          "setup": {
+            "W1": [
+              "FVG"
+            ],
+            "D1": [],
+            "H4": [
+              "2d candle sweep",
+              "FVG"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mr3lawza573q3",
+          "dateOpen": "2026-07-02T14:17",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "ny",
+          "direction": "long",
+          "result": "sl",
+          "rr": -1,
+          "risk": 2,
+          "setup": {
+            "W1": [
+              "FVG"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG",
+              "2d candle sweep",
+              "Continuation flow"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mr3lkdujayjqf",
+          "dateOpen": "2021-09-01T13:00",
+          "dateClose": "2021-09-08T04:00",
+          "pair": "Other",
+          "session": "other",
+          "direction": "long",
+          "result": "tp",
+          "rr": 2.82,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "rb",
+              "ATH"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mr3q4mlb4jjjc",
+          "dateOpen": "2026-07-02T13:00",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "other",
+          "direction": "short",
+          "result": "tp",
+          "rr": 2.58,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "Ext.liq. sweep"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG"
+            ],
+            "H1": [
+              "i-FVG",
+              "лімітка"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        },
+        {
+          "id": "mr3qekpa3ai7o",
+          "dateOpen": "2026-07-02T16:40",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "ny",
+          "direction": "short",
+          "result": "tp",
+          "rr": 2.28,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "Ext.liq. sweep"
+            ],
+            "D1": [],
+            "H4": [
+              "Int. liq. sweep"
+            ],
+            "H1": [
+              "i-FVG",
+              "OB",
+              "лімітка"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": []
+        }
+      ],
+      "dict": {
+        "mistakes": [],
+        "notes": [],
+        "targets": [],
+        "tfTools": {
+          "W1": [
+            "FVG",
+            "rb",
+            "ATH",
+            "Ext.liq. sweep"
+          ],
+          "D1": [],
+          "H4": [
+            "2d candle sweep",
+            "FVG",
+            "Continuation flow",
+            "Int. liq. sweep"
+          ],
+          "H1": [
+            "OB",
+            "i-FVG",
+            "лімітка"
+          ],
+          "M15": []
+        },
+        "targetTools": {
+          "W1": [],
+          "D1": [],
+          "H4": [],
+          "H1": [],
+          "M15": []
+        }
+      },
+      "name": "GER swing w-d-h4-h1",
+      "dateStart": "",
+      "dateEnd": "",
+      "pair": "Other",
+      "strategy": "",
+      "setup": "",
+      "idea": ""
     }
   ],
-  "activeBtId": "mqv0dr4eyaxl0",
-  "savedAt": "2026-06-26T15:15:23.128Z"
+  "activeBtId": "mr3kr9jep8lzg",
+  "savedAt": "2026-07-02T16:41:21.752Z"
 }

@@ -112,7 +112,8 @@
             "H1": [],
             "M15": []
           },
-          "screenshots": []
+          "screenshots": [],
+          "btId": "mo1je4rmjopwn"
         },
         {
           "id": "mo1nfcnxmhvdw",
@@ -1200,7 +1201,8 @@
             "H1": [],
             "M15": []
           },
-          "screenshots": []
+          "screenshots": [],
+          "btId": "mqv0dr4eyaxl0"
         },
         {
           "id": "mr29ce1o8536e",
@@ -1234,191 +1236,13 @@
             "H1": [],
             "M15": []
           },
-          "screenshots": []
+          "screenshots": [],
+          "btId": "mqv0dr4eyaxl0"
         }
       ]
     },
     {
       "id": "mr3kr9jep8lzg",
-      "trades": [
-        {
-          "id": "mr3l3rwyd6ma9",
-          "dateOpen": "2022-08-27T08:00",
-          "dateClose": "20200-08-31T06:00",
-          "pair": "Other",
-          "session": "london",
-          "direction": "long",
-          "result": "tp",
-          "rr": 3.64,
-          "risk": 2,
-          "setup": {
-            "W1": [
-              "FVG"
-            ],
-            "D1": [],
-            "H4": [
-              "2d candle sweep",
-              "FVG"
-            ],
-            "H1": [
-              "OB"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": []
-        },
-        {
-          "id": "mr3lawza573q3",
-          "dateOpen": "2026-07-02T14:17",
-          "dateClose": "",
-          "pair": "Other",
-          "session": "ny",
-          "direction": "long",
-          "result": "sl",
-          "rr": -1,
-          "risk": 2,
-          "setup": {
-            "W1": [
-              "FVG"
-            ],
-            "D1": [],
-            "H4": [
-              "FVG",
-              "2d candle sweep",
-              "Continuation flow"
-            ],
-            "H1": [
-              "OB"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": []
-        },
-        {
-          "id": "mr3lkdujayjqf",
-          "dateOpen": "2021-09-01T13:00",
-          "dateClose": "2021-09-08T04:00",
-          "pair": "Other",
-          "session": "other",
-          "direction": "long",
-          "result": "tp",
-          "rr": 2.82,
-          "risk": 1,
-          "setup": {
-            "W1": [
-              "rb",
-              "ATH"
-            ],
-            "D1": [],
-            "H4": [
-              "FVG"
-            ],
-            "H1": [
-              "OB"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": []
-        },
-        {
-          "id": "mr3q4mlb4jjjc",
-          "dateOpen": "2026-07-02T13:00",
-          "dateClose": "",
-          "pair": "Other",
-          "session": "other",
-          "direction": "short",
-          "result": "tp",
-          "rr": 2.58,
-          "risk": 1,
-          "setup": {
-            "W1": [
-              "Ext.liq. sweep"
-            ],
-            "D1": [],
-            "H4": [
-              "FVG"
-            ],
-            "H1": [
-              "i-FVG",
-              "лімітка"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": []
-        },
-        {
-          "id": "mr3qekpa3ai7o",
-          "dateOpen": "2026-07-02T16:40",
-          "dateClose": "",
-          "pair": "Other",
-          "session": "ny",
-          "direction": "short",
-          "result": "tp",
-          "rr": 2.28,
-          "risk": 1,
-          "setup": {
-            "W1": [
-              "Ext.liq. sweep"
-            ],
-            "D1": [],
-            "H4": [
-              "Int. liq. sweep"
-            ],
-            "H1": [
-              "i-FVG",
-              "OB",
-              "лімітка"
-            ],
-            "M15": []
-          },
-          "mistakes": [],
-          "notes": [],
-          "targets": {
-            "W1": [],
-            "D1": [],
-            "H4": [],
-            "H1": [],
-            "M15": []
-          },
-          "screenshots": []
-        }
-      ],
       "dict": {
         "mistakes": [],
         "notes": [],
@@ -1458,9 +1282,193 @@
       "pair": "Other",
       "strategy": "",
       "setup": "",
-      "idea": ""
+      "idea": "",
+      "trades": [
+        {
+          "id": "mr3l3rwyd6ma9",
+          "dateOpen": "2022-08-27T08:00",
+          "dateClose": "20200-08-31T06:00",
+          "pair": "Other",
+          "session": "london",
+          "direction": "long",
+          "result": "tp",
+          "rr": 3.64,
+          "risk": 2,
+          "setup": {
+            "W1": [
+              "FVG"
+            ],
+            "D1": [],
+            "H4": [
+              "2d candle sweep",
+              "FVG"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": [],
+          "btId": "mr3kr9jep8lzg"
+        },
+        {
+          "id": "mr3lawza573q3",
+          "dateOpen": "2026-07-02T14:17",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "ny",
+          "direction": "long",
+          "result": "sl",
+          "rr": -1,
+          "risk": 2,
+          "setup": {
+            "W1": [
+              "FVG"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG",
+              "2d candle sweep",
+              "Continuation flow"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": [],
+          "btId": "mr3kr9jep8lzg"
+        },
+        {
+          "id": "mr3lkdujayjqf",
+          "dateOpen": "2021-09-01T13:00",
+          "dateClose": "2021-09-08T04:00",
+          "pair": "Other",
+          "session": "other",
+          "direction": "long",
+          "result": "tp",
+          "rr": 2.82,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "rb",
+              "ATH"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG"
+            ],
+            "H1": [
+              "OB"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": [],
+          "btId": "mr3kr9jep8lzg"
+        },
+        {
+          "id": "mr3q4mlb4jjjc",
+          "dateOpen": "2026-07-02T13:00",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "other",
+          "direction": "short",
+          "result": "tp",
+          "rr": 2.58,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "Ext.liq. sweep"
+            ],
+            "D1": [],
+            "H4": [
+              "FVG"
+            ],
+            "H1": [
+              "i-FVG",
+              "лімітка"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": [],
+          "btId": "mr3kr9jep8lzg"
+        },
+        {
+          "id": "mr3qekpa3ai7o",
+          "dateOpen": "2026-07-02T16:40",
+          "dateClose": "",
+          "pair": "Other",
+          "session": "ny",
+          "direction": "short",
+          "result": "tp",
+          "rr": 2.28,
+          "risk": 1,
+          "setup": {
+            "W1": [
+              "Ext.liq. sweep"
+            ],
+            "D1": [],
+            "H4": [
+              "Int. liq. sweep"
+            ],
+            "H1": [
+              "i-FVG",
+              "OB",
+              "лімітка"
+            ],
+            "M15": []
+          },
+          "mistakes": [],
+          "notes": [],
+          "targets": {
+            "W1": [],
+            "D1": [],
+            "H4": [],
+            "H1": [],
+            "M15": []
+          },
+          "screenshots": [],
+          "btId": "mr3kr9jep8lzg"
+        }
+      ]
     }
   ],
   "activeBtId": "mr3kr9jep8lzg",
-  "savedAt": "2026-07-02T16:41:21.752Z"
+  "savedAt": "2026-07-03T11:24:24.328Z"
 }
